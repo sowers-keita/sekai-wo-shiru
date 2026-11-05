@@ -96,6 +96,7 @@ function earnYen(p, n) { const y = yenOf(p); const d = p.dev || 'd0'; y.e[d] = (
 function spendYen(p, n, why) { if (!(n > 0) || yenBal(p) < n) return false; yenOf(p).s.push({ id: (p.dev || 'd0') + '-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), n, why, at: Date.now() }); p.coins = yenBal(p); return true; }
 function mergeYen(p, a, b) { const ya = (a && a.yen) || null, yb = (b && b.yen) || null; if (!ya && !yb) return; const e = {}; for (const y of [ya, yb]) if (y) for (const [k, v] of Object.entries(y.e || {})) e[k] = Math.max(e[k] || 0, v); const s = new Map(); for (const y of [ya, yb]) if (y) for (const x of y.s || []) s.set(x.id, x); p.yen = { e, s: [...s.values()].sort((x, z) => x.at - z.at), mig: 1 }; p.coins = yenBal(p); }
 export function sekaiWallet() { const p = loadProgress(); return { yen: yenBal(p), earned: Object.values(yenOf(p).e).reduce((a, b) => a + b, 0), spent: yenOf(p).s.slice() }; }
+export function sekaiEarn(n) { if (!(n > 0)) return false; const p = loadProgress(); earnYen(p, Math.round(n)); saveProgress(p); return true; } // ほかの ゲームで もらった えん（おなじ さいふ）
 export function sekaiSpend(n, why) { const p = loadProgress(); const ok = spendYen(p, n, why || 'ゲーム'); if (ok) { saveProgress(p); sekaiSync().catch(() => {}); } return ok; } // ほかの ゲームで かいものを したとき
 // ───────── かぞくで おなじ きろく（MEGAPAD・スマホ どれでも おなじ。Supabase に まなびコードの かたちで あずける）
 const SB_URL = 'https://ihdrkukgeqqktzxmlrzy.supabase.co', SB_KEY = 'sb_publishable_-Q-BiuJ-PqeUG04nOcVnRA_LL9Ri3J3', FAM_KEY = 'sekai-family';

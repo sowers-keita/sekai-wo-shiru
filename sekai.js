@@ -213,7 +213,11 @@ function speakParts(hs, opt) { return new Promise((res) => { let done = false; c
   Promise.all(hs.map((h) => vBuf(h))).then((bs) => { const c = ac(); if (g !== sayGen || !c || bs.some((b) => !b)) { fin(); return; } const rate = opt.fast ? 1.12 : 1; let t = c.currentTime + 0.02, last = null; const srcs = [];
     for (const b of bs) { const s = c.createBufferSource(); s.buffer = b; s.playbackRate.value = rate; s.connect(c.destination); s.start(t); t += b.duration / rate - 0.06; srcs.push(s); last = s; }
     curSrc = { stop: () => srcs.forEach((s) => { try { s.stop(); } catch (e) {} }) }; last.onended = fin; setTimeout(fin, (t - c.currentTime) * 1000 + 800); }).catch(fin); }); }
+function enFileH(text, slow) { if (!VM) return null; const k = 'en|' + String(text).trim(); let h = vHash(k + (slow ? '|s' : '')); if (!VM.has(h)) h = vHash(k); return VM.has(h) ? h : null; } // えいごは ネイティブの こえの ファイル（ゆっくりは ゆっくり よんだ ファイル）
+function playH(h, text, opt) { return new Promise((res) => { let done = false; const fin = () => { if (!done) { done = true; speakingN = Math.max(0, speakingN - 1); res(); } }; speakingN++; const g = sayGen;
+  vBuf(h).then((b) => { const c = ac(); if (g !== sayGen) { fin(); return; } if (!b || !c) { ttsNow(text, opt).then(fin); return; } const s = c.createBufferSource(); s.buffer = b; s.connect(c.destination); s.onended = fin; curSrc = s; s.start(); setTimeout(fin, b.duration * 1000 + 700); }).catch(() => { ttsNow(text, opt).then(fin); }); }); }
 function speakNow(text, opt = {}) {
+  if (voiceOn && opt.en && VM && location.protocol !== 'file:') { const h = enFileH(text, opt.slow); if (h) return playH(h, text, opt); }
   if (voiceOn && !opt.en && VM && location.protocol !== 'file:') { const tk = vToks(vNorm(text)); if (tk.length > 1 && !VM.has(vHash(vNorm(text))) && tk.every((x) => VM.has(vHash(x)))) return speakParts(tk.map(vHash), opt); }
   if (voiceOn && !opt.en && VM) { const h = vHash(vNorm(text)); if (VM.has(h)) return new Promise((res) => {
     let done = false; const fin = () => { if (!done) { done = true; speakingN = Math.max(0, speakingN - 1); res(); } }; speakingN++; const g = sayGen;
@@ -230,7 +234,7 @@ function ttsNow(text, opt = {}) {
     if (!voiceOn || !window.speechSynthesis) { setTimeout(res, Math.min(2600, 400 + text.length * 90)); return; }
     try {
       const u = new SpeechSynthesisUtterance(noEmo(text).replace(/\n/g, '。').replace(/＋/g, 'たす').replace(/−/g, 'ひく').replace(/＝ ？/g, 'は？').replace(/＝/g, 'は'));
-      u.lang = opt.en ? 'en-US' : 'ja-JP'; u.rate = opt.en ? (opt.slow ? 0.5 : 0.62) : opt.fast ? 1.15 : opt.slow ? 0.85 : 0.95; if (opt.en) { const v = enVoice(); if (v) u.voice = v; } u.pitch = 1.12;
+      u.lang = opt.en ? 'en-US' : 'ja-JP'; u.rate = opt.en ? (opt.slow ? 0.75 : 0.9) : opt.fast ? 1.15 : opt.slow ? 0.85 : 0.95; if (opt.en) { const v = enVoice(); if (v) u.voice = v; } u.pitch = opt.en ? 1 : 1.12;
       let done = false; const fin = () => { if (!done) { done = true; res(); } };
       u.onend = fin; u.onerror = fin; setTimeout(fin, 1500 + text.length * (opt.slow ? 380 : 300)); // onend が こない たんまつ むけの ほけん（ながめに）
       speechSynthesis.speak(u);
@@ -1969,7 +1973,7 @@ export function openSekai(opt0 = {}) {
     const tag = q.retry ? `🔁 ${q.retry}` : `${S.ic} ${S.n} ・ ${q.skn}${q.peek ? ' ・ ⭐ つぎの つきを ちょっとだけ' : q.chal ? ' ・ ⭐チャレンジ' : q.isNew ? '' : ' ・ ふくしゅう'}`;
     const mo = MON[q.sk]; const hard = !!(q.chal || q.peek); const mb = mo != null ? `<div class="sk-mb${hard ? ' hard' : ''}" style="--c:${S.col}">${hard ? '<b>⭐ むずかしい！</b>' : ''}<span>${MON_EMO[mo]}</span>1ねんせい <em>${mo}がつ</em>${TB_PAGE[q.sk] ? `<small>きょうかしょ ${TB_PAGE[q.sk]}ページ</small>` : ''}</div>` : sj === 'eigo' ? `<div class="sk-mb" style="--c:${S.col}"><span>🔤</span>えいご <em>レベル ${S.L.findIndex((x) => x.id === q.sk) + 1}</em></div>` : '';
     main.innerHTML = `${mb}<div class="sk-tag${q.retry ? ' re' : ''}" style="color:${S.col}">${tag}</div><div class="sk-q">${q.text}<button class="sk-say" tabindex="-1">🔊</button></div><div class="sk-viz">${q.viz || ''}</div><div class="sk-ch ${q.emoji ? 'emo' : q.txt ? 'txt' : q.bigC ? 'big' : ''}"></div>`;
-    const ch = main.querySelector('.sk-ch'); if (q.sayQ && !q.sayEn) vPrefetch(q.sayQ); (q.steps || []).slice(0, 2).forEach((s) => s && !s.en && !s.mix && vPrefetch(s.s));
+    const ch = main.querySelector('.sk-ch'); if (q.sayQ && !q.sayEn) vPrefetch(q.sayQ); if (q.sayQ && q.sayEn) [false, true].forEach((sl) => { const h = enFileH(q.sayQ, sl); if (h && !VBUF.has(h)) vBuf(h).catch(() => {}); }); (q.steps || []).slice(0, 2).forEach((s) => s && !s.en && !s.mix && vPrefetch(s.s));
     if (opt.debug) window.__skQ = q; for (const c of q.choices) { const b = el('button', '', c); if (opt.debug) b.dataset.c = c; b.onclick = () => answer(b, c); ch.appendChild(b); }
     const sayQ = () => (q.sayEn ? say(q.sayQ, { en: true }) : say(q.sayQ));
     main.querySelector('.sk-say').onclick = sayQ;

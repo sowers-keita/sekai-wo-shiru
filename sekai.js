@@ -1041,8 +1041,10 @@ const TB_KOKUGO = (() => {
     { lv: 1, q: 'のりものの ことは、なにで しらべる？', a: '{本|ほん}や ずかん', ng: ['テレビの アニメ', 'てがみ', 'おりがみ'], k: '{本|ほん}や ずかんで しらべる' },
     F(2, (d) => ask({ q: '「やく{目|め}」が かいて ある {文|ぶん}は どれ？', sq: 'やくめ が かいて ある ぶんは どれ？', a: pick(YAKU), ng: TSUKURI, w: 'やくめは、その のりものが「なにを するか」。おしごとの こと', nw: Object.fromEntries(TSUKURI.map((x) => [x, 'これは、のりものに「なにが あるか」の ぶん。つくりの せつめいだよ'])) }, d)),
     F(2, (d) => ask({ q: '「つくり」が かいて ある {文|ぶん}は どれ？', sq: 'つくり が かいて ある ぶんは どれ？', a: pick(TSUKURI), ng: YAKU, w: 'つくりは、のりものに「なにが あるか」', nw: Object.fromEntries(YAKU.map((x) => [x, 'これは、のりものが「なにを するか」の ぶん。やくめの せつめいだよ'])) }, d)),
-    F(2, (d) => kjR([{ s: '[本|ほん]で しらべる。', ng: ['き', 'もと', 'ぼん'] }, { s: 'ずかんの [本|ほん]を よむ。', ng: ['き', 'ひと', 'やす'] }], d)),
-    F(3, (d) => kjW([{ s: '[本|ほん]で しらべる', ng: ['木', '休', '大'], w: 'きの したに よこぼう。きの ねもとを あらわす' }], d)),
+    F(2, (d) => (Math.random() < 0.5 ? kjR([{ s: '[本|ほん]で しらべる。', ng: ['き', 'もと', 'ぼん'] }, { s: 'ずかんの [本|ほん]を よむ。', ng: ['き', 'ひと', 'やす'] }], d) : kjR([{ s: '[車|くるま]の しごと。', ng: ['しゃ', 'くる', 'ま'] }, { s: '[土|つち]を はこぶ。', ng: ['ど', 'と', 'ち'] }], d))),
+    F(3, (d) => kjW([{ s: '[本|ほん]で しらべる', ng: ['木', '休', '大'], w: 'きの したに よこぼう。きの ねもとを あらわす' }, { s: 'じどう[車|しゃ]', ng: ['東', '早', '日'], w: 'くるまを うえから みた かたち' }, { s: '[土|つち]や すな', ng: ['上', '士', '工'], w: 'したの よこぼうが ながいよ' }], d)),
+    { lv: 2, t: 'しょうぼうていは、{火|か}じを けす ための ふねです。ポンプや ホースを つんで います。', q: 'しょうぼうていが つんで いる ものは？', a: 'ポンプや ホース', ng: ['あみ', 'きゃくしつ', '{土|つち}や すな'], k: 'ポンプや ホースを つんで います' },
+    { lv: 2, t: 'ぎょせんは、さかなを とる ための ふねです。あみを つんで います。', q: 'ぎょせんの やく{目|め}は？', a: 'さかなを とる', ng: ['{火|か}じを けす', '{人|ひと}を はこぶ', '{土|つち}を はこぶ'], k: 'さかなを とる ための ふね' },
   ];
 
   // ───── まとめて よぶ ことば
@@ -1532,7 +1534,14 @@ function build(S, idx, frac, isNew, sj, r) {
   return q;
 }
 // mode：'easy'＝はじめの 2もん（できている ところから）／'down'＝つづけて まちがえた あと（ひとつ やさしく）
-function makeQ(p, sj, mode) {
+// おなじ もんだい・おなじ こたえが つづかないように：さいきんの ものと かぶったら つくりなおす
+const RECENT = []; const rKey = (t) => String(t ?? '').replace(/\{([^|}]*)\|[^}]*\}/g, '$1').replace(/<[^>]+>/g, '').replace(/[\s　。、]/g, '');
+function makeQ(p, sj, mode) { if (FORCE) return makeQ0(p, sj, mode);
+  const win = sj === 'math' ? 5 : 10; let q = null;
+  for (let t = 0; t < 12; t++) { q = makeQ0(p, sj, t >= 8 && !mode ? 'easy' : mode); const a = rKey(q.ans), x = rKey(q.text) + '|' + rKey(q.sayQ);
+    const near = RECENT.filter((r) => r.sj === sj).slice(-win); if (!near.some((r) => r.a === a) && !RECENT.slice(-30).some((r) => r.x === x)) break; }
+  RECENT.push({ sj, a: rKey(q.ans), x: rKey(q.text) + '|' + rKey(q.sayQ) }); if (RECENT.length > 60) RECENT.shift(); return q; }
+function makeQ0(p, sj, mode) {
   if (FORCE) for (const k of Object.keys(SUBJ)) { const i = SUBJ[k].L.findIndex((s) => s.id === FORCE); if (i >= 0) return build(SUBJ[k], i, window.__forceD != null ? window.__forceD : 0.5, true, k, p.subj[k].r); }
   const S = SUBJ[sj], r = p.subj[sj].r, cap = capOf(p, sj), top = Math.min(S.L.length - 1, Math.floor(r), cap); const frac = Math.floor(r) > cap ? 1 : r - Math.floor(r);
   // えらんだ つきより さきは「ちょっと チャレンジ」で すこしだけ（とくいな ところは さきへ）

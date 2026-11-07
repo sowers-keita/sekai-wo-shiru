@@ -1500,7 +1500,9 @@ function hopRun(from, n, dir = 1) { return async (stage, alive) => { for (let i 
 // つまずいた ときに もどる「もとに なる たんげん」
 const PRE = { m_carry9: 'm_make10', m_carry87: 'm_make10', m_carry: 'm_make10', m_carry2: 'm_make10', m_borrow: 'm_bunkai', m_borrow2: 'm_bunkai', m_sub1x: 'm_teen', m_teen: 'm_count', m_add10: 'm_count', m_sub10: 'm_bunkai', m_make10: 'm_bunkai', m_three: 'm_add10', m_word: 'm_add10' };
 const MULTI = new Set(['m_teen', 'm_carry', 'm_word', 'k_shugo', 'k_kanjiR', 'k_jun', 'k_kimochi']);
+const WORDQ = new Set(['tm_hiku_bun', 'tm_mono', 'tm_junban', 'tm_tasuhiku', 'tm_nanju', 'tm_nanjuto', 'tm_2keta', 'tm_2nen_bun', 'tm_ooi']); // ぶんしょうだいは もんだいで ことばを ふとじに しない（よんで きづく ちからを つける。せつめいでは つかう）
 function decorate(q) {
+  if (q && WORDQ.has(q.sk) && typeof q.text === 'string') q.text = q.text.replace(/<\/?b>/g, '');
   if (!q || q.altSteps !== undefined) return q;
   const t = String(q.text || '');
   q.fmt = q.sk === 'm_carry' && q.nums ? (q.nums[0] < q.nums[1] ? 's' : 'b') : q.sk === 'm_teen' ? (/は 10 と/.test(t) ? 'b' : 'a') : q.sk === 'k_shugo' ? (/だれ/.test(t) ? 'w' : 'o') : q.sk === 'k_kanjiR' ? (/sk-p/.test(q.viz || '') ? 'ctx' : 'word') : q.sk === 'k_jun' ? (/はじめ/.test(t) ? 'f' : 'l') : q.sk === 'm_word' ? t.slice(0, 6) : q.sk === 'k_kimochi' ? (/いちばん/.test(t) ? '3' : 'x' + t.length % 3) : 'a';

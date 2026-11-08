@@ -100,7 +100,8 @@ export function sekaiEarn(n) { if (!(n > 0)) return false; const p = loadProgres
 export function sekaiSpend(n, why) { const p = loadProgress(); const ok = spendYen(p, n, why || 'ゲーム'); if (ok) { saveProgress(p); sekaiSync().catch(() => {}); } return ok; } // ほかの ゲームで かいものを したとき
 // ───────── かぞくで おなじ きろく（MEGAPAD・スマホ どれでも おなじ。Supabase に まなびコードの かたちで あずける）
 const SB_URL = 'https://ihdrkukgeqqktzxmlrzy.supabase.co', SB_KEY = 'sb_publishable_-Q-BiuJ-PqeUG04nOcVnRA_LL9Ri3J3', FAM_KEY = 'sekai-family';
-const famGet = () => { try { return JSON.parse(localStorage.getItem(FAM_KEY) || 'null'); } catch (e) { return null; } };
+const HOME_FAM = { code: 'sekai-home-k1', pin: '4817' }; // かぞくだけで つかう：せっていなしで どの アプリ・たんまつも おなじ きろくに（ためしの とき・ローカルでは つながない）
+const famGet = () => { if (window.__skNoSync || location.protocol === 'file:' || /^(localhost|127\.)/.test(location.hostname)) return null; try { return JSON.parse(localStorage.getItem(FAM_KEY) || 'null') || HOME_FAM; } catch (e) { return HOME_FAM; } };
 const famSet = (f) => { try { if (f) localStorage.setItem(FAM_KEY, JSON.stringify(f)); else localStorage.removeItem(FAM_KEY); } catch (e) {} };
 async function sbRpc(fn, args) { const r = await fetch(SB_URL + '/rest/v1/rpc/' + fn, { method: 'POST', headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type': 'application/json' }, body: JSON.stringify(args) }); const t = await r.text(); if (!r.ok) throw new Error(/PIN_NG/.test(t) ? 'PIN_NG' : 'NET'); return t ? JSON.parse(t) : null; }
 let syncBusy = null;
@@ -1812,7 +1813,7 @@ export function openSekai(opt0 = {}) {
   const REDUCE = opt.motion === 'reduce' || (opt.motion !== 'full' && typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches);
   try { sekaiVoiceInit(opt.voiceBase || new URL('voice/', import.meta.url).href); } catch (e) {}
   if (!document.getElementById('skcss')) { const s = el('style'); s.id = 'skcss'; s.textContent = CSS; document.head.appendChild(s); }
-  voiceOn = opt.voice !== false; FORCE = opt.debug && opt.force ? opt.force : null;
+  voiceOn = opt.voice !== false; FORCE = opt.debug && opt.force ? opt.force : null; if (opt.debug) window.__skNoSync = 1;
   const p = loadProgress(); const gameId = opt.gameId || 'nakayoshi';
   if (famGet()) sekaiSync().then((r) => { if (r && r.ok) { const q = loadProgress(); Object.assign(p, q); try { coinUI(); if (main.querySelector('.sk-wallet')) home(); } catch (e) {} } });
   if (!p.tb1) { const st = { math: SUBJ.math.L.findIndex((s) => s.id === 'tm_hiku9'), kokugo: SUBJ.kokugo.L.findIndex((s) => TB_PAGE[s.id] >= 49) }; for (const k in st) if (st[k] > 0 && p.subj[k].r < st[k]) p.subj[k].r = st[k]; p.tb1 = 1; saveProgress(p); }

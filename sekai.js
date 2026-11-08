@@ -111,6 +111,10 @@ export function sekaiSync() { if (syncBusy) return syncBusy; const f = famGet();
     const put = await sbRpc('sekai_save', { p_code: f.code, p_pin: f.pin, p_data: { code: exportCode(p), at: Date.now() }, p_version: got ? got.version : 0 });
     if (put && !put.conflict) { famSet({ ...f, last: Date.now() }); return { ok: true }; } }
     return { ok: false, why: 'busy' }; } catch (e) { return { ok: false, why: e.message }; } finally { setTimeout(() => { syncBusy = null; }, 0); } })(); return syncBusy; }
+// ほかの アプリ（ショート×チャレンジ など）の せってい がめんから かぞくコードを つなぐ
+export function sekaiFamily(v) { if (v === undefined) { const f = famGet(); return f ? { code: f.code, last: f.last || null } : null; } if (v === null) { famSet(null); return Promise.resolve({ ok: true }); }
+  const code = String(v.code || '').trim().toLowerCase(), pin = String(v.pin || '').trim(); if (!/^[a-z0-9_-]{6,}$/.test(code) || !/^\d{4}$/.test(pin)) return Promise.resolve({ ok: false, why: 'FORMAT' });
+  famSet({ code, pin }); return sekaiSync().then((r) => { if (!r.ok) famSet(null); return r; }); }
 function mergeProgress0(a, b) {
   const p = JSON.parse(JSON.stringify(a)); const mx = (x, y) => Math.max(x || 0, y || 0);
   for (const k of Object.keys(b.subj || {})) { const x = p.subj[k] || (p.subj[k] = { r: 0, ok: 0, ng: 0 }), y = b.subj[k]; x.r = mx(x.r, y.r); x.ok = mx(x.ok, y.ok); x.ng = mx(x.ng, y.ng); }

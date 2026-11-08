@@ -105,12 +105,17 @@ const famGet = () => { if (window.__skNoSync || location.protocol === 'file:' ||
 const famSet = (f) => { try { if (f) localStorage.setItem(FAM_KEY, JSON.stringify(f)); else localStorage.removeItem(FAM_KEY); } catch (e) {} };
 async function sbRpc(fn, args) { const r = await fetch(SB_URL + '/rest/v1/rpc/' + fn, { method: 'POST', headers: { apikey: SB_KEY, Authorization: 'Bearer ' + SB_KEY, 'Content-Type': 'application/json' }, body: JSON.stringify(args) }); const t = await r.text(); if (!r.ok) throw new Error(/PIN_NG/.test(t) ? 'PIN_NG' : 'NET'); return t ? JSON.parse(t) : null; }
 let syncBusy = null;
+// アプリがわの きろく（ショート×チャレンジの みた じかん など）も いっしょに あずける：sekaiExtra(なまえ, いまの きろくを かえす, うけとった きろくを まぜる)
+const EXTRA = {};
+export function sekaiExtra(name, get, put) { EXTRA[name] = { get, put }; }
 export function sekaiSync() { if (syncBusy) return syncBusy; const f = famGet(); if (!f) return Promise.resolve({ ok: false, why: 'none' });
   syncBusy = (async () => { try { for (let tries = 0; tries < 3; tries++) {
     const got = await sbRpc('sekai_load', { p_code: f.code, p_pin: f.pin }); let p = loadProgress();
     if (got && got.data && got.data.code) { const m = importCode(got.data.code, 'merge'); if (m) { p = m; saveProgress(p); } }
-    const put = await sbRpc('sekai_save', { p_code: f.code, p_pin: f.pin, p_data: { code: exportCode(p), at: Date.now() }, p_version: got ? got.version : 0 });
-    if (put && !put.conflict) { famSet({ ...f, last: Date.now() }); return { ok: true }; } }
+    const gx = (got && got.data && got.data.x) || {}; for (const [k, e] of Object.entries(EXTRA)) if (gx[k] != null) try { e.put(gx[k]); } catch (er) {}
+    const x = { ...gx }; for (const [k, e] of Object.entries(EXTRA)) try { const v = e.get(); if (v != null) x[k] = v; } catch (er) {}
+    const put = await sbRpc('sekai_save', { p_code: f.code, p_pin: f.pin, p_data: { code: exportCode(p), at: Date.now(), x }, p_version: got ? got.version : 0 });
+    if (put && !put.conflict) { famSet({ ...f, last: Date.now() }); try { dispatchEvent(new CustomEvent('sekai-synced')); } catch (er) {} return { ok: true }; } }
     return { ok: false, why: 'busy' }; } catch (e) { return { ok: false, why: e.message }; } finally { setTimeout(() => { syncBusy = null; }, 0); } })(); return syncBusy; }
 // ほかの アプリ（ショート×チャレンジ など）の せってい がめんから かぞくコードを つなぐ
 export function sekaiFamily(v) { if (v === undefined) { const f = famGet(); return f ? { code: f.code, last: f.last || null } : null; } if (v === null) { famSet(null); return Promise.resolve({ ok: true }); }

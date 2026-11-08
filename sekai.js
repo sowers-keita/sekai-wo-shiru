@@ -1703,7 +1703,7 @@ const CSS = `
 .sk-ch{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;max-width:820px;width:100%}
 .sk-ch button{min-width:140px;min-height:96px;flex:1 1 140px;max-width:260px;border:none;border-radius:26px;background:#fff;font-size:34px;font-weight:900;box-shadow:0 7px 0 #d9c3ce;transition:transform .08s}
 .sk-ch button:active{transform:translateY(5px);box-shadow:0 2px 0 #d9c3ce}.sk-ch.big button{font-size:44px}.sk-ch.emo button{font-size:80px}
-.sk-ch button.rd{position:relative;padding-top:26px}.sk-ch .sk-chsay{position:absolute;right:8px;top:6px;font-size:22px;line-height:1;padding:4px 6px;border-radius:12px;background:#fff4d6}.sk-ch button.hear{background:#fff3c4;box-shadow:0 0 0 6px #ffd34d,0 7px 0 #d9c3ce}
+.sk-chw{display:flex;align-items:center;gap:16px;flex:1 1 190px;max-width:330px;min-width:0}.sk-chw>button:first-child{flex:1 1 auto;min-width:0;max-width:none}#sk .sk-ch .sk-chsp{flex:0 0 auto;width:60px;height:60px;min-width:0;min-height:0;max-width:none;padding:0;border-radius:50%;font-size:28px;background:#fff4d6;box-shadow:0 4px 0 #e8cf8f;outline:none;transform:none}#sk .sk-ch .sk-chsp:active{transform:translateY(3px);box-shadow:0 1px 0 #e8cf8f}.sk-ch button.hear{background:#fff3c4;box-shadow:0 0 0 6px #ffd34d,0 7px 0 #d9c3ce}
 .sk-ch button.ok{background:#a8f0c0;box-shadow:0 7px 0 #5cc183;animation:skpop .4s}.sk-ch button.ng{background:#ffe6cc;box-shadow:0 7px 0 #f3c08c;animation:skshake .3s}
 @keyframes skpop{40%{transform:scale(1.15)}}@keyframes skshake{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
 .sk-viz{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:10px;min-height:10px}.sk-viz>.sk-ill{font-size:104px}.sk-exp .sk-stage>.sk-ill{font-size:120px;display:block;margin:0 auto 6px}
@@ -2003,9 +2003,11 @@ export function openSekai(opt0 = {}) {
     const readCh = q.en && !q.emoji && q.choices.every((c) => /^[A-Za-z][A-Za-z ,.!?'’-]*$/.test(String(c)));
     const hearCh = (b, c) => { if (b._hearAt && Date.now() - b._hearAt < 400) return; b._hearAt = Date.now(); hush(); ch.querySelectorAll('button.hear').forEach((x) => x.classList.remove('hear')); const tok = (b._tok = {}); b.classList.add('hear'); return say(c, { en: true }).finally(() => { if (b._tok === tok) b.classList.remove('hear'); }); };
     if (opt.debug) window.__skQ = q; for (const c of q.choices) { const b = el('button', '', c); if (opt.debug) b.dataset.c = c;
-      if (readCh) { b.classList.add('rd'); b.insertAdjacentHTML('beforeend', '<span class="sk-chsay" aria-hidden="true">🔊</span>'); b.addEventListener('focus', () => { if (session.chReady === q && !session.lock) hearCh(b, c); }); }
-      b.onclick = (ev) => { if (readCh && ev && ev.target && ev.target.closest && ev.target.closest('.sk-chsay')) { ev.stopPropagation(); hearCh(b, c); return; } answer(b, c); }; ch.appendChild(b); }
-    const readAll = async () => { for (const b of ch.querySelectorAll('button')) { if (session.q !== q || session.lock || !document.contains(b)) return; b.classList.add('hear'); await say(q.choices[[...ch.children].indexOf(b)], { en: true }); b.classList.remove('hear'); await new Promise((r) => setTimeout(r, 250)); } };
+      b.onclick = () => answer(b, c);
+      if (readCh) { b.addEventListener('focus', () => { if (session.chReady === q && !session.lock) hearCh(b, c); }); const w = el('div', 'sk-chw'); const sp = el('button', 'sk-chsp', '🔊'); sp.tabIndex = -1; sp.setAttribute('aria-label', 'きく'); sp.addEventListener('pointerdown', (e) => e.preventDefault()); sp.addEventListener('mousedown', (e) => e.preventDefault()); sp.onclick = (e) => { e.stopPropagation(); if (!session.lock) hearCh(b, c); }; w.appendChild(b); w.appendChild(sp); ch.appendChild(w); }
+      else ch.appendChild(b); }
+    const ansBtns = () => [...ch.querySelectorAll('button:not(.sk-chsp)')];
+    const readAll = async () => { const bs = ansBtns(); for (let i = 0; i < bs.length; i++) { const b = bs[i]; if (session.q !== q || session.lock || !document.contains(b)) return; b.classList.add('hear'); await say(q.choices[i], { en: true }); b.classList.remove('hear'); await new Promise((r) => setTimeout(r, 250)); } };
     const sayQ0 = () => (q.sayEn ? say(q.sayQ, { en: true }) : say(q.sayQ));
     const sayQ = () => sayQ0().then(() => { if (!readCh) return; session.chReady = null; return readAll().then(() => { if (session.q === q) session.chReady = q; }); });
     main.querySelector('.sk-say').onclick = sayQ;

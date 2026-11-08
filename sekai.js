@@ -221,7 +221,8 @@ function speakParts(hs, opt) { return new Promise((res) => { let done = false; c
 function enFileH(text, slow) { if (!VM) return null; const k = 'en|' + String(text).trim(); let h = vHash(k + (slow ? '|s' : '')); if (!VM.has(h)) h = vHash(k); return VM.has(h) ? h : null; } // えいごは ネイティブの こえの ファイル（ゆっくりは ゆっくり よんだ ファイル）
 function playH(h, text, opt) { return new Promise((res) => { let done = false; const fin = () => { if (!done) { done = true; speakingN = Math.max(0, speakingN - 1); res(); } }; speakingN++; const g = sayGen;
   vBuf(h).then((b) => { const c = ac(); if (g !== sayGen) { fin(); return; } if (!b || !c) { ttsNow(text, opt).then(fin); return; } const s = c.createBufferSource(); s.buffer = b; s.connect(c.destination); s.onended = fin; curSrc = s; s.start(); setTimeout(fin, b.duration * 1000 + 700); }).catch(() => { ttsNow(text, opt).then(fin); }); }); }
-function speakNow(text, opt = {}) {
+const rbStrip = (t) => String(t ?? '').replace(/<rt>[\s\S]*?<\/rt>/g, '').replace(/<\/?(ruby|rb|rp)>/g, '');
+function speakNow(text, opt = {}) { text = rbStrip(text);
   if (voiceOn && opt.en && VM && location.protocol !== 'file:') { const h = enFileH(text, opt.slow); if (h) return playH(h, text, opt); }
   if (voiceOn && !opt.en && VM && location.protocol !== 'file:') { const tk = vToks(vNorm(text)); if (tk.length > 1 && !VM.has(vHash(vNorm(text))) && tk.every((x) => VM.has(vHash(x)))) return speakParts(tk.map(vHash), opt); }
   if (voiceOn && !opt.en && VM) { const h = vHash(vNorm(text)); if (VM.has(h)) return new Promise((res) => {
@@ -960,10 +961,10 @@ const TB_MATH = (() => {
 const TB_KOKUGO = (() => {
   const RB = /\{([^|{}]+)\|([^{}]+)\}/g;
   const TG = /\[([^|\]]+)\|([^\]]+)\]/;
-  const D = (s) => String(s).replace(RB, '$1');
+  const D = (s) => String(s).replace(RB, '<ruby>$1<rt>$2</rt></ruby>'); // もんだいの かんじには ルビ（よみあげ・じまくは rbStrip で かんじだけ）
   const Y = (s) => String(s).replace(RB, '$2').replace(/（　）/g, ' まる ').replace(/<br\s*\/?>/g, '、').replace(/<[^>]+>/g, ' ').replace(/[「」『』（）\n]/g, ' ').replace(/\s+/g, ' ').trim();
   const end = (s) => (/[。？！]$/.test(s) ? s : s + '。');
-  const plain = (s) => D(s).replace(/<[^>]+>/g, '');
+  const plain = (s) => String(s).replace(RB, '$1').replace(/<[^>]+>/g, '');
   const lvOf = (d) => (d < 0.34 ? 1 : d < 0.67 ? 2 : 3);
   // いまの レベルの もんだいを おおめに、したの レベルも まぜる
   const pool = (L, d) => { const v = lvOf(d); const f = L.filter((x) => (x.lv || 1) <= v); const top = f.filter((x) => (x.lv || 1) === v); return top.length && Math.random() < 0.6 ? top : f.length ? f : L; };
@@ -1710,7 +1711,7 @@ const CSS = `
 .sk-clk{width:200px;height:200px}.sk-morph{display:flex;align-items:center;gap:16px}.sk-morph span{font-size:44px}
 .sk-beats{display:flex;gap:10px;justify-content:center}.sk-beats i{font-style:normal;font-size:46px;font-weight:900;background:#fff;border-radius:16px;padding:6px 14px;position:relative}.sk-beats.on i{animation:skbeat .5s backwards}.sk-beats.on i:nth-child(2){animation-delay:.5s}.sk-beats.on i:nth-child(3){animation-delay:1s}.sk-beats.on i:nth-child(4){animation-delay:1.5s}.sk-beats.on i:nth-child(5){animation-delay:2s}.sk-beats em{position:absolute;top:-30px;left:50%;transform:translateX(-50%);font-size:26px;font-style:normal}
 @keyframes skbeat{0%{transform:scale(1)}40%{transform:scale(1.25);background:#fff2a8}}
-.sk-exp>*{flex-shrink:0}#sk .sk-ch button:focus:not(.zz)::before{left:50%;top:-4px;transform:translate(-50%,-100%) rotate(90deg);width:50px;height:50px}.sk-count i small.cn{display:block;font-size:18px;font-weight:900;color:#6a5a75;font-style:normal;line-height:1}.smk{font-size:.7em;color:#e0457b}.sk-yomi{flex-basis:100%;text-align:center;font-size:30px;font-weight:800;color:#6a5a75;margin-top:6px;letter-spacing:2px}.sk-objs .sk-d.emo-d:has(.sk-ill[data-k^="coin"]){width:52px;height:52px;font-size:48px}.sk-clk.mins{width:270px;height:270px}.sk-exp .sk-story{font-size:30px}.sk-story.kgs{font-size:34px}.sk-story .kg{color:#e0457b;font-size:1.3em}.sk-pair .lab{white-space:nowrap}.sk-pair.row{flex-direction:row;justify-content:center}.sk-pair.row>div{flex-direction:column;gap:2px;padding:26px 30px 10px;min-width:150px}.sk-pair.row .sk-big.kjs{font-size:110px;line-height:1.1}.sk-pair .yo{font-size:24px;font-weight:900;color:#6a5a75}
+.sk-exp>*{flex-shrink:0}#sk .sk-ch button:focus:not(.zz)::before{left:50%;top:-4px;transform:translate(-50%,-100%) rotate(90deg);width:50px;height:50px}.sk-count i small.cn{display:block;font-size:18px;font-weight:900;color:#6a5a75;font-style:normal;line-height:1}.smk{font-size:.7em;color:#e0457b}#sk ruby{ruby-position:over}#sk rt{font-size:.5em;font-weight:700;color:inherit;opacity:.85;letter-spacing:0}.sk-yomi{flex-basis:100%;text-align:center;font-size:30px;font-weight:800;color:#6a5a75;margin-top:6px;letter-spacing:2px}.sk-objs .sk-d.emo-d:has(.sk-ill[data-k^="coin"]){width:52px;height:52px;font-size:48px}.sk-clk.mins{width:270px;height:270px}.sk-exp .sk-story{font-size:30px}.sk-story.kgs{font-size:34px}.sk-story .kg{color:#e0457b;font-size:1.3em}.sk-pair .lab{white-space:nowrap}.sk-pair.row{flex-direction:row;justify-content:center}.sk-pair.row>div{flex-direction:column;gap:2px;padding:26px 30px 10px;min-width:150px}.sk-pair.row .sk-big.kjs{font-size:110px;line-height:1.1}.sk-pair .yo{font-size:24px;font-weight:900;color:#6a5a75}
 .sk-story{font-size:24px;font-weight:700;text-align:left;background:#fffdf3;border-radius:16px;padding:10px 14px;margin-bottom:8px;line-height:1.7}
 .sk-col{display:inline-block;width:120px;height:120px;border-radius:24px;border:4px solid #4a3b52}.sk-big .sk-col{width:100px;height:100px}
 .sk-count{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;max-width:600px}.sk-count i{font-style:normal;font-size:44px;display:flex;flex-direction:column;align-items:center;animation:skin .3s backwards;animation-delay:calc(var(--i)*.55s)}.sk-count b{font-size:16px}
@@ -2116,7 +2117,7 @@ export function openSekai(opt0 = {}) {
           else { b.classList.add('ng'); SE.ng(); box.querySelectorAll('button').forEach((x) => x.textContent === a.ans && x.classList.add('hint')); cap.textContent = 'いっしょに かぞえよう'; await say('いっしょに かぞえよう'); if (a.help) await a.help(stage, () => d.isConnected); await end(a.ok); } }; });
       });
       const play = async () => { const my = ++tok; const alive = () => my === tok && d.isConnected; d.querySelector('.go').style.display = 'none';
-        for (let i = 0; i < st.length; i++) { if (!alive()) return; const s = st[i]; d.querySelectorAll('.sk-sdots i').forEach((x, j) => x.classList.toggle('on', j <= i)); stage.innerHTML = s.h; stage.classList.toggle('noanim', i > 0); cap.textContent = s.s; fit(); stage.querySelectorAll('img').forEach((im) => im.addEventListener('load', fit, { once: true })); SE.step();
+        for (let i = 0; i < st.length; i++) { if (!alive()) return; const s = st[i]; d.querySelectorAll('.sk-sdots i').forEach((x, j) => x.classList.toggle('on', j <= i)); stage.innerHTML = s.h; stage.classList.toggle('noanim', i > 0); cap.textContent = rbStrip(s.s); fit(); stage.querySelectorAll('img').forEach((im) => im.addEventListener('load', fit, { once: true })); SE.step();
           if (s.seq) { for (const [t, en] of s.seq) { if (!alive()) return; if (en) { for (let r = 0; r < (en === 2 ? 1 : 3); r++) { if (!alive()) return; await say(t, { en: true, slow: r > 0 }); await wait(500); } } else await say(t); } }
           else if (s.mix) { await say(s.s.replace(s.mix, '').trim()); if (!alive()) return; for (let r = 0; r < 3; r++) { if (!alive()) return; await say(s.mix, { en: true, slow: r > 0 }); await wait(500); } } else if (s.en) { const nr = s.s.length > 20 ? 1 : 3; for (let r = 0; r < nr; r++) { if (!alive()) return; await say(s.s, { en: true, slow: r > 0 || nr === 1 }); if (nr > 1) await wait(500); } } else await say(s.s, { slow: true });
           if (!alive()) return; if (s.ask) { await askRun(s.ask); if (!alive()) return; } if (s.run) await s.run(stage, alive); if (!alive()) return; await wait(s.run ? 600 : 400 + Math.min(900, s.s.length * 20)); if (opt.debug && window.__hold) await window.__hold(i); }

@@ -1703,6 +1703,7 @@ const CSS = `
 .sk-ch{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;max-width:820px;width:100%}
 .sk-ch button{min-width:140px;min-height:96px;flex:1 1 140px;max-width:260px;border:none;border-radius:26px;background:#fff;font-size:34px;font-weight:900;box-shadow:0 7px 0 #d9c3ce;transition:transform .08s}
 .sk-ch button:active{transform:translateY(5px);box-shadow:0 2px 0 #d9c3ce}.sk-ch.big button{font-size:44px}.sk-ch.emo button{font-size:80px}
+.sk-ch button.rd{position:relative;padding-top:26px}.sk-ch .sk-chsay{position:absolute;right:8px;top:6px;font-size:22px;line-height:1;padding:4px 6px;border-radius:12px;background:#fff4d6}.sk-ch button.hear{background:#fff3c4;box-shadow:0 0 0 6px #ffd34d,0 7px 0 #d9c3ce}
 .sk-ch button.ok{background:#a8f0c0;box-shadow:0 7px 0 #5cc183;animation:skpop .4s}.sk-ch button.ng{background:#ffe6cc;box-shadow:0 7px 0 #f3c08c;animation:skshake .3s}
 @keyframes skpop{40%{transform:scale(1.15)}}@keyframes skshake{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
 .sk-viz{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:10px;min-height:10px}.sk-viz>.sk-ill{font-size:104px}.sk-exp .sk-stage>.sk-ill{font-size:120px;display:block;margin:0 auto 6px}
@@ -1998,8 +1999,15 @@ export function openSekai(opt0 = {}) {
     const mo = MON[q.sk]; const hard = !!(q.chal || q.peek); const mb = mo != null ? `<div class="sk-mb${hard ? ' hard' : ''}" style="--c:${S.col}">${hard ? '<b>⭐ むずかしい！</b>' : ''}<span>${MON_EMO[mo]}</span>1ねんせい <em>${mo}がつ</em>${TB_PAGE[q.sk] ? `<small>きょうかしょ ${TB_PAGE[q.sk]}ページ</small>` : ''}</div>` : sj === 'eigo' ? `<div class="sk-mb" style="--c:${S.col}"><span>🔤</span>えいご <em>レベル ${S.L.findIndex((x) => x.id === q.sk) + 1}</em></div>` : '';
     main.innerHTML = `${mb}<div class="sk-tag${q.retry ? ' re' : ''}" style="color:${S.col}">${tag}</div><div class="sk-q">${q.text}<button class="sk-say" tabindex="-1">🔊</button></div><div class="sk-viz">${q.viz || ''}</div><div class="sk-ch ${q.emoji ? 'emo' : q.txt ? 'txt' : q.bigC ? 'big' : ''}"></div>`;
     const ch = main.querySelector('.sk-ch'); if (q.sayQ && !q.sayEn) vPrefetch(q.sayQ); if (q.sayQ && q.sayEn) [false, true].forEach((sl) => { const h = enFileH(q.sayQ, sl); if (h && !VBUF.has(h)) vBuf(h).catch(() => {}); }); (q.steps || []).slice(0, 2).forEach((s) => s && !s.en && !s.mix && vPrefetch(s.s));
-    if (opt.debug) window.__skQ = q; for (const c of q.choices) { const b = el('button', '', c); if (opt.debug) b.dataset.c = c; b.onclick = () => answer(b, c); ch.appendChild(b); }
-    const sayQ = () => (q.sayEn ? say(q.sayQ, { en: true }) : say(q.sayQ));
+    // えいごの もじの せんたくしは よめないので こえで きく：さいしょに じゅんばんに よむ・🔊で もういちど・リモコンで えらぶと よむ
+    const readCh = q.en && !q.emoji && q.choices.every((c) => /^[A-Za-z][A-Za-z ,.!?'’-]*$/.test(String(c)));
+    const hearCh = (b, c) => { if (b._hearAt && Date.now() - b._hearAt < 400) return; b._hearAt = Date.now(); hush(); ch.querySelectorAll('button.hear').forEach((x) => x.classList.remove('hear')); const tok = (b._tok = {}); b.classList.add('hear'); return say(c, { en: true }).finally(() => { if (b._tok === tok) b.classList.remove('hear'); }); };
+    if (opt.debug) window.__skQ = q; for (const c of q.choices) { const b = el('button', '', c); if (opt.debug) b.dataset.c = c;
+      if (readCh) { b.classList.add('rd'); b.insertAdjacentHTML('beforeend', '<span class="sk-chsay" aria-hidden="true">🔊</span>'); b.addEventListener('focus', () => { if (session.chReady === q && !session.lock) hearCh(b, c); }); }
+      b.onclick = (ev) => { if (readCh && ev && ev.target && ev.target.closest && ev.target.closest('.sk-chsay')) { ev.stopPropagation(); hearCh(b, c); return; } answer(b, c); }; ch.appendChild(b); }
+    const readAll = async () => { for (const b of ch.querySelectorAll('button')) { if (session.q !== q || session.lock || !document.contains(b)) return; b.classList.add('hear'); await say(q.choices[[...ch.children].indexOf(b)], { en: true }); b.classList.remove('hear'); await new Promise((r) => setTimeout(r, 250)); } };
+    const sayQ0 = () => (q.sayEn ? say(q.sayQ, { en: true }) : say(q.sayQ));
+    const sayQ = () => sayQ0().then(() => { if (!readCh) return; session.chReady = null; return readAll().then(() => { if (session.q === q) session.chReady = q; }); });
     main.querySelector('.sk-say').onclick = sayQ;
     const tut = (p.tut || 0) < 3; if (tut) { const rw = root.classList.contains('sk-lrow'); const t = el('div', 'sk-tut', `<span class="rm${rw ? ' rw' : ''}"><i>${rw ? '◀' : '▲'}</i><b>●</b><i>${rw ? '▶' : '▼'}</i></span><span>${rw ? '◀▶' : '▲▼'} で えらんで<br>まんなかで こたえる</span>`); main.appendChild(t); }
     const focus0 = () => { const b0 = ch.querySelector('button'); if (b0 && document.contains(b0)) { b0.focus({ preventScroll: true }); setTimeout(() => { b0.classList.add('ready'); setTimeout(() => b0.classList.remove('ready'), 400); }, 350); } }; // えらべる ように なった しゅんかんに かるく ひかる // さいしょの こたえを えらんだ じょうたいに（リモコンで まよわない）

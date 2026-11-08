@@ -319,7 +319,7 @@ const M = [
   { id: 'm_clock', n: 'とけい', q() { const h = R(1, 12), half = Math.random() < 0.5, ans = half ? `${h}じはん` : `${h}じ`; const ch = shuffle(uniq([ans, half ? `${h}じ` : `${h}じはん`, `${h % 12 + 1}じ${half ? 'はん' : ''}`, `${(h + 5) % 12 + 1}じ`]).slice(0, 3)); if (!ch.includes(ans)) ch[0] = ans;
     return { text: 'とけいは なんじ？', sayQ: 'とけいは なんじ？', viz: clock(h, half), ans, choices: shuffle(ch), steps: [
       { h: clock(h, half) + '<p class="sk-p"><span style="color:#ff6b6b">●みじかい はり</span>が「なんじ」</p>', s: `みじかい はりを みよう。${half ? `${h}と ${h % 12 + 1}の あいだ` : `${h}を さしてるね`}` },
-      { h: clock(h, half) + `<p class="sk-p"><span style="color:#4d8af0">●ながい はり</span>が ${half ? '6 → 「はん」' : '12 → 「ちょうど」'}</p>`, s: half ? 'ながい はりが 6の ときは、はん' : 'ながい はりが 12の ときは、ちょうど' },
+      { h: clock(h, half) + `<p class="sk-p"><span style="color:#4d8af0">●ながい はり</span>が ${half ? '6 → 「はん」' : '12 → 「ちょうど」'}</p>`, s: half ? 'ながい はりが 6の ときは「はん」' : 'ながい はりが 12の ときは「ちょうど」' },
       { h: big(ans), s: `こたえは ${ans}` }] }; } },
   { id: 'm_word', n: 'ぶんしょうだい', q() { return wordQ(); } },
   { id: 'm_shape', n: 'かたち', q() { return shapeQ(); } },
@@ -383,36 +383,37 @@ const KATA_W = [['🍰', 'けーき', 'ケーキ', ['ケーモ', 'ゲーキ', '�
 const KANJI = [['山', 'やま', '⛰️', 'やまの かたちから できた じ'], ['川', 'かわ', '🏞️', 'みずが ながれる ようす'], ['木', 'き', '🌳', 'えだと ねが ある き'], ['日', 'ひ', '☀️', 'おひさまの かたち'], ['月', 'つき', '🌙', 'みかづきの かたち'],
   ['火', 'ひ', '🔥', 'もえる ほのお'], ['水', 'みず', '💧', 'ながれる みず'], ['田', 'た', '🌾', 'たんぼを うえから みた かたち'], ['口', 'くち', '👄', 'ひらいた くち'], ['目', 'め', '👁️', 'めを たてに した かたち'],
   ['手', 'て', '✋', 'ゆびを ひらいた て'], ['足', 'あし', '🦶', 'ひざから したの あし'], ['雨', 'あめ', '🌧️', 'くもから あめつぶが おちる'], ['花', 'はな', '🌸', 'くさかんむりは しょくぶつの しるし'], ['石', 'いし', '🪨', 'がけの したの いし'],
-  ['空', 'そら', '🌤️', 'ひろい そら'], ['犬', 'いぬ', '🐕', 'いぬが よこを むいた かたち'], ['虫', 'むし', '🐛', 'むしの かたち'], ['人', 'ひと', '🧍', 'ひとが たって いる よこがお'], ['森', 'もり', '🌲', '木が 3つで もり'],
+  ['空', 'そら', '🌤️', 'ひろい そら'], ['犬', 'いぬ', '🐕', 'いぬが よこを むいた かたち'], ['虫', 'むし', '🐛', 'むしの かたち'], ['人', 'ひと', '🧍', 'ひとが たって いる すがたを よこから みた かたち'], ['森', 'もり', '🌲', '木が 3つで もり'],
   ['一', 'いち', '1️⃣', 'よこぼう 1ぽんで 1'], ['二', 'に', '2️⃣', 'よこぼう 2ほんで 2'], ['三', 'さん', '3️⃣', 'よこぼう 3ぼんで 3'], ['大きい', 'おおきい', '🙆', '「大」は ひとが てを おおきく ひろげた かたち'], ['小さい', 'ちいさい', '🤏', '「小」は ちいさな つぶの かたち'],
   ['上', 'うえ', '⬆️', 'せんの うえに しるし'], ['下', 'した', '⬇️', 'せんの したに しるし'], ['子', 'こ', '👶', 'あかちゃんの かたち'], ['女', 'おんな', '🙎‍♀️', 'すわった ひとの かたち'], ['耳', 'みみ', '👂', 'みみの かたち']];
 const KS = { 山: '山に のぼりました。', 川: '川で あそびました。', 木: '木に とりが とまって いる。', 日: '日が のぼりました。', 月: 'よぞらに 月が でて いる。', 火: 'ろうそくの 火を けしました。', 水: '水を のみました。', 口: '口を おおきく あけました。', 目: '目を とじました。', 手: '手を あらいました。', 足: 'うさぎは 足が はやい。', 雨: '雨が ふって きた。', 花: '花が さきました。', 石: '石を ひろいました。', 空: '空が あおい。', 犬: '犬が はしって いる。', 虫: '虫を みつけた。', 森: '森の なかを あるく。', 耳: '耳を すませた。', 子: 'ねこの 子が うまれた。', 上: 'つくえの 上に ほんが ある。', 下: 'いすの 下に ねこが いる。' };
 const PART = [['わたし（ ）がっこうへ いきます。', 'は', 'わ', 'だれの おはなしかを いう「わ」は「は」と かく'], ['ぼく（ ）えを かきます。', 'は', 'わ', 'だれが するかの「わ」は「は」と かく'], ['えほん（ ）よみます。', 'を', 'お', 'なにを するかの「お」は「を」と かく'],
   ['おにぎり（ ）たべます。', 'を', 'お', 'なにを たべるかの「お」は「を」'], ['こうえん（ ）いきます。', 'へ', 'え', 'いく ばしょの「え」は「へ」と かく'], ['うみ（ ）でかけます。', 'へ', 'え', 'むかう ばしょの「え」は「へ」'], ['ねこ（ ）ねて います。', 'が', 'を', 'だれが しているかは「が」']];
 const SMALL = [['✉️', 'きって', ['きて', 'きつて'], ['き', 'っ', 'て']], ['🚂', 'きしゃ', ['きしや', 'きさ'], ['き', 'しゃ']], ['🐠', 'きんぎょ', ['きんぎよ', 'きんご'], ['き', 'ん', 'ぎょ']], ['🚃', 'でんしゃ', ['でんしや', 'でしゃ'], ['で', 'ん', 'しゃ']],
-  ['🥛', 'ぎゅうにゅう', ['ぎゆうにゆう', 'ぎうにう'], ['ぎゅ', 'う', 'にゅ', 'う']], ['🛌', 'ねっこ', ['ねこ', 'ねつこ'], null], ['🧸', 'にんぎょう', ['にんぎよう', 'にんごう'], ['に', 'ん', 'ぎょ', 'う']], ['📷', 'しゃしん', ['しやしん', 'さしん'], ['しゃ', 'し', 'ん']],
-  ['🏃', 'がっこう', ['がこう', 'がつこう'], ['が', 'っ', 'こ', 'う']], ['🦗', 'ばった', ['ばた', 'ばつた'], ['ば', 'っ', 'た']]].filter((x) => x[3]);
-const LONG = [['🍦', 'こおり', ['こうり', 'こーり']], ['🗻', 'おおきい', ['おうきい', 'おーきい']], ['👨', 'おとうさん', ['おとおさん', 'おとーさん']], ['👩', 'おかあさん', ['おかさん', 'おかーさん']], ['👧', 'おねえさん', ['おねいさん', 'おねーさん']], ['🎈', 'ふうせん', ['ふせん', 'ふーせん']]];
+  ['🥛', 'ぎゅうにゅう', ['ぎゆうにゆう', 'ぎうにう'], ['ぎゅ', 'う', 'にゅ', 'う']], ['🛌', 'ねっこ', ['ねこ', 'ねつこ'], null], ['🦋', 'ちょうちょ', ['ちようちよ', 'ちょうちよ'], ['ちょ', 'う', 'ちょ']], ['📷', 'しゃしん', ['しやしん', 'さしん'], ['しゃ', 'し', 'ん']],
+  ['🧼', 'せっけん', ['せけん', 'せつけん'], ['せ', 'っ', 'け', 'ん']], ['🚒', 'しょうぼうしゃ', ['しようぼうしや', 'しょうぼうしや'], ['しょ', 'う', 'ぼ', 'う', 'しゃ']]].filter((x) => x[3]);
+const LONG = [['🧊', 'こおり', ['こうり', 'こーり'], 'こおり は「お」と かく とくべつな ことば（おおきい、とおい も おなじ）'], ['🐘', 'おおきい', ['おうきい', 'おーきい'], 'おおきい は「お」と かく とくべつな ことば（こおり、とおい も おなじ）'], ['👨', 'おとうさん', ['おとおさん', 'おとーさん'], 'お の なかまの おとは「う」で のばすよ（おとうと、ひこうき）'], ['👩', 'おかあさん', ['おかさん', 'おかーさん'], 'あ の なかまの おとは「あ」で のばすよ（おばあさん）'], ['👧', 'おねえさん', ['おねいさん', 'おねーさん'], 'おねえさん は「え」で のばす とくべつな ことば（ふつうは せんせい の「い」）'], ['🎈', 'ふうせん', ['ふせん', 'ふーせん'], 'う の なかまの おとは「う」で のばすよ（くうき、ゆうき）']];
 const READ = [
   { t: 'バスは、おおぜいの ひとを のせて はこびます。トラックは、おもい にもつを はこびます。', q: 'にもつを はこぶのは？', a: 'トラック', ng: ['バス', 'じてんしゃ'], k: 1 },
   { t: 'バスは、おおぜいの ひとを のせて はこびます。トラックは、おもい にもつを はこびます。', q: 'ひとを のせて はこぶのは？', a: 'バス', ng: ['トラック', 'ふね'], k: 0 },
-  { t: 'たぬきの ぽんたは、もりで あかい きのみを みつけました。いもうとに あげると、にっこり わらいました。', q: 'ぽんたが みつけたのは？', a: 'あかい きのみ', ng: ['あおい いし', 'きいろい はな'], k: 0 },
-  { t: 'たぬきの ぽんたは、もりで あかい きのみを みつけました。いもうとに あげると、にっこり わらいました。', q: 'わらったのは だれ？', a: 'いもうと', ng: ['ぽんた', 'おかあさん'], k: 1 },
+  { t: 'たぬきの ぽんたは、もりで あかい きのみを みつけました。いもうとに あげると、いもうとは にっこり わらいました。', q: 'ぽんたが みつけたのは？', a: 'あかい きのみ', ng: ['あおい いし', 'きいろい はな'], k: 0 },
+  { t: 'たぬきの ぽんたは、もりで あかい きのみを みつけました。いもうとに あげると、いもうとは にっこり わらいました。', q: 'わらったのは だれ？', a: 'いもうと', ng: ['ぽんた', 'おかあさん'], k: 1 },
   { t: 'クレーンしゃは、おもい ものを つりあげる しごとを します。そのために、じょうぶな うでが のびたり うごいたり します。', q: 'クレーンしゃの しごとは？', a: 'おもい ものを つりあげる', ng: ['ひとを はこぶ', 'みちを はく'], k: 0 },
   { t: 'ぶたの ぶうこは、あさ はやく おきました。かおを あらって、パンを たべて、がっこうへ いきました。', q: 'ぶうこが たべたのは？', a: 'パン', ng: ['ごはん', 'りんご'], k: 1 },
   { t: 'うさぎの みみは ながいです。とおくの おとも よく きこえます。', q: 'みみが ながいと どうなる？', a: 'とおくの おとが きこえる', ng: ['はやく はしれる', 'よく みえる'], k: 1 },
 ];
+const kTip = (k) => { const n = String(k).normalize('NFD'); const t = []; if (/\u3099/.test(n)) t.push('「゛」'); if (/\u309A/.test(n)) t.push('「゜」'); if (/ッ/.test(k)) t.push('ちいさい「ッ」'); if (/[ャュョァィゥェォ]/.test(k)) t.push('ちいさい じ'); if (/ー/.test(k)) t.push('のばす「ー」'); return t.length ? `${t.join('、')}に きを つけようね` : 'ひとつずつ たしかめようね'; };
 const K = [
   { id: 'k_kana1', n: 'カタカナ 1もじ', q(d) { const i = R(0, Math.min(KANA_H.length - 1, 10 + d * 30 | 0)); const h = KANA_H[i], k = KANA_K[i]; const ng = shuffle([...KANA_K].filter((c) => c !== k)).slice(0, 2); return { text: `「${h}」の カタカナは？`, sayQ: `${h} の カタカナは どれ？`, ans: k, choices: shuffle([k, ...ng]), bigC: true, steps: [{ h: big(`${h} → <b>${k}</b>`), s: `${h} は カタカナで こう かくよ` }, { h: big(`<b>${k}</b>`), s: 'かたちを よく みてね' }] }; } },
   { id: 'k_kata', n: 'カタカナの ことば', q(d) { const [e, h, k, ng] = pick(KATA_W); const ch = shuffle([k, ...shuffle(ng).slice(0, d > 0.5 ? 3 : 2)]);
     const diff = [...k].map((c, i) => { const w = ng[0][i]; return c !== w ? `<b class="mark">${c}</b>` : c; }).join('');
-    return { text: `${e}「${h}」を カタカナで かくと？`, sayQ: `${h} を カタカナで かくと どれ？`, ans: k, choices: ch, bigC: true, steps: [{ h: big(e) + big(`${[...h].join(' ')}`), s: `${h}。ひとつずつ カタカナに しよう` }, { h: big(`${[...h].map((c) => `<span>${c}</span>`).join('')}<br>↓<br>${k}`), s: `${h} は ${k}` }, { h: big(diff), s: '「゛」と「゜」、ちいさい「ッ」、のばす「ー」に きを つけようね' }] }; } },
+    return { text: `${e}「${h}」を カタカナで かくと？`, sayQ: `${h} を カタカナで かくと どれ？`, ans: k, choices: ch, bigC: true, steps: [{ h: big(e) + big(`${[...h].join(' ')}`), s: `${h}。ひとつずつ カタカナに しよう` }, { h: big(`${[...h].map((c) => `<span>${c}</span>`).join('')}<br>↓<br>${k}`), s: `${h} は ${k}` }, { h: big(diff), s: kTip(k) }] }; } },
   { id: 'k_small', n: 'ちいさい「っ」「ゃゅょ」', q() { const [e, a, ng, beats] = pick(SMALL); return { text: `${e} ただしい かきかたは？`, sayQ: 'ただしい かきかたは どれ？', ans: a, choices: shuffle([a, ...ng]), bigC: true,
     ng: (c) => ({ h: `<div class="sk-pair"><div class="ngp"><span class="lab">えらんだ のは</span>${big(c)}</div><div class="okp"><span class="lab">ただしくは</span>${big(a)}</div></div>`, s: /[ゃゅょっ]/.test(c) === /[ゃゅょっ]/.test(a) && c.length === a.length ? 'くらべると、かきかたが ちがう ところが あるね' : /[ゃゅょっ]/.test(a) ? `${c} では、ちいさい じが ないね` : `${c} は、よみかたが ちがうね` }),
     steps: [{ h: big(e) + `<div class="sk-beats">${beats.map((b) => `<i>${b}</i>`).join('')}</div>`, s: `てを たたいて よもう。${beats.join('、')}` }, { h: `<div class="sk-beats on">${beats.map((b) => `<i>${b}<em>👏</em></i>`).join('')}</div>`, s: `${beats.length}かい てを たたくね。${a.includes('っ') ? 'つまる ところは ちいさい「っ」' : /[ゃゅょ]/.test(a) ? 'ちいさい じは まえの じと いっしょに よむ' : `${a}には ちいさい じは ないよ`}` }, ...(() => { const cm = [...new Set(beats.filter((b) => b.length === 2 && /[ゃゅょ]/.test(b[1])))]; return cm.length ? [{ h: cm.map((b) => eq(`${b[0]} ＋ <span class="smk">${b[1]}</span> → <b>${b}</b>`)).join(''), s: cm.map((b) => `${b[0]}と ちいさい ${b[1]}で ${b}`).join('。') }] : []; })(), { h: big(a), s: `ただしくは ${a}` }] }; } },
-  { id: 'k_long', n: 'のばす おと', q() { const [e, a, ng] = pick(LONG); return { text: `${e} ただしい かきかたは？`, sayQ: 'ただしい かきかたは どれ？', ans: a, choices: shuffle([a, ...ng]), bigC: true, steps: [{ h: big(e) + big(a), s: `${a}。ひらがなでは「ー」を つかわないよ` }, { h: big(a), s: a.includes('おお') ? 'おお と かく ことばは とくべつ。おおきい、こおり、とおい' : 'まえの おとと おなじ なかまの じで のばすよ' }] }; } },
+  { id: 'k_long', n: 'のばす おと', q() { const [e, a, ng, rule] = pick(LONG); return { text: `${e} ただしい かきかたは？`, sayQ: 'ただしい かきかたは どれ？', ans: a, choices: shuffle([a, ...ng]), bigC: true, steps: [{ h: big(e) + big(a), s: `${a}。ひらがなでは「ー」を つかわないよ` }, { h: big(a), s: rule }] }; } },
   { id: 'k_part', n: '「は」「を」「へ」', q() { const [s, a, b, why] = pick(PART); return { text: `（ ）に はいる じは？\n${s}`, sayQ: s.replace('（ ）', 'まる'), ans: a, choices: shuffle([a, b]), bigC: true,
-    steps: [{ h: `<p class="sk-p">${s.replace('（ ）', `<b class="mark">${a === 'は' ? 'わ' : a === 'を' ? 'お' : a === 'へ' ? 'え' : a}</b>`)}</p>`, s: 'よむ ときの おとは こうだね' }, { h: `<p class="sk-p">${s.replace('（ ）', `<b class="mark big">${a}</b>`)}</p>`, s: `でも かく ときは ${a}。${why}` }] }; } },
+    steps: [{ h: `<p class="sk-p">${s.replace('（ ）', `<b class="mark">${a === 'は' ? 'わ' : a === 'を' ? 'お' : a === 'へ' ? 'え' : a}</b>`)}</p>`, s: 'はをへ'.includes(a) ? `こえに だすと「${a === 'は' ? 'わ' : a === 'を' ? 'お' : 'え'}」と きこえるね` : `ここには「${a}」が はいるよ` }, { h: `<p class="sk-p">${s.replace('（ ）', `<b class="mark big">${a}</b>`)}</p>`, s: 'はをへ'.includes(a) ? `でも かく ときは ${a}。${why}` : why }] }; } },
   { id: 'k_kanjiR', n: 'かんじを よむ', q(d) { const L = KANJI.slice(0, 12 + (d * 18 | 0)); const ctx = d >= 0.5 ? L.filter((x) => KS[x[0]]) : []; const [k, y, e, why] = pick(ctx.length ? ctx : L); const ng = shuffle(uniq(L.filter((x) => x[1] !== y).map((x) => x[1]))).slice(0, 2);
     // はじめは「え＋かんじ」、なれたら みじかい ぶんの なかで よむ
     const inS = ctx.length > 0; const viz = inS ? `<div class="sk-p">${KS[k].replace(k, `<b class="mark big">${k}</b>`)}</div>` : `<div class="sk-morph">${big(e, 'emos')}${big(k, 'kj')}</div>`;
@@ -420,7 +421,7 @@ const K = [
     ng: (c) => { const f = KANJI.find((x) => x[1] === c); return f ? { h: `<div class="sk-pair"><div class="ngp"><span class="lab">えらんだ よみ</span>${big(c)}<span class="ar">は</span>${big(f[0], 'kjs')}</div><div class="okp"><span class="lab">この かんじ</span>${big(k, 'kjs')}<span class="ar">は</span>${big(y)}</div></div>`, s: `${c} と よむのは「${f[0]}」。この かんじは ${y} だよ` } : null; },
     steps: [{ h: `<div class="sk-morph">${big(e, 'emo')}<span>→</span>${big(k, 'kj')}</div>`, s: `${why}。だから ${k} は ${y}` }, ...(inS ? [{ h: `<div class="sk-p">${KS[k].replace(k, `<b class="mark big">${k}</b>`)}</div>`, s: KS[k].replace(k, y) }] : [])] }; } },
   { id: 'k_kanjiW', n: 'かんじを えらぶ', q(d) { const L = KANJI.slice(0, 15 + (d * 15 | 0)); const [k, y, e, why] = pick(L); const ng = shuffle(L.filter((x) => x[0] !== k && x[1] !== y)).slice(0, 2).map((x) => x[0]); return { text: `「${y}」を かんじで かくと？`, sayQ: `${y} を かんじで かくと どれ？`, ans: k, choices: shuffle([k, ...ng]), bigC: true, kanji: true,
-    steps: [{ h: `<div class="sk-morph">${big(e, 'emo')}<span>→</span>${big(k, 'kj')}</div>`, s: `${y}は、${why}。だから ${k}` }] }; } },
+    steps: [{ h: `<div class="sk-morph">${big(e, 'emo')}<span>→</span>${big(k, 'kj')}</div>`, s: `${why}。だから「${y}」は ${k}` }] }; } },
   { id: 'k_read', n: 'おはなしを よむ', q() { const r = pick(READ); const sents = r.t.split('。').filter(Boolean); return { text: `<div class="sk-story">${r.t}</div>${r.q}`, sayQ: r.t + '。' + r.q, ans: r.a, choices: shuffle([r.a, ...r.ng]),
     steps: [{ h: `<div class="sk-story">${sents.map((s, i) => `<span class="${i === r.k ? 'mark' : ''}">${s}。</span>`).join('')}</div>`, s: `この ぶんを よく よもう。${sents[r.k]}` }, { h: big(r.a), s: `こたえは ${r.a}` }] }; } },
 ];
@@ -442,7 +443,7 @@ const E = [
   { id: 'e_body', n: 'からだ', q() { const [e, w, j] = pick(BODY); const ng = shuffle(BODY.filter((x) => x[1] !== w)).slice(0, 2).map((x) => x[1]); return { text: `${e} は えいごで？`, sayQ: `${j} は えいごで？`, ans: w, choices: shuffle([w, ...ng]), en: true, steps: enSteps(e, w, j) }; } },
   { id: 'e_greet', n: 'あいさつ', q() { const [j, e, ic] = pick(GREET); const ng = shuffle(GREET.filter((x) => x[1] !== e)).slice(0, 2).map((x) => x[1]); return { text: `${ic}「${j}」は えいごで？`, sayQ: `${j} は えいごで？`, ans: e, choices: shuffle([e, ...ng]), en: true, steps: enSteps(ic, e, j), ng: (c) => { const f = GREET.find((x) => x[1] === c); return f ? { h: `<div class="sk-pair"><div class="ngp"><span class="lab">えらんだ のは</span>${big(f[2], 'emos')}${big(c)}</div></div>`, s: `${c} は ${f[0]} だよ`, seq: [[ 'えらんだのは' ], [c, 2], [`${f[0]} の ことだよ`]] } : null; } }; } },
   { id: 'e_first', n: 'さいしょの もじ', q() { const [e, w, j] = pick(EN); const L = w[0]; const ng = shuffle('abcdefghmnoprstw'.split('').filter((c) => c !== L)).slice(0, 2); return { text: `${e} <b>_</b>${w.slice(1)}<br>さいしょの もじは？`, sayQ: w, sayEn: true, ans: L, choices: shuffle([L, ...ng]), en: true, bigC: true,
-    steps: [{ h: big(e, 'emo'), s: w, en: true }, { h: big(`<b class="mark">${L}</b>${w.slice(1)}`), s: `${w}。さいしょは ${L.toUpperCase()}`, mix: w }] }; } },
+    steps: [{ h: big(e, 'emo'), s: w, en: true }, { h: big(`<b class="mark">${L}</b>${w.slice(1)}`), s: `${w}。さいしょは ${L}`, mix: w }] }; } },
 ];
 
 // ───────── 2026-11-04 アストラ レビュー①：こくご・えいごの ふやし／いれかえ（「どうして ちがうか」が わかる せつめい）
@@ -462,7 +463,7 @@ const KIMO = [ // lv1＝きもちの ことばが ある／lv2＝ようすから
   { lv: 2, t: 'ともだちに だまって おもちゃを とられました。くまたは かおを まっかに して、あしを どんどん ならしました。', k: 'かおを まっかに して、あしを どんどん', a: ['😠', 'おこっている'], ng: [['😄', 'うれしい'], ['😪', 'ねむい']] },
   { lv: 2, t: 'はこを あけたら、おおきな ケーキが でて きました。ねこみは めを まるく して、くちを ぽかんと あけました。', k: 'めを まるく して、くちを ぽかんと', a: ['😲', 'びっくり'], ng: [['😢', 'かなしい'], ['😱', 'こわい']] },
   { lv: 2, t: 'おばあちゃんから てがみが とどきました。いぬおは にこにこ しながら、なんども よみました。', k: 'にこにこ しながら、なんども よみました', a: ['😄', 'うれしい'], ng: [['😠', 'おこっている'], ['😱', 'こわい']] },
-  { lv: 3, t: 'あしたは えんそくです。ぽんたは リュックを なんども あけて、おやつを かぞえました。「はやく あしたに ならないかな」。', k: '「はやく あしたに ならないかな」', a: ['🤩', 'たのしみ'], ng: [['😢', 'かなしい'], ['😠', 'おこっている']], w: 'かなしい なら「はやく」とは いわないね' },
+  { lv: 3, t: 'あしたは えんそくです。ぽんたは リュックを なんども あけて、おやつを かぞえました。「はやく あしたに ならないかな」。', k: '「はやく あしたに ならないかな」', a: ['🤩', 'たのしみ'], ng: [['😢', 'かなしい'], ['😠', 'おこっている']], w: '「はやく あしたに ならないかな」は、まちきれない きもち' },
   { lv: 3, t: 'まいにち いっしょに あそんだ ともだちが、とおくへ ひっこしました。うさこは ともだちの いえの まえで、ずっと まどを みあげて いました。', k: 'ずっと まどを みあげて', a: ['🥺', 'さびしい'], ng: [['😆', 'たのしい'], ['😲', 'びっくり']], w: 'ともだちが いなくなって、ずっと みている。たのしい ようすでは ないね' },
   { lv: 3, t: 'たんじょうびに もらった ペンダントを、ねこみは まいばん そっと なでてから ねます。だれにも さわらせません。', k: 'まいばん そっと なでて', a: ['🥰', 'だいじに おもっている'], ng: [['😠', 'おこっている'], ['😱', 'こわい']], w: 'おこっていたら、そっと なでたり しないね' }];
 
@@ -480,7 +481,7 @@ const NEWK = [
   { id: 'k_kata', n: 'カタカナの ことば', q(d) { const [e, h, k, ng] = pick(KATA_W); const ch = shuffle([k, ...shuffle(ng).slice(0, d > 0.5 ? 3 : 2)]);
     return { text: `${e}「${h}」を カタカナで かくと？`, sayQ: `${h} を カタカナで かくと どれ？`, ans: k, choices: ch, bigC: true,
       ng: (c) => { const A = [...k], C = [...c]; const mk = (arr, other, cls) => arr.map((x, i) => x !== other[i] ? `<b class="${cls}">${x}</b>` : x).join(''); return { h: `<div class="sk-pair"><div class="ngp"><span class="lab">えらんだ のは</span>${big(mk(C, A, 'ngm'))}</div><div class="okp"><span class="lab">ただしくは</span>${big(mk(A, C, 'mark'))}</div></div>`, s: 'くらべると、いろが ついた ところが ちがうね' }; },
-      steps: [{ h: big(e) + big(`${[...h].map((c) => `<span>${c}</span>`).join('')}<br>↓<br>${k}`), s: `${h} を カタカナで かくと ${k}` }, { h: big(k), s: '「゛」と「゜」、ちいさい「ッ」、のばす「ー」に きを つけようね' }] }; } },
+      steps: [{ h: big(e) + big(`${[...h].map((c) => `<span>${c}</span>`).join('')}<br>↓<br>${k}`), s: `${h} を カタカナで かくと ${k}` }, { h: big(k), s: kTip(k) }] }; } },
   { id: 'k_kanjiR', n: 'かんじを よむ', q(d) { const L = KANJI.slice(0, 12 + (d * 18 | 0)); const ctx = d >= 0.5 ? L.filter((x) => KS[x[0]]) : []; const [k, y, e, why] = pick(ctx.length ? ctx : L); const ng = shuffle(uniq(L.filter((x) => x[1] !== y).map((x) => x[1]))).slice(0, 2);
     // はじめは「え＋かんじ」、なれたら みじかい ぶんの なかで よむ
     const inS = ctx.length > 0; const viz = inS ? `<div class="sk-p">${KS[k].replace(k, `<b class="mark big">${k}</b>`)}</div>` : `<div class="sk-morph">${big(e, 'emos')}${big(k, 'kj')}</div>`;
@@ -489,23 +490,23 @@ const NEWK = [
     steps: [{ h: `<div class="sk-morph">${big(e, 'emo')}<span>→</span>${big(k, 'kj')}</div>`, s: `${why}。だから ${k} は ${y}` }, ...(inS ? [{ h: `<div class="sk-p">${KS[k].replace(k, `<b class="mark big">${k}</b>`)}</div>`, s: KS[k].replace(k, y) }] : [])] }; } },
   { id: 'k_kanjiW', n: 'かんじを えらぶ', q(d) { const L = KANJI.slice(0, 15 + (d * 15 | 0)); const [k, y, e, why] = pick(L); const ng = shuffle(L.filter((x) => x[0] !== k && x[1] !== y)).slice(0, 2).map((x) => x[0]); return { text: `「${y}」を かんじで かくと？`, sayQ: `${y} を かんじで かくと どれ？`, ans: k, choices: shuffle([k, ...ng]), bigC: true, kanji: true,
     ng: (c) => { const f = KANJI.find((x) => x[0] === c); return f ? { h: `<div class="sk-pair"><div class="ngp"><span class="lab">えらんだ のは</span>${big(c, 'kjs')}<span class="ar">=</span>${big(f[2], 'emos')}${big(f[1])}</div><div class="okp"><span class="lab">こたえ</span>${big(k, 'kjs')}<span class="ar">=</span>${big(e, 'emos')}${big(y)}</div></div>`, s: `${c} は ${f[1]}。${y} は ${k}` } : null; },
-    steps: [{ h: `<div class="sk-morph">${big(e, 'emo')}<span>→</span>${big(k, 'kj')}</div>`, s: `${y}は、${why}。だから ${k}` }] }; } },
+    steps: [{ h: `<div class="sk-morph">${big(e, 'emo')}<span>→</span>${big(k, 'kj')}</div>`, s: `${why}。だから「${y}」は ${k}` }] }; } },
   { id: 'k_shugo', n: 'だれが・なにを', q() { const [e, s, o, v, pl] = pick(SHUGO); const other = pick(SHUGO.filter((x) => x[1] !== s)); const who = Math.random() < 0.5;
     const line = `${e}「${s}が ${o}を ${v}。」`;
     return who ? { text: `${line}\n${pl}のは だれ？`, sayQ: `${s}が ${o}を ${v}。${pl}のは だれ？`, ans: s, choices: shuffle([s, o, other[1]]),
-      steps: [{ h: sent([[`${s}が`, 'だれが'], [`${o}を`], [v, 'どうした']]), s: '「が」の まえが「だれが」' }, { h: big(e, 'emo') + big(s), s: `${pl}のは ${s}` }] }
+      steps: [{ h: sent([[`${s}が`, 'だれが'], [`${o}を`], [v, 'どうした']]), s: '「が」の まえの ことばが「だれが」に あたるよ' }, { h: big(e, 'emo') + big(s), s: `${pl}のは ${s}` }] }
     : { text: `${line}\n${s}は なにを ${pl}？`, sayQ: `${s}が ${o}を ${v}。${s}は なにを ${pl}？`, ans: o, choices: shuffle([o, s, other[2]]),
-      steps: [{ h: sent([[`${s}が`], [`${o}を`, 'なにを'], [v, 'どうした']]), s: '「を」の まえが「なにを」' }, { h: big(o), s: `${s}が ${pl}のは ${o}` }] }; } },
+      steps: [{ h: sent([[`${s}が`], [`${o}を`, 'なにを'], [v, 'どうした']]), s: '「を」の まえの ことばが「なにを」に あたるよ' }, { h: big(o), s: `${s}が ${pl}のは ${o}` }] }; } },
   { id: 'k_bun', n: 'ぶんを つくる', q() { const [a, p1, b, p2, v] = pick(BUN); const ok = `${a}${p1} ${b}${p2} ${v}。`; const w1 = `${a}${p2} ${b}${p1} ${v}。`; const w2 = `${a}わ ${b}${p2 === 'へ' ? 'え' : 'お'} ${v}。`;
     return { text: 'ただしい ぶんは どれ？', sayQ: 'ただしい ぶんは どれ？', ans: ok, choices: shuffle([ok, w1, w2]), txt: true,
       ng: (c) => ({ h: `<div class="sk-pair"><div class="ngp"><span class="lab">えらんだ ぶん</span><div class="sk-p">${c}</div></div></div>`, s: c === w1 ? `これだと ${b}が ${v} みたいに なっちゃうね` : '「わ」「え」「お」の かきかたが ちがうね' }),
-      steps: [{ h: sent([[`${a}${p1}`, 'だれが'], [`${b}${p2}`, p2 === 'へ' ? 'どこへ' : 'なにを'], [v, 'どうする']]), s: `だれが → ${p2 === 'へ' ? 'どこへ' : 'なにを'} → どうする` }, { h: `<div class="sk-p">${a}<b class="mark big">${p1}</b> ${b}<b class="mark big">${p2}</b> ${v}。</div>`, s: `よむ ときは「${p1 === 'は' ? 'わ' : p1}」「${p2 === 'へ' ? 'え' : 'お'}」、かく ときは「${p1}」「${p2}」` }] }; } },
+      steps: [{ h: sent([[`${a}${p1}`, 'だれは'], [`${b}${p2}`, p2 === 'へ' ? 'どこへ' : 'なにを'], [v, 'どうする']]), s: `だれは → ${p2 === 'へ' ? 'どこへ' : 'なにを'} → どうする` }, { h: `<div class="sk-p">${a}<b class="mark big">${p1}</b> ${b}<b class="mark big">${p2}</b> ${v}。</div>`, s: `よむ ときは「${p1 === 'は' ? 'わ' : p1}」「${p2 === 'へ' ? 'え' : 'お'}」、かく ときは「${p1}」「${p2}」` }] }; } },
   { id: 'k_jun', n: 'じゅんばんの ことば', q() { const [e, ss, cue] = pick(JUN2); const first = Math.random() < 0.6; const ans = first ? ss[0] : ss[2]; const mix = shuffle(ss);
     const hl = (t, i) => t.replace(cue[i], `<b class="mark">${cue[i]}</b>`);
     return { text: `${e} おはなしの じゅんばんを かんがえよう\n<b>${first ? 'いちばん はじめ' : 'いちばん さいご'}</b>は どれ？`, sayQ: `おはなしの じゅんばんを かんがえよう。${first ? 'いちばん はじめ' : 'いちばん さいご'}は どれ？`, ans, choices: mix, txt: true,
-      steps: [{ h: `<div class="sk-story">${ss.map((t, i) => `<div>${i + 1}. ${hl(t, i)}</div>`).join('')}</div>`, s: `「${cue[0]}」「${cue[1]}」「${cue[2]}」が じゅんばんの あいず` }, { h: `<div class="sk-story"><div>${hl(ans, first ? 0 : 2)}</div></div>`, s: `「${first ? cue[0] : cue[2]}」が ついているから、${first ? 'いちばん はじめ' : 'いちばん さいご'}` }] }; } },
+      steps: [{ h: `<div class="sk-story">${ss.map((t, i) => `<div>${i + 1}. ${hl(t, i)}</div>`).join('')}</div>`, s: `「${cue[0]}」「${cue[1]}」「${cue[2]}」が じゅんばんの あいず` }, { h: `<div class="sk-story"><div>${hl(ans, first ? 0 : 2)}</div></div>`, s: `「${cue[0]}」→「${cue[1]}」→「${cue[2]}」の じゅん。だから「${first ? cue[0] : cue[2]}」の ぶんが ${first ? 'いちばん はじめ' : 'いちばん さいご'}` }] }; } },
   { id: 'k_kimochi', n: 'きもちを よむ', q(d) { const lv = d < 0.34 ? 1 : d < 0.67 ? 2 : 3; const r = pick(KIMO.filter((x) => x.lv === lv)); const tier = ['', 'きもちの ことばを さがそう', 'ようすから かんがえよう', 'おはなしから かんがえよう'][lv]; const op = (x) => `${x[0]} ${x[1]}`; return { text: `<div class="sk-story">${r.t}</div>${lv === 3 ? 'いちばん ちかい きもちは？' : 'どんな きもち？'}`, sayQ: `${r.t} どんな きもち？`, ans: op(r.a), choices: shuffle([op(r.a), ...r.ng.map(op)]), txt: true,
-      steps: [{ h: `<div class="sk-story">${r.t.replace(r.k, `<span class="mark">${r.k}</span>`)}</div>`, s: `${tier}。ヒントは「${r.k}」` }, { h: `<div class="sk-p"><span class="mark">${r.k}</span></div><div class="sk-p">↓</div>` + big(r.a[0], 'emo') + big(r.a[1]), s: `${r.k}、だから ${r.a[1]} きもち` }, ...(r.w ? [{ h: `<div class="sk-p">${r.ng.map((x) => `${x[0]} ${x[1]}`).join('　')} は？</div>`, s: r.w }] : [])] }; } },
+      steps: [{ h: `<div class="sk-story">${r.t.replace(r.k, `<span class="mark">${r.k}</span>`)}</div>`, s: `${tier}。ヒントは ${/^「/.test(r.k) ? r.k : `「${r.k}」`}` }, { h: `<div class="sk-p"><span class="mark">${r.k}</span></div><div class="sk-p">↓</div>` + big(r.a[0], 'emo') + big(r.a[1]), s: `${r.k}。だから きもちは「${r.a[1]}」` }, ...(r.w ? [{ h: `<div class="sk-p">${r.ng.map((x) => `${x[0]} ${x[1]}`).join('　')} は？</div>`, s: r.w }] : [])] }; } },
 ];
 const COLE = [['red', 'あか', '🟥'], ['blue', 'あお', '🟦'], ['yellow', 'きいろ', '🟨'], ['green', 'みどり', '🟩'], ['pink', 'ピンク', '🩷'], ['black', 'くろ', '⬛'], ['white', 'しろ', '⬜'], ['orange', 'オレンジ', '🟧'], ['purple', 'むらさき', '🟪'], ['brown', 'ちゃいろ', '🟫']];
 const ED = {}; [...EN, ...BODY].forEach(([e, w, j]) => { ED[w] = [e, j]; ED[e] = [w, j]; }); COLE.forEach(([w, j, e]) => { ED[w] = [e, j]; ED[e] = [w, j]; });
@@ -534,7 +535,7 @@ const MON_EMO = { 4: '🌸', 5: '🎏', 6: '☔', 7: '🌻', 8: '🍉', 9: '🎑
 const SCHOOL = [4, 5, 6, 7, 9, 10, 11, 12, 1, 2, 3]; const ordM = (m) => (m + 8) % 12; // 4がつ＝0 … 3がつ＝11
 const NEWM = [
   { id: 'm_count', n: 'かずを かぞえる', q() { const n = R(1, 10); const [em, nm] = pick([['🍎', 'りんご'], ['🐟', 'さかな'], ['⭐', 'ほし'], ['🌷', 'はな'], ['🚗', 'くるま']]); return { text: `${nm}は いくつ？`, sayQ: `${nm}は いくつ？`, viz: `<div class="sk-objs">${em.repeat(n)}</div>`, ans: String(n), choices: numChoices(n, 1, 10), bigC: true, steps: [{ h: `<div class="sk-objs">${[...Array(n)].map(() => `<i class="sk-d emo-d">${em}</i>`).join('')}</div>`, s: 'ひとつずつ ゆびで さして かぞえよう', run: countRun('.sk-d', 1) }, { h: big(String(n)), s: `${n}こ` }] }; } },
-  { id: 'm_cmp', n: 'どちらが おおきい', q() { let a = R(1, 10), b = R(1, 10); while (b === a) b = R(1, 10); return { text: 'おおきい かずは どっち？', sayQ: `${a} と ${b}、おおきい かずは どっち？`, viz: `<div class="sk-cmp"><div><b>${a}</b>${numDots(a, 'a', 0)}</div><div><b>${b}</b>${numDots(b, 'b', 0)}</div></div>`, ans: String(Math.max(a, b)), choices: shuffle([String(a), String(b)]), bigC: true, steps: [{ h: `<div class="sk-cmp"><div>${numDots(a, 'a', 1)}<b>${a}</b></div><div>${numDots(b, 'b', 1)}<b>${b}</b></div></div>`, s: 'つぶを ならべて くらべよう。ながい ほうが おおきい' }, { h: big(String(Math.max(a, b))), s: `${Math.max(a, b)}の ほうが おおきい` }] }; } },
+  { id: 'm_cmp', n: 'どちらが おおきい', q() { let a = R(1, 10), b = R(1, 10); while (b === a) b = R(1, 10); return { text: 'おおきい かずは どっち？', sayQ: `${a} と ${b}、おおきい かずは どっち？`, viz: `<div class="sk-cmp"><div><b>${a}</b>${numDots(a, 'a', 0)}</div><div><b>${b}</b>${numDots(b, 'b', 0)}</div></div>`, ans: String(Math.max(a, b)), choices: shuffle([String(a), String(b)]), bigC: true, steps: [{ h: `<div class="sk-cmp"><div>${numDots(a, 'a', 1)}<b>${a}</b></div><div>${numDots(b, 'b', 1)}<b>${b}</b></div></div>`, s: 'つぶを ならべて くらべよう。つぶが おおい ほうが おおきい' }, { h: big(String(Math.max(a, b))), s: `${Math.max(a, b)}の ほうが おおきい` }] }; } },
   { id: 'm_bunkai', n: 'いくつと いくつ', q() { const n = R(3, 9), a = R(1, n - 1); return { text: `${n}は ${a}と いくつ？`, sayQ: `${n}は ${a}と いくつ？`, viz: numDots(n, 'a', 0), ans: String(n - a), choices: numChoices(n - a, 0, 9), bigC: true, steps: [{ h: numDots(a, 'a', 1) + numDots(n - a, 'b', 0, 'join'), s: `${n}こを ${a}こと のこりに わけるよ`, run: countRun('.sk-d.b', 1) }, { h: eq(`${n}は ${a}と <b>${n - a}</b>`), s: `${n}は ${a}と ${n - a}` }] }; } },
 ];
 const HIRA_W = [['🐶', 'いぬ'], ['🐱', 'ねこ'], ['🐟', 'さかな'], ['🍎', 'りんご'], ['🚗', 'くるま'], ['🌸', 'はな'], ['🐻', 'くま'], ['🦊', 'きつね'], ['🍓', 'いちご'], ['🐢', 'かめ'], ['🍉', 'すいか'], ['🐘', 'ぞう'], ['🥚', 'たまご'], ['🦉', 'ふくろう']];
@@ -593,7 +594,7 @@ function deEmo(node) { if (node.nodeType === 3) { deEmoText(node); return; } if 
 const SHOP = [[10, 'candy', 'あめ', 'こ'], [30, 'choco', 'ちいさい チョコ', 'こ'], [40, 'egg', 'たまご', 'こ'], [40, 'banana', 'バナナ', 'ほん'], [50, 'mikan', 'みかん', 'こ'], [60, 'pencil', 'えんぴつ', 'ほん'], [80, 'eraser', 'けしゴム', 'こ'], [110, 'gum', 'ガム', 'パック'], [130, 'apple', 'りんご', 'こ'], [150, 'onigiri', 'おにぎり', 'こ'], [150, 'pudding', 'プリン', 'こ'],
   [160, 'juice_bottle', 'ペットボトルの おちゃ', 'ほん'], [200, 'notebook', 'ノート', 'さつ'], [200, 'hamburger', 'ハンバーガー', 'こ'], [220, 'donut', 'ドーナツ', 'こ'], [250, 'milk', 'ぎゅうにゅう', 'パック'], [300, 'sticker', 'シール', 'まい'], [350, 'icecream', 'ソフトクリーム', 'こ'], [400, 'cake', 'ショートケーキ', 'こ'], [600, 'strawberry', 'いちご', 'パック'],
   [600, 'color_pencils', 'いろえんぴつ', 'はこ'], [1000, 'jigsaw', 'パズル', 'こ'], [1100, 'toy_car', 'おもちゃの くるま', 'だい'], [1300, 'book', 'えほん', 'さつ'], [2000, 'teddy', 'くまの ぬいぐるみ', 'こ'], [2000, 'stuffed_rabbit', 'うさぎの ぬいぐるみ', 'こ'], [3000, 'ball', 'サッカーボール', 'こ'], [20000, 'bicycle', 'じてんしゃ', 'だい']];
-const cnt = (n, u) => u === 'ほん' ? n + ([1, 6, 8, 0].includes(n % 10) && n !== 11 ? 'ぽん' : n % 10 === 3 ? 'ぼん' : 'ほん') : u === 'はこ' ? n + (n === 1 || n === 6 || n === 8 || n % 10 === 0 ? 'ぱこ' : n === 3 ? 'ぱこ' : 'はこ') : u === 'だい' ? n + 'だい' : n + u;
+const cnt = (n, u) => u === 'ほん' ? n + ([1, 6, 8, 0].includes(n % 10) && n !== 0 ? 'ぽん' : n % 10 === 3 ? 'ぼん' : 'ほん') : u === 'はい' ? n + ([1, 6, 8, 0].includes(n % 10) && n !== 0 ? 'ぱい' : n % 10 === 3 ? 'ばい' : 'はい') : u === 'はこ' ? n + (n === 1 || n === 6 || n === 8 || n % 10 === 0 ? 'ぱこ' : n === 3 ? 'ぱこ' : 'はこ') : u === 'だい' ? n + 'だい' : n + u;
 
 // ───────── きょうかしょ（啓林館『わくわく さんすう 1』p76〜p139）に そった さんすう
 // エンジンの なかに はりこむ。TB_MATH だけを そとに だす（ほかの なまえは この なかだけ）。
@@ -656,7 +657,7 @@ const TB_MATH = (() => {
     else if (b % 10 === 0) st = [{ h: BD(a), s: `${a}は ${at}と ${ao}` }, { h: eq(`${at} ${S} ${b} ＝ ${op === '+' ? at + b : at - b}`), s: `10の たばの ほうを けいさん。${at} ${W} ${b}は ${op === '+' ? at + b : at - b}` }, { h: BD(r) + eq(`${a} ${S} ${b} ＝ <b>${r}</b>`), s: `ばらの ${ao}は そのまま。こたえは ${r}` }];
     else if (op === '+' && ao === 0) st = [{ h: BD(a) + OP('と') + O('stick', b), s: `${a}と ${b}` }, { h: BD(r) + eq(`${a} ＋ ${b} ＝ <b>${r}</b>`), s: `${a}と ${b}で ${r}` }];
     else if (op === '-' && b === ao) st = [{ h: BD(a), s: `${a}は ${at}と ${ao}` }, { h: B10(at) + `<div class="sk-objs">${O('stick', ao, ao)}</div>`, s: `ばらの ${ao}を とると` }, { h: eq(`${a} − ${b} ＝ <b>${r}</b>`), s: `${at}が のこる。こたえは ${r}` }];
-    else { const oo = op === '+' ? ao + b : ao - b; st = [{ h: BD(a), s: `${a}は ${at}と ${ao}` }, { h: eq(`${ao} ${S} ${b} ＝ ${oo}`), s: `ばらの ほうを けいさん。${ao} ${W} ${b}は ${oo}` }, { h: BD(r) + eq(`${at} と ${oo} で <b>${r}</b>`), s: `${at}と ${oo}で ${r}` }]; }
+    else { const oo = op === '+' ? ao + b : ao - b; st = [{ h: BD(a), s: `${a}は ${at}と ${ao}` }, { h: eq(`${ao} ${S} ${b} ＝ ${oo}`), s: `ばらの ほうを けいさん しよう。${ao} ${W} ${b}は ${oo}` }, { h: BD(r) + eq(`${at} と ${oo} で <b>${r}</b>`), s: `${at}と ${oo}で ${r}` }]; }
     return { text: `${a} ${S} ${b} ＝ ？`, sayQ: `${a} ${W} ${b} は？`, ans: String(r), choices: numChoices(r, 0, 100), bigC: true, steps: st }; }
   function threeQ(a, o1, b, o2, c) { const ab = o1 === '+' ? a + b : a - b, r = o2 === '+' ? ab + c : ab - c;
     return { text: `${a} ${SY(o1)} ${b} ${SY(o2)} ${c} ＝ ？`, sayQ: `${a} ${WD(o1)} ${b} ${WD(o2)} ${c} は？`, ans: String(r), choices: numChoices(r, 0, 20), bigC: true, steps: [
@@ -722,7 +723,7 @@ const TB_MATH = (() => {
         const cmp = (hl) => `<div class="sk-cmp">${row('ball_red', r)}${row('ball_white', w, hl)}</div>`;
         q.viz = cmp(false); q.steps = [{ h: cmp(false), s: 'あかと しろを 1こずつ ならべて みよう' }, { h: cmp(true), s: `しろが ${s}こ のこったね。これが おおい ぶんだよ` }, { h: eq(`${w} − ${r} ＝ <b>${s}</b>`), s: `しきに すると ${w} ひく ${r} は ${s}` }, { h: big(ans), s: `こたえは ${ans}` }]; return q; } // p80
       if (t === 3) { const n = R(11, 14), m = R(n - 9, 5); return wq({ a: n, op: '-', b: m, u: 'こ', text: `くりが ${n}こ あります。${m}こ たべると、<b>のこりは</b> なんこ？`, viz: O('chestnut', n), kw: KW_NOKORI('のこりは'), kws: 'たべると へる。のこりは ひきざん', vizS: O('chestnut', n, m), vizSs: `${m}こ たべるよ` }); } // p81
-      const n = R(11, 15), m = R(n - 9, 9); return wq({ a: n, op: '-', b: m, u: 'ひき', ansS: hiki(n - m), text: `こねこが ${hiki(n)} あそんで いました。${hiki(m)} ねました。<b>おきて いるのは</b> なんびき？`, choices: chT(hiki(n - m), [hiki(n - m + 1), hiki(n - m - 1 || n - m + 2), hiki(n + m > 20 ? n - m + 10 : n + m)], 3), kw: 'ねた ぶんを ひく → ひきざん', kws: `${n}ひきの うち ${m}ひき ねたから、ひきざん` }); } }, // p85 かみしばい
+      const n = R(11, 15), m = R(n - 9, 9); return wq({ a: n, op: '-', b: m, u: 'ひき', ansS: hiki(n - m), text: `こねこが ${hiki(n)} あそんで いました。${hiki(m)} ねました。<b>おきて いるのは</b> なんびき？`, choices: chT(hiki(n - m), [hiki(n - m + 1), hiki(n - m - 1 || n - m + 2), hiki(n + m > 20 ? n - m + 10 : n + m)], 3), kw: 'ねた ぶんを ひく → ひきざん', kws: `${hiki(n)}の うち ${hiki(m)} ねたから、ひきざん` }); } }, // p85 かみしばい
     { id: 'tm_hiku_card', n: 'ひきざんの かあど', page: 82, m: 12, q(d) { const t = R(0, 2);
       if (t === 0) { const tg = d < 0.4 ? 9 : R(2, 9); const ok = HC.filter((e) => valOf(e) === tg), ng = HC.filter((e) => valOf(e) !== tg); const a = pick(ok), n = d < 0.5 ? 3 : 4; const raw = shuffle([a, ...shuffle(ng).slice(0, n - 1)]), ch = raw.map(show);
         return { text: `こたえが ${tg}に なる かあどは どれ？`, sayQ: `こたえが ${tg} に なる かあどは どれ？`, ans: show(a), choices: ch, txt: true, steps: [{ h: P(raw.map((c) => `${show(c)} ＝ ${valOf(c)}`).join('<br>')), s: 'ひとつずつ こたえを だして みよう' }, { h: eq(`${show(a)} ＝ <b>${tg}</b>`), s: `${strip(show(a)).replace('−', 'ひく')} は ${tg}` }] }; } // p82・p86 めいろ
@@ -747,22 +748,22 @@ const TB_MATH = (() => {
     // ════ 16 0の たしざんと ひきざん  p88〜89
     { id: 'tm_zero', n: '0の たしざんと ひきざん', page: 88, m: 1, q(d) { const t = R(0, 2);
       if (t === 0) { const nm = pick(['みさき', 'けんた', 'あすか']); const a = d < 0.5 ? R(0, 3) : R(0, 5), b = a === 0 ? R(0, 3) : pick([0, 0, R(1, 3)]); const r = a + b; // p88 たまいれ
-        return { text: `たまいれ。${nm}さんは 1かいめ ${a}こ、2かいめ ${b}こ はいりました。あわせて なんこ？`, sayQ: `たまいれ。${nm}さんは いっかいめ ${a}こ、にかいめ ${b}こ はいりました。あわせて なんこ？`, viz: COL(LB('1かいめ', a ? O('ball_red', a) : P('0こ')), LB('2かいめ', b ? O('ball_red', b) : P('0こ'))), ans: String(r), choices: numChoices(r, 0, 8), bigC: true, steps: [{ h: P('はいらなかった ときは 0こ'), s: '1こも はいらない ときは 0こ。0も しきに かけるよ' }, ...(a === 0 || b === 0 ? zeroQ(a, '+', b).steps.slice(-1) : addQ(a, b).steps)] }; }
+        return { text: `たまいれ。${nm}さんの たまは 1かいめに ${a}こ、2かいめに ${b}こ はいりました。あわせて なんこ？`, sayQ: `たまいれ。${nm}さんの たまは いっかいめに ${a}こ、にかいめに ${b}こ はいりました。あわせて なんこ？`, viz: COL(LB('1かいめ', a ? O('ball_red', a) : P('0こ')), LB('2かいめ', b ? O('ball_red', b) : P('0こ'))), ans: String(r), choices: numChoices(r, 0, 8), bigC: true, steps: [{ h: P('はいらなかった ときは 0こ'), s: '1こも はいらない ときは 0こ。0も しきに かくよ' }, ...(a === 0 || b === 0 ? zeroQ(a, '+', b).steps.slice(-1) : addQ(a, b).steps)] }; }
       if (t === 1) { const k = pick([R(1, 5), 6, 0]), nm = pick(['けんた', 'あすか', 'みさき']); const r = 6 - k; // p89 ボウリング
-        return { text: `ペットボトルが ${hon(6)} たって います。${nm}さんは ${k === 0 ? '1ぽんも たおせませんでした' : `${hon(k)} たおしました`}。のこりは なんぼん？`, sayQ: `ペットボトルが ${hon(6)} たって います。${nm}さんは ${k === 0 ? 'いっぽんも たおせませんでした' : `${hon(k)} たおしました`}。のこりは なんぼん？`, viz: O('bottle_pin', 6), ans: String(r), choices: numChoices(r, 0, 8), bigC: true, steps: [{ h: O('bottle_pin', 6, k), s: k ? `${k}ほん たおれた` : 'ひとつも たおれない ときは 0ぽん' }, { h: eq(`6 − ${k} ＝ <b>${r}</b>`), s: `6 ひく ${k} は ${r}` }] }; }
+        return { text: `ペットボトルが ${hon(6)} たって います。${nm}さんは ${k === 0 ? '1ぽんも たおせませんでした' : `${hon(k)} たおしました`}。のこりは なんぼん？`, sayQ: `ペットボトルが ${hon(6)} たって います。${nm}さんは ${k === 0 ? 'いっぽんも たおせませんでした' : `${hon(k)} たおしました`}。のこりは なんぼん？`, viz: O('bottle_pin', 6), ans: String(r), choices: numChoices(r, 0, 8), bigC: true, steps: [{ h: O('bottle_pin', 6, k), s: k ? `${hon(k)} たおれた` : '1ぽんも たおれない ときは 0ほん' }, { h: eq(`6 − ${k} ＝ <b>${r}</b>`), s: `6 ひく ${k} は ${r}` }] }; }
       const e = pick(d < 0.5 ? ['1+0', '4+0', '7+0', '10+0', '0+1', '0+5', '0+9', '0+10'] : ['1-1', '3-3', '8-8', '10-10', '1-0', '5-0', '10-0', '0-0', '0+0', ...L.r8]); return Math.random() < 0.5 ? parse(e) : parse(G.r8()); } },
 
     // ════ 17 ものと ひとの かず  p90〜93
     { id: 'tm_mono', n: 'ものと ひとの かず', page: 90, m: 1, q(d) {
       if (Math.random() < 0.6) { const n = d < 0.4 ? R(6, 10) : R(11, 15), c = d < 0.4 ? R(2, n - 1) : R(Math.max(n - 9, 5), 9); const r = n - c; // p90 ▲1 いす14 こども9
-        return { text: `いすが ${n}きゃく あります。こどもが ${c}にん、1にんずつ すわります。<b>あいて いる いすは</b> なんきゃく？`, sayQ: `いすが ${n}きゃく あります。こどもが ${c}にん、ひとりずつ すわります。あいて いる いすは なんきゃく？`, viz: COL(LB('いす', O('chair', n)), LB('こども', O('child', c))), ans: String(r), choices: numChoices(r, 0, 12), bigC: true, nums: n <= 20 ? [n, c, '-'] : undefined,
+        return { text: `いすが ${n}きゃく あります。こどもが ${c}にん、1きゃくに ひとりずつ すわります。<b>あいて いる いすは</b> なんきゃく？`, sayQ: `いすが ${n}きゃく あります。こどもが ${c}にん、ひとりずつ すわります。あいて いる いすは なんきゃく？`, viz: COL(LB('いす', O('chair', n)), LB('こども', O('child', c))), ans: String(r), choices: numChoices(r, 0, 12), bigC: true, nums: n <= 20 ? [n, c, '-'] : undefined,
           steps: [{ h: COL(LB('いす', O('chair', n, r)), LB('こども', O('child', c))), s: 'いすと こどもを 1つずつ せんで むすぶと、こどもの いない いすが のこる' }, { h: eq(`${n} − ${c}`), s: `いすの かずから こどもの かずを ひく。${n} ひく ${c}` }, ...cq(n, '-', c).steps, { h: big(`${r}きゃく`), s: `あいて いる いすは ${r}きゃく` }] }; }
       const s = d < 0.4 ? R(3, 5) : R(4, 9), t = d < 0.4 ? R(2, 5) : R(Math.max(2, 11 - s), 9), r = s + t; // p90 ▲2 しゃしん
-      return { text: `しゃしんを とります。${s}きゃくの いすに 1にんずつ すわり、うしろに ${t}にん たちます。<b>みんなで</b> なんにん？`, sayQ: `しゃしんを とります。${s}きゃくの いすに ひとりずつ すわり、うしろに ${t}にん たちます。みんなで なんにん？`, viz: COL(LB('たつ', O('child', t)), LB('すわる', O('child', s))), ans: String(r), choices: numChoices(r, 2, 20), bigC: true,
+      return { text: `しゃしんを とります。${s}きゃくの いすに ひとりずつ すわり、うしろに ${t}にん たちます。<b>みんなで</b> なんにん？`, sayQ: `しゃしんを とります。${s}きゃくの いすに ひとりずつ すわり、うしろに ${t}にん たちます。みんなで なんにん？`, viz: COL(LB('たつ', O('child', t)), LB('すわる', O('child', s))), ans: String(r), choices: numChoices(r, 2, 20), bigC: true,
         steps: [{ h: P('いす 1きゃくに 1にん → すわる ひとは いすの かずと おなじ'), s: `すわって いるのは ${s}にん` }, { h: eq(`${s} ＋ ${t}`), s: `すわる ${s}にんと たつ ${t}にんを あわせる` }, ...cq(s, '+', t).steps, { h: big(`${r}にん`), s: `みんなで ${r}にん` }] }; } },
     { id: 'tm_junban', n: 'なんばんめ', page: 91, m: 1, q(d) { const t = d < 0.3 ? R(0, 1) : R(0, 3); const row = (n, k, hl) => `<div style="display:flex;align-items:center;gap:8px;justify-content:center"><b style="font-size:22px">まえ</b><span class="sk-dr" style="max-width:520px">${Array.from({ length: n }, (_, i) => `<i class="sk-d ${i === k - 1 ? 'b' : 'a'}${hl && hl(i) ? ' hle' : ''}" style="--i:${i}"${hl ? ` data-n="${i + 1}"` : ''}></i>`).join('')}</span><b style="font-size:22px">うしろ</b></div>`;
       if (t === 0) { const b = d < 0.5 ? R(2, 7) : R(5, 11), k = b + 1; // p91 ▲1 けんたさんの まえに 7にん
-        return { text: `1にんずつ じゅんに ならびます。けんたさんの まえに ${b}にん います。けんたさんは まえから なんばんめ？`, sayQ: `ひとりずつ じゅんに ならびます。けんたさんの まえに ${b}にん います。けんたさんは まえから なんばんめ？`, viz: row(k, k), ans: `${k}ばんめ`, choices: chT(`${k}ばんめ`, [`${b}ばんめ`, `${k + 1}ばんめ`, `${b - 1}ばんめ`]), txt: true,
+        return { text: `ひとりずつ じゅんばんに ならびます。けんたさんの まえに ${b}にん います。けんたさんは まえから なんばんめ？`, sayQ: `ひとりずつ じゅんに ならびます。けんたさんの まえに ${b}にん います。けんたさんは まえから なんばんめ？`, viz: row(k, k), ans: `${k}ばんめ`, choices: chT(`${k}ばんめ`, [`${b}ばんめ`, `${k + 1}ばんめ`, `${b - 1}ばんめ`]), txt: true,
           steps: [{ h: row(k, k, (i) => i < b), s: `まえの ${b}にんの つぎが けんたさん` }, { h: row(k, k, () => true), s: Array.from({ length: k }, (_, i) => i + 1).join('、') }, { h: big(`${k}ばんめ`), s: `けんたさんは まえから ${k}ばんめ` }] }; }
       if (t === 1) { const k = d < 0.5 ? R(3, 8) : R(6, 12), b = k - 1; // p91 ▲2 みさきさんは 6ばんめ
         return { text: `ふねに のります。みさきさんは まえから ${k}ばんめ。みさきさんの <b>まえには</b> なんにん？`, sayQ: `ふねに のります。みさきさんは まえから ${k}ばんめ。みさきさんの まえには なんにん？`, viz: row(k, k), ans: `${b}にん`, choices: chT(`${b}にん`, [`${k}にん`, `${b - 1}にん`, `${k + 1}にん`]), txt: true,
@@ -784,7 +785,7 @@ const TB_MATH = (() => {
       let u = R(0, 3), rt = R(0, 4); if (u + rt === 0) rt = 2; const mv = d > 0.8 ? shuffle([...Array(u).fill('うえ'), ...Array(rt).fill('みぎ')]) : [...Array(u).fill('うえ'), ...Array(rt).fill('みぎ')]; // p95 うえ・みぎ・みぎ
       const r = 1 + u, c = 1 + rt, a = cell[`${r},${c}`]; const path = []; { let y = 1, x = 1; for (const s of mv) { if (s === 'うえ') y++; else x++; path.push(`${y},${x}`); } }
       return { text: `ろぼっとが「${mv.join('・')}」と 1ますずつ すすむと、どの もじに つく？`, sayQ: `ろぼっとが ${mv.join('、')} と ひとますずつ すすむと、どの もじに つく？`, viz: grid(), ans: a, choices: chT(a, near(r, c)), bigC: true, steps: [
-        { h: grid((y, x) => (y === 1 && x === 1 ? '#ffb84d' : '')), s: 'ろぼっとは ひだりの いちばん した' }, { h: grid((y, x) => (path.includes(`${y},${x}`) ? (y === r && x === c ? '#5cc183' : '#8ccfff') : '')), s: `${mv.join('、')}。1ますずつ すすむと ここ` }, { h: big(a), s: `こたえは ${a}` }] }; } },
+        { h: grid((y, x) => (y === 1 && x === 1 ? '#ffb84d' : '')), s: 'ろぼっとは ひだりはしの いちばん したに いるよ' }, { h: grid((y, x) => (path.includes(`${y},${x}`) ? (y === r && x === c ? '#5cc183' : '#8ccfff') : '')), s: `${mv.join('、')}。1ますずつ すすむと ここ` }, { h: big(a), s: `こたえは ${a}` }] }; } },
 
     // ════ ふくしゅう  p96〜97
     { id: 'tm_fuku96', n: 'ふくしゅう（96ページ）', page: 96, m: 1, q(d) { const t = R(0, 4);
@@ -797,7 +798,7 @@ const TB_MATH = (() => {
       if (t === 3) { const ok = pick([`${R(8, 9)}+${R(3, 5)}`, `${R(17, 19)}-${R(5, 6)}`]); const ng = [`${R(2, 4)}+${R(3, 6)}`, `${R(11, 12)}-${R(2, 5)}`, `${R(5, 6)}+${R(2, 4)}`, `${R(13, 15)}-${R(4, 6)}`].filter((e) => valOf(e) <= 10); const ch = shuffle([ok, ...shuffle(ng).slice(0, 2)]); // ❗p97 ▲5
         return { text: 'こたえが 10より おおきく なるのは どれ？', sayQ: 'こたえが じゅうより おおきく なるのは どれ？', ans: show(ok), choices: ch.map(show), txt: true, steps: [{ h: P(ch.map((e) => `${show(e)} ＝ ${valOf(e)}`).join('<br>')), s: 'ひとつずつ けいさん して みよう' }, { h: eq(`${show(ok)} ＝ <b>${valOf(ok)}</b>`), s: `10より おおきいのは ${valOf(ok)}` }] }; }
       const a = d < 0.5 ? 13 : R(11, 16), b = d < 0.5 ? 6 : R(a - 9, 9), r = a - b; // ❗p97 ▲6 すずめ13 はと6
-      return wq({ a, op: '-', b, u: 'わ', text: `すずめが ${a}わ、はとが ${b}わ います。すずめは はとより なんわ おおい？`, viz: COL(LB('すずめ', O('sparrow', a)), LB('はと', O('pigeon', b))), kw: 'ちがいは ひきざん', kws: `どちらが おおいかの ちがいは ${a} ひく ${b}` }); } },
+      return wq({ a, op: '-', b, u: 'わ', text: `すずめが ${a}わ、はとが ${b}わ います。すずめは はとより なんわ おおい？`, viz: COL(LB('すずめ', O('sparrow', a)), LB('はと', O('pigeon', b))), kw: 'ちがいは ひきざん', kws: 'おおい ほうから すくない ほうを ひく' }); } },
 
     // ════ 18 大きい かず  p98〜111
     { id: 'tm_kazoe', n: 'ぼうの かずを かぞえる', page: 98, m: 1, q(d) { const t = d < 0.4 ? R(2, 4) : R(2, 9), o = R(0, 9), n = t * 10 + o; // p98 26・30、p99 42・60、p100 54・70・43
@@ -827,7 +828,7 @@ const TB_MATH = (() => {
       const coins = (n10, n5, n1) => `<div class="sk-objs">${[...Array(n10).fill('coin10'), ...Array(n5).fill('coin5'), ...Array(n1).fill('coin1')].map((x) => `<i class="sk-d emo-d">${ill(x)}</i>`).join('')}</div>`;
       if (k === 0) return { text: `10えんだまが ${t}まいと 1えんだまが ${o}まい。ぜんぶで なんえん？`, sayQ: `じゅうえんだまが ${t}まいと いちえんだまが ${o}まい。ぜんぶで なんえん？`, viz: coins(t, 0, o), ans: `${price}えん`, choices: chT(`${price}えん`, [`${o * 10 + t}えん`, `${t + o}えん`, `${price + 10}えん`, `${price - 1}えん`]), txt: true, steps: [{ h: coins(t, 0, 0), s: `10えんが ${t}まいで ${t * 10}えん` }, { h: `<span class="sk-grp">${coins(t, 0, 0)}<b>${t * 10}えん</b></span>` + OP('＋') + `<span class="sk-grp">${coins(0, 0, o)}<b>${o}えん</b></span>`, s: `10えんだまで ${t * 10}えん。1えんだまで ${o}えん` }, { h: eq(`${t * 10}えん ＋ ${o}えん ＝ <b>${price}えん</b>`), s: `${t * 10}えんと ${o}えん。あわせて ${price}えん` }] }; // p107 そら「10が2つと1が8つ」
       if (k === 1) { const f = Math.floor(price / 5), r1 = price % 5; return { text: `5えんだまが ${f}まいと 1えんだまが ${r1}まい。ぜんぶで なんえん？`, sayQ: `ごえんだまが ${f}まいと いちえんだまが ${r1}まい。ぜんぶで なんえん？`, viz: coins(0, f, r1), ans: `${price}えん`, choices: chT(`${price}えん`, [`${f + r1}えん`, `${price + 5}えん`, `${price - 5}えん`, `${price + 1}えん`]), txt: true, steps: [{ h: coins(0, f, 0), s: Array.from({ length: f }, (_, i) => (i + 1) * 5).join('、') }, { h: coins(0, f, r1) + eq(`<b>${price}</b>えん`), s: r1 ? `${f * 5}から ${Array.from({ length: r1 }, (_, i) => f * 5 + i + 1).join('、')}。${price}えん` : `${price}えん` }] }; } // p107 れん「5、10、15…」
-      return { text: `${price}えんの ${nm}を かいます。10えんだま ${t}まいと、1えんだまは なんまい いる？`, sayQ: `${price}えんの ${nm}を かいます。じゅうえんだま ${t}まいと、いちえんだまは なんまい いる？`, viz: coins(t, 0, 0), ans: `${o}まい`, choices: chT(`${o}まい`, [`${t}まい`, `${o + 1}まい`, `${o > 1 ? o - 1 : o + 2}まい`, `${price}まい`]), txt: true, steps: [{ h: PV(t, o), s: `${price}は 10が ${t}つと 1が ${o}つ` }, { h: coins(t, 0, o), s: `1えんだまは ${o}まい` }] }; } },
+      return { text: `${price}えんの ${nm}を かいます。10えんだまを ${t}まいと、1えんだまを なんまい だせば いい？`, sayQ: `${price}えんの ${nm}を かいます。じゅうえんだまを ${t}まいと、いちえんだまを なんまい だせば いい？`, viz: coins(t, 0, 0), ans: `${o}まい`, choices: chT(`${o}まい`, [`${t}まい`, `${o + 1}まい`, `${o > 1 ? o - 1 : o + 2}まい`, `${price}まい`]), txt: true, steps: [{ h: PV(t, o), s: `${price}は 10が ${t}つと 1が ${o}つ` }, { h: coins(t, 0, o), s: `1えんだまは ${o}まい` }] }; } },
     { id: 'tm_100koe', n: '100より おおきい かず', page: 108, m: 2, q(d) { const t = R(0, 2);
       if (t === 0) { const x = d < 0.4 ? pick([13, 20, 6]) : R(1, 20), n = 100 + x; // p108 113・120・106
         return { text: 'ぼうは なんぼん？', sayQ: 'ぼうは なんぼん あるかな？', viz: BD(n), ans: String(n), choices: chT(n, [100 + (x % 10) * 10 + Math.floor(x / 10), n + 1, n - 1, n + 10, x < 10 ? 100 + x * 10 : n - 10].filter((v) => v > 100 && v <= 130)), bigC: true, steps: [{ h: O('stick100', 1), s: '10の たばが 10こで 100' }, { h: BD(n), s: `100と ${x}` }, { h: eq(`100 と ${x} で <b>${n}</b>`), s: `ひゃくと ${x}で ${n}` }] }; }
@@ -848,10 +849,10 @@ const TB_MATH = (() => {
     // ════ 20 おなじ かずずつ  p115
     { id: 'tm_wakeru', n: 'おなじ かずずつ', page: 115, m: 2, q(d) { const ppl = d < 0.5 ? pick([2, 3]) : R(2, 4), per = d < 0.5 ? R(2, 4) : R(2, 5), tot = ppl * per;
       const rows = (n) => COL(...Array.from({ length: ppl }, (_, i) => LB(`${i + 1}にんめ`, O('cookie', n))));
-      if (Math.random() < 0.5) return { text: `クッキーが ${tot}こ あります。${ppl}にんで おなじ かずずつ わけると、1にん なんこ？`, sayQ: `クッキーが ${tot}こ あります。${ppl}にんで おなじ かずずつ わけると、ひとり なんこ？`, viz: O('cookie', tot), ans: `${per}こ`, choices: chT(`${per}こ`, [`${per + 1}こ`, `${per - 1}こ`, `${ppl}こ`, `${per + 2}こ`].filter((x) => x !== '0こ' && x !== '1こ')), txt: true, // p115 ▲1 12こを 3にんで
-        steps: [{ h: rows(1), s: `${ppl}にんに 1こずつ くばるよ` }, { h: rows(per), s: `ぜんぶ なくなるまで、1こずつ じゅんばんに くばる` }, { h: eq(`${Array(ppl).fill(per).join(' ＋ ')} ＝ ${tot}`), s: `1にん ${per}こで ちょうど ${tot}こ` }, { h: big(`${per}こ`), s: `こたえは ${per}こ` }] };
+      if (Math.random() < 0.5) return { text: `クッキーが ${tot}こ あります。${ppl}にんで おなじ かずずつ わけると、ひとり なんこ？`, sayQ: `クッキーが ${tot}こ あります。${ppl}にんで おなじ かずずつ わけると、ひとり なんこ？`, viz: O('cookie', tot), ans: `${per}こ`, choices: chT(`${per}こ`, [`${per + 1}こ`, `${per - 1}こ`, `${ppl}こ`, `${per + 2}こ`].filter((x) => x !== '0こ' && x !== '1こ')), txt: true, // p115 ▲1 12こを 3にんで
+        steps: [{ h: rows(1), s: `ひとりに 1こずつ じゅんばんに くばって みよう` }, { h: rows(per), s: `ぜんぶ なくなるまで くばる` }, { h: eq(`${Array(ppl).fill(per).join(' ＋ ')} ＝ ${tot}`), s: `ひとり ${per}こずつで ちょうど ${tot}こ` }, { h: big(`${per}こ`), s: `こたえは ${per}こ` }] };
       const grp = COL(...Array.from({ length: ppl }, () => `<span style="border:3px dashed #4dabf0;border-radius:14px;padding:4px 8px">${O('candy', per)}</span>`));
-      return { text: `あめが ${tot}こ あります。1にんに ${per}こずつ わけると、なんにんに わけられる？`, sayQ: `あめが ${tot}こ あります。ひとりに ${per}こずつ わけると、なんにんに わけられる？`, viz: O('candy', tot), ans: `${ppl}にん`, choices: chT(`${ppl}にん`, [`${ppl + 1}にん`, `${ppl - 1}にん`, `${per}にん`, `${ppl + 2}にん`].filter((x) => x !== '1にん' && x !== `${ppl}にん`)), txt: true, // p115 ▲2 8こを 2こずつ
+      return { text: `あめが ${tot}こ あります。ひとりに ${per}こずつ わけると、なんにんに わけられる？`, sayQ: `あめが ${tot}こ あります。ひとりに ${per}こずつ わけると、なんにんに わけられる？`, viz: O('candy', tot), ans: `${ppl}にん`, choices: chT(`${ppl}にん`, [`${ppl + 1}にん`, `${ppl - 1}にん`, `${per}にん`, `${ppl + 2}にん`].filter((x) => x !== '1にん' && x !== `${ppl}にん`)), txt: true, // p115 ▲2 8こを 2こずつ
         steps: [{ h: grp, s: `${per}こずつ かこんで みよう` }, { h: grp + big(`${ppl}にん`), s: `かこみが ${ppl}つ。${ppl}にんに わけられる` }] }; } },
 
     // ════ たすのかな ひくのかな  p116〜117
@@ -871,7 +872,7 @@ const TB_MATH = (() => {
       if (t === 2) { const k = R(0, 2); // p118 ▲1・p119 ▲7
         if (k === 0) { const x = R(1, 19), n = 100 + x; return { text: `${n}は 100と いくつを あわせた かず？`, sayQ: `${n}は ひゃくと いくつを あわせた かず？`, ans: String(x), choices: chT(x, [x + 10, x - 1, x + 1, n - 10, Math.floor(x / 10) + (x % 10)].filter((v) => v > 0 && v < 120)), bigC: true, steps: [{ h: BD(n), s: `${n}は 100と ${x}` }, { h: eq(`100 と <b>${x}</b> で ${n}`), s: `こたえは ${x}` }] }; }
         if (k === 1) { const t2 = R(2, 9), n = t2 * 10; return { text: `${n}は 10が いくつ？`, sayQ: `${n}は じゅうが いくつ？`, ans: String(t2), choices: numChoices(t2, 1, 10), bigC: true, steps: [{ h: B10(n), s: `10の たばが ${t2}こ` }, { h: big(String(t2)), s: `${n}は 10が ${t2}こ` }] }; }
-        const o = R(1, 9), n = 100 + o; return { text: 'ぼうは なんぼん？', sayQ: 'ぼうは なんぼん あるかな？', viz: BD(n), ans: String(n), choices: chT(n, [100 + o * 10, 10 + o, n + 1, n - 1]), bigC: true, steps: [{ h: BD(n), s: `100の たばと ばらが ${o}` }, { h: eq(`100 と ${o} で <b>${n}</b>`), s: `ひゃくと ${o}で ${n}` }] }; }
+        const o = R(1, 9), n = 100 + o; return { text: 'ぼうは なんぼん？', sayQ: 'ぼうは なんぼん あるかな？', viz: BD(n), ans: String(n), choices: chT(n, [100 + o * 10, 10 + o, n + 1, n - 1]), bigC: true, steps: [{ h: BD(n), s: `100の たばが 1つと、ばらが ${o}` }, { h: eq(`100 と ${o} で <b>${n}</b>`), s: `ひゃくと ${o}で ${n}` }] }; }
       if (t === 3) { const a = d < 0.5 ? 12 : R(11, 15), b = d < 0.5 ? 9 : R(a - 9, 9); return wq({ a, op: '-', b, u: 'こ', text: `みかんが ${a}こ あります。${b}にんの こどもに 1こずつ あげると、のこりは なんこ？`, viz: COL(LB('みかん', O('mikan', a)), LB('こども', O('child', b))), kw: KW_NOKORI('のこりは'), kws: `${b}にんに 1こずつ だから ${b}こ へる` }); } // p119 ▲5
       const tg = d < 0.5 ? 5 : R(5, 9), seq = Array.from({ length: tg - 1 }, (_, i) => [i + 1, tg - i - 1]), hi = R(1, seq.length - 2 >= 1 ? seq.length - 2 : 1), [x, y] = seq[hi]; const a = `${x} ＋ ${y}`; // p119 ▲6
       return { text: `こたえが ${tg}に なる たしざん。${seq.map(([p, q], i) => (i === hi ? '□' : `${p} ＋ ${q}`)).join('、')}　□は どれ？`, sayQ: `こたえが ${tg}に なる たしざんの かあど。しかくに はいるのは どれ？`, ans: a, choices: chT(a, [`${x} ＋ ${y + 1}`, `${x + 1} ＋ ${y + 1}`, `${x} ＋ ${y - 1}`, `${x - 1} ＋ ${y - 1}`].filter((c) => c !== a && !/^0 |＋ 0$/.test(c))), txt: true,
@@ -894,14 +895,14 @@ const TB_MATH = (() => {
 
     // ════ 22 おおい ほう すくない ほう  p124〜125
     { id: 'tm_ooi', n: 'おおい ほう すくない ほう', page: 124, m: 3, q(d) { const t = R(0, 3); const big_ = d >= 0.5;
-      const S = [[5, 3, '+', 'こ', ['たいき', 'ひまり'], 'たいきさんの うえきばちに めが {a}こ でました。ひまりさんは たいきさんより {b}こ おおく でました。ひまりさんは なんこ？'], // p124 ▲1
+      const S = [[5, 3, '+', 'こ', ['たいき', 'ひまり'], 'たいきさんの うえきばちに めが {a}こ でました。ひまりさんの うえきばちには、たいきさんより {b}こ おおく めが でました。ひまりさんは なんこ？'], // p124 ▲1
         [8, 4, '+', 'ひき', ['ひまり', 'たいき'], 'きんぎょすくい。ひまりさんは {a}ひき すくいました。たいきさんは ひまりさんより {b}ひき おおく すくいました。たいきさんは なんびき？'], // p124 ▲2
-        [9, 2, '-', 'こ', ['たいき', 'ひまり'], 'たいきさんは どんぐりを {a}こ ひろいました。ひまりさんは たいきさんより {b}こ すくなかった。ひまりさんは なんこ？'], // p125 ▲3
-        [12, 3, '-', 'こ', ['ひまり', 'たいき'], 'おはじきとり。ひまりさんは {a}こ とりました。たいきさんは ひまりさんより {b}こ すくなかった。たいきさんは なんこ？']][t]; // p125 ▲4
+        [9, 2, '-', 'こ', ['たいき', 'ひまり'], 'たいきさんは どんぐりを {a}こ ひろいました。ひまりさんは たいきさんより {b}こ すくなく ひろいました。ひまりさんは なんこ？'], // p125 ▲3
+        [12, 3, '-', 'こ', ['ひまり', 'たいき'], 'おはじきとり。ひまりさんは {a}こ とりました。たいきさんは ひまりさんより {b}こ すくなく とりました。たいきさんは なんこ？']][t]; // p125 ▲4
       let [a, b, op, u] = S; if (Math.random() < 0.6) { if (op === '+') { a = big_ ? R(5, 9) : R(3, 6); b = big_ ? R(Math.max(2, 11 - a), 9) : R(1, 10 - a); } else { a = big_ ? R(11, 16) : R(5, 10); b = big_ ? R(a - 9, 9) : R(1, a - 2); } }
       const r = op === '+' ? a + b : a - b; const text = S[5].replace('{a}', a).replace('{b}', b); const fx = (n) => (u === 'ひき' ? hiki(n) : `${n}${u}`); const txt = text.replace(`${a}ひき`, hiki(a)).replace(`${b}ひき`, hiki(b));
       const tape = (hl) => COL(LB(S[4][0], dots(a, 'a')), LB(S[4][1], op === '+' ? dots(a, 'b') + `<span class="sk-split">${dots(b, 'b')}</span>` : `<span class="sk-dr">${Array.from({ length: a }, (_, i) => `<i class="sk-d ${i < r ? 'b' : 'e'}${hl && i >= r ? ' hle' : ''}"></i>`).join('')}</span>`));
-      return wq({ a, op, b, u, text: txt, ansS: fx(r), choices: chT(fx(r), [fx(op === '+' ? Math.abs(a - b) : a + b), fx(r + 1), fx(r - 1)].filter((x) => !/^0/.test(x))), viz: '', kw: op === '+' ? `「<b class="mark">より ${fx(b)} おおい</b>」→ たしざん` : `「<b class="mark">より ${fx(b)} すくない</b>」→ ひきざん`, kws: op === '+' ? `${b}こ おおい から、${a}に ${b}を たす` : `${b}こ すくない から、${a}から ${b}を ひく`, vizS: tape(true), vizSs: op === '+' ? `ならべると、${b}こ ぶん ながい` : `ならべると、${b}こ ぶん みじかい` }); } },
+      return wq({ a, op, b, u, text: txt, ansS: fx(r), choices: chT(fx(r), [fx(op === '+' ? Math.abs(a - b) : a + b), fx(r + 1), fx(r - 1)].filter((x) => !/^0/.test(x))), viz: '', kw: op === '+' ? `「<b class="mark">より ${fx(b)} おおい</b>」→ たしざん` : `「<b class="mark">より ${fx(b)} すくない</b>」→ ひきざん`, kws: op === '+' ? `${fx(b)} おおい から、${a}に ${b}を たす` : `${fx(b)} すくない から、${a}から ${b}を ひく`, vizS: tape(true), vizSs: op === '+' ? `ならべると、${fx(b)} ぶん ながい` : `ならべると、${fx(b)} ぶん みじかい` }); } },
 
     // ════ 23 大きさくらべ(2)（ひろさ）  p126〜127
     { id: 'tm_hirosa', n: 'ひろさくらべ', page: 126, m: 3, q(d) { let w1, h1, w2, h2; if (d < 0.4 || Math.random() < 0.3) { [w1, h1, w2, h2] = Math.random() < 0.5 ? [4, 2, 3, 3] : [3, 3, 4, 2]; } else { do { w1 = R(2, 5); h1 = R(1, 4); w2 = R(2, 5); h2 = R(1, 4); } while (Math.abs(w1 * h1 - w2 * h2) > (d < 0.7 ? 3 : 1) || (w1 === w2 && h1 === h2) || (w1 === h2 && h1 === w2)); } // p127 ▲3 4×2 と 3×3
@@ -917,13 +918,13 @@ const TB_MATH = (() => {
           steps: [{ h: NL(rng(Math.min(p, 50) - 1, Math.max(p, 50) + 1), { q: p, reveal: true, hl: [50] }), s: `${p}と 50を くらべると、${p}の ほうが ${cheap ? 'ちいさい' : 'おおきい'}` }, { h: big(a), s: `${nm}は 50えんより ${cheap ? 'やすいから かえます' : 'たかいから かえません'}` }] }; }
       const cheapP = Math.random() < 0.5, both = cheapP ? [IT[0], IT[1]] : [IT[2], IT[3]], ps = both.map((x) => (Math.random() < 0.5 ? x[2] : cheapP ? R(40, 49) : R(51, 59))); // p128 ▲1う、p129 ▲2う
       const o2 = ['どちらも やすいから かえます', 'どちらも たかいから かえません', 'どちらも やすいから かえません', 'どちらも たかいから かえます'], cc = cheapP, aa = cc ? o2[0] : o2[1];
-      return { text: `50えんだま 2まいで、${both[0][0]}（${ps[0]}えん）と ${both[1][0]}（${ps[1]}えん）を 1つずつ かえますか？`, sayQ: `ごじゅうえんだま にまいで、${ps[0]}えんの ${both[0][0]}と ${ps[1]}えんの ${both[1][0]}を ひとつずつ かえますか？`, viz: `<div style="display:flex;gap:18px;align-items:center;justify-content:center;flex-wrap:wrap">${O('coin50', 2)}${LB(`${ps[0]}えん`, O(both[0][1], 1))}${LB(`${ps[1]}えん`, O(both[1][1], 1))}</div>`, ans: aa, choices: shuffle(o2.slice()), txt: true,
+      return { text: `50えんだまを 1まいずつ つかって、${both[0][0]}（${ps[0]}えん）と ${both[1][0]}（${ps[1]}えん）を 1つずつ かえますか？`, sayQ: `ごじゅうえんだまを いちまいずつ つかって、${ps[0]}えんの ${both[0][0]}と ${ps[1]}えんの ${both[1][0]}を ひとつずつ かえますか？`, viz: `<div style="display:flex;gap:18px;align-items:center;justify-content:center;flex-wrap:wrap">${O('coin50', 2)}${LB(`${ps[0]}えん`, O(both[0][1], 1))}${LB(`${ps[1]}えん`, O(both[1][1], 1))}</div>`, ans: aa, choices: shuffle(o2.slice()), txt: true,
         steps: [{ h: P(`50えんだま 1まいで 1つ かう と かんがえる<br>${both[0][0]} ${ps[0]}えん、${both[1][0]} ${ps[1]}えん`), s: `どちらも 50えんと くらべよう` }, { h: big(aa), s: cc ? 'どちらも 50えんより やすいから かえます' : 'どちらも 50えんより たかいから かえません' }] }; } },
 
     // ════ もうすぐ 2ねんせい  p130〜135
     { id: 'tm_2nen_kazu', n: 'もうすぐ2ねんせい（かず）', page: 130, m: 3, q(d) { const t = R(0, 2);
       if (t === 0) { const tt = R(2, 9), o = R(0, 9), n = tt * 10 + o, it = pick([['えんぴつ', 'ほん', '10ぽん いりの はこ'], ['はっぱ', 'まい', '10まいの たば']]); // p130 ▲1 36・73
-        return { text: `${it[0]}。${it[2]}が ${tt}つと、1${it[1] === 'ほん' ? 'ぽん' : 'まい'}が ${o}つ。ぜんぶで いくつ？`, sayQ: `${it[0]}。${it[2]}が ${tt}つと、ばらが ${o}つ。ぜんぶで いくつ？`, viz: BD(n), ans: String(n), choices: chT(n, [o * 10 + tt, n + 10, n - 1, tt + o].filter((v) => v > 0 && v !== n)), bigC: true, steps: [{ h: BD(n), s: `10が ${tt}つで ${tt * 10}` }, { h: PV(tt, o) + eq(`<b>${n}</b>`), s: `${tt * 10}と ${o}で ${n}` }] }; }
+        return { text: o ? `${it[0]}。${it[2]}が ${tt}つと、ばらが ${cnt(o, it[1])}。ぜんぶで なん${it[1] === 'ほん' ? 'ぼん' : 'まい'}？` : `${it[0]}。${it[2]}が ${tt}つ。ぜんぶで なん${it[1] === 'ほん' ? 'ぼん' : 'まい'}？`, sayQ: o ? `${it[0]}。${it[2]}が ${tt}つと、ばらが ${cnt(o, it[1])}。ぜんぶで なん${it[1] === 'ほん' ? 'ぼん' : 'まい'}？` : `${it[0]}。${it[2]}が ${tt}つ。ぜんぶで なん${it[1] === 'ほん' ? 'ぼん' : 'まい'}？`, viz: BD(n), ans: String(n), choices: chT(n, [o * 10 + tt, n + 10, n - 1, tt + o].filter((v) => v > 0 && v !== n)), bigC: true, steps: [{ h: BD(n), s: `10が ${tt}つで ${tt * 10}` }, { h: PV(tt, o) + eq(`<b>${n}</b>`), s: `${tt * 10}と ${o}で ${n}` }] }; }
       if (t === 1) { const st = pick(d < 0.5 ? [1, 2] : [2, 5, -5, -1]), len = 7; const s0 = st > 0 ? R(1, Math.floor((100 - st * (len - 1)) / st)) * st : R(Math.abs(st) * (len - 1) / Math.abs(st) + 2, 20) * Math.abs(st); // p130 ▲2
         const seq = Array.from({ length: len }, (_, i) => s0 + st * i).filter((v) => v >= 0 && v <= 100); const hi = R(2, seq.length - 1), a = seq[hi];
         return { text: `${seq.map((v, i) => (i === hi ? '□' : v)).join('、')}　□に はいる かずは？`, sayQ: `${seq.map((v, i) => (i === hi ? 'しかく' : v)).join('、')}。しかくに はいる かずは？`, ans: String(a), choices: chT(a, [a + 1, a - 1, a + st, a - st, a + 10].filter((v) => v >= 0 && v <= 105)), bigC: true, steps: [{ h: NL(seq, { q: a }), s: `${Math.abs(st)}ずつ ${st > 0 ? 'ふえて' : 'へって'} いるね` }, { h: NL(seq, { q: a, reveal: true }), s: `こたえは ${a}` }] }; }
@@ -934,7 +935,7 @@ const TB_MATH = (() => {
       if (t === 0) { const a = R(5, 10); let b = R(5, 10); if (b === a) b = a + 1; const ans = a > b ? 'あ' : 'い'; const pic = (num) => COL(LB('あ', STRIPE(a, '#ff9a3c', '#ffd8b0', num)), LB('い', STRIPE(b, '#4dabf0', '#c9e7ff', num))); // p132 ▲1 しまもよう
         return { text: 'しまもようの ぼう。どちらが ながい？', sayQ: 'しまもようの ぼう。あ と い、どちらが ながい？', viz: pic(false), ans, choices: ['あ', 'い', 'おなじ'], bigC: true, steps: [{ h: pic(true), s: `おなじ ながさの しまが いくつ あるか かぞえる。あは ${a}こ、いは ${b}こ` }, { h: big(ans), s: `${ans}の ほうが ながい` }] }; }
       if (t === 1) { const a = R(3, 8); let b = R(3, 8); if (b === a) b = a + 1; const ans = a > b ? 'あ' : 'い'; const pic = (num) => COL(LB('あ', CUPS(a, num)), LB('い', CUPS(b, num))); // p132 ▲2 コップ
-        return { text: 'すいとうの みずを おなじ コップに うつしました。どちらが おおく はいる？', sayQ: 'すいとうの みずを おなじ コップに うつしました。あ と い、どちらが おおく はいる？', viz: pic(false), ans, choices: ['あ', 'い', 'おなじ'], bigC: true, steps: [{ h: pic(true), s: `コップの かずで くらべる。あは ${a}はい、いは ${b}はい` }, { h: big(ans), s: `${ans}の ほうが おおく はいる` }] }; }
+        return { text: 'すいとうの みずを おなじ コップに うつしました。どちらの すいとうに みずが おおく はいって いた？', sayQ: 'すいとうの みずを おなじ コップに うつしました。あ と い、どちらの すいとうに みずが おおく はいって いた？', viz: pic(false), ans, choices: ['あ', 'い', 'おなじ'], bigC: true, steps: [{ h: pic(true), s: `コップの かずで くらべる。あは ${cnt(a, 'はい')}、いは ${cnt(b, 'はい')}` }, { h: big(ans), s: `${ans}の ほうが おおく はいる` }] }; }
       if (t === 2) { const a = R(5, 9); let b = R(5, 9); if (b === a) b = a - 1; const sh = (n) => (n % 2 === 0 ? [n / 2, 2] : [n, 1]), [w1, h1] = sh(a), [w2, h2] = sh(b); const ans = a > b ? 'あ' : 'い'; const pic = (num) => `<div style="display:flex;gap:28px;justify-content:center"><div><b style="font-size:26px">あ</b><br>${TILES(w1, h1, 'a', num)}</div><div><b style="font-size:26px">い</b><br>${TILES(w2, h2, 'b', num)}</div></div>`; // p132 ▲3
         return { text: 'どちらが ひろい？', sayQ: 'あ と い、どちらが ひろい？', viz: pic(false), ans, choices: ['あ', 'い', 'おなじ'], bigC: true, steps: [{ h: pic(true), s: `ますの かずで くらべる。あは ${a}ます、いは ${b}ます` }, { h: big(ans), s: `${ans}の ほうが ひろい` }] }; }
       const [h, m] = Math.random() < 0.5 ? pick([[4, 30], [5, 50], [2, 59], [4, 6]]) : [R(1, 12), d < 0.5 ? R(1, 11) * 5 : R(1, 59)]; const ans = TL(h, m), nx = (h % 12) + 1; // p132 ▲4 4じ30ぷん・❗5じ50ぷん・❗2じ59ふん
@@ -944,9 +945,9 @@ const TB_MATH = (() => {
       if (t === 1) { const a = vy ? 20 : R(2, 8) * 10, b = vy ? 7 : R(1, 9); return wq({ a, op: '+', b, u: 'ほん', ansS: hon(a + b), choices: chT(hon(a + b), [hon(a - b), hon(a + b + 10), hon(a + b - 1)]), text: `つくしとり。つばささんは ${hon(a)} とりました。みらいさんは つばささんより ${hon(b)} おおく とりました。みらいさんは なんぼん？`, kw: `「<b class="mark">より ${hon(b)} おおい</b>」→ たしざん`, kws: `${hon(b)} おおいから ${a}に ${b}を たす` }); } // p134 ▲2
       if (t === 2) { const a = vy ? 80 : R(3, 9) * 10; return wq({ a: 100, op: '-', b: a, u: 'かい', text: `かたを 100かい たたく やくそく。いままでに ${a}かい たたきました。<b>あと</b> なんかい？`, kw: 'あと いくつ → 100から ひく', kws: `100から いままでの ${a}を ひく` }); } // p134 ▲3
       if (t === 3) { const a = vy ? 15 : R(11, 16), b = vy ? 9 : R(a - 9, 9); return wq({ a, op: '-', b, u: 'ほん', ansS: hon(a - b), choices: chT(hon(a - b), [hon(a + b), hon(a - b + 1), hon(a - b - 1 || a - b + 2)]), text: `くじが ${hon(a)} あります。はずれは ${hon(b)}。<b>あたりは</b> なんぼん？`, viz: dots(a, 'a'), kw: 'ぜんぶ − はずれ ＝ あたり', kws: `ぜんぶの ${hon(a)}から はずれの ${hon(b)}を ひく` }); } // ❗p135 ▲4
-      if (t === 4) { const a = vy ? 25 : R(2, 9) * 10 + R(4, 9), b = vy ? 3 : R(1, Math.min(3, a % 10 - 1)); return wq({ a, op: '-', b, u: 'ほん', ansS: hon(a - b), choices: chT(hon(a - b), [hon(a + b), hon(a - b + 1), hon(a - b - 10)]), text: `あかい ちゅうりっぷが ${hon(a)} さいて います。きいろい ちゅうりっぷは それより ${hon(b)} すくない。きいろは なんぼん？`, kw: `「<b class="mark">より ${hon(b)} すくない</b>」→ ひきざん`, kws: `${hon(b)} すくないから ${a}から ${b}を ひく` }); } // ❗p135 ▲5
+      if (t === 4) { const a = vy ? 25 : R(2, 9) * 10 + R(4, 9), b = vy ? 3 : R(1, Math.min(3, a % 10 - 1)); return wq({ a, op: '-', b, u: 'ほん', ansS: hon(a - b), choices: chT(hon(a - b), [hon(a + b), hon(a - b + 1), hon(a - b - 10)]), text: `あかい ちゅうりっぷが ${hon(a)} さいて います。きいろい ちゅうりっぷは それより ${hon(b)} すくなく さいて います。きいろい ちゅうりっぷは なんぼん？`, kw: `「<b class="mark">より ${hon(b)} すくない</b>」→ ひきざん`, kws: `${hon(b)} すくないから ${a}から ${b}を ひく` }); } // ❗p135 ▲5
       const ap = vy ? 7 : R(4, 9), sh = vy ? 4 : R(2, 6), r = ap + sh; // ❗p135 ▲6 りんご7こ 4にんぶん たりない
-      return wq({ a: ap, op: '+', b: sh, u: 'にん', text: `りんごが ${ap}こ あります。こどもに 1こずつ くばると、${sh}にんぶん たりません。こどもは なんにん？`, viz: O('apple', ap), kw: 'もらえた ひと ＋ たりない ひと', kws: `りんごを もらえた ${ap}にんと、もらえない ${sh}にんを あわせる`, vizS: COL(LB('りんご', O('apple', ap)), LB('こども', O('child', r, sh))), vizSs: `りんごを もらえる こどもは ${ap}にん。もらえない こどもが ${sh}にん` }); } },
+      return wq({ a: ap, op: '+', b: sh, u: 'にん', text: `りんごが ${ap}こ あります。こどもに 1こずつ くばると、${sh}にんぶん たりません。こどもは なんにん？`, viz: O('apple', ap), kw: 'もらえた ひと ＋ たりない ひと', kws: `りんごを もらえる ${ap}にんと、もらえない ${sh}にんを あわせる`, vizS: COL(LB('りんご', O('apple', ap)), LB('こども', O('child', r, sh))), vizSs: `りんごを もらえる こどもは ${ap}にん。もらえない こどもが ${sh}にん` }); } },
 
     // ════ けいさんの れんしゅう  p136〜138
     { id: 'tm_renshu', n: 'けいさんの れんしゅう', page: 136, m: 3, q(d) { const P9 = [['r1', 'r2'], ['r8', 'r3'], ['r4'], ['r5'], ['r6'], ['r7'], ['r9'], ['r10'], ['r11']]; const idx = Math.min(8, Math.floor(d * 9)); const g = P9[R(Math.max(0, idx - 2), idx)]; return parse(fromList(pick(g))); } },
@@ -956,7 +957,7 @@ const TB_MATH = (() => {
       if (t === 0) { const x = mk(); let y = mk(), g = 0; while ((valOf(y) === valOf(x) && Math.random() < 0.7) || y === x) { y = mk(); if (++g > 20) break; } if (y === x) y = valOf(x) > 1 ? `${valOf(x) - 1}+1` : '1+1'; const vx = valOf(x), vy = valOf(y), ans = vx === vy ? 'おなじ' : show(vx > vy ? x : y); // おおきさくらべ（5＋1 と 3＋2）
         return { text: `おおきさくらべ。こたえが おおきい かあどは どっち？`, sayQ: `おおきさくらべ。${strip(show(x)).replace(/＋/g, 'たす').replace(/−/g, 'ひく')} と ${strip(show(y)).replace(/＋/g, 'たす').replace(/−/g, 'ひく')}、こたえが おおきい のは どっち？`, ans, choices: [show(x), show(y), 'おなじ'], txt: true, steps: [{ h: P(`${show(x)} ＝ ${vx}<br>${show(y)} ＝ ${vy}`), s: 'それぞれの こたえを だそう' }, { h: big(ans === 'おなじ' ? 'おなじ' : String(Math.max(vx, vy))), s: ans === 'おなじ' ? 'こたえが おなじ' : `${Math.max(vx, vy)}の ほうが おおきい` }] }; }
       const tg = d < 0.4 ? R(5, 10) : R(5, 18); let ok = null, g = 0; while (!ok && g++ < 50) { const e = mk(); if (valOf(e) === tg) ok = e; } if (!ok) ok = tg <= 10 ? `${tg - 2}+2` : `${tg - 9}+9`; const ng = []; g = 0; while (ng.length < (d < 0.5 ? 2 : 3) && g++ < 100) { const e = mk(); if (valOf(e) !== tg && !ng.includes(e) && e !== ok) ng.push(e); } // かあどとり・なかまあつめ
-      const ch = shuffle([ok, ...ng]); return { text: `かあどとり。こたえが ${tg}の かあどを とろう。どれ？`, sayQ: `かあどとり。こたえが ${tg}の かあどを とろう。どれ？`, ans: show(ok), choices: ch.map(show), txt: true, steps: [{ h: P(ch.map((e) => `${show(e)} ＝ ${valOf(e)}`).join('<br>')), s: 'ひとつずつ こたえを だして みよう' }, { h: eq(`${show(ok)} ＝ <b>${tg}</b>`), s: `こたえが ${tg}なのは この かあど` }] }; } },
+      const ch = shuffle([ok, ...ng]); return { text: `かあどとり。こたえが ${tg}に なる かあどは どれ？`, sayQ: `かあどとり。こたえが ${tg}に なる かあどは どれ？`, ans: show(ok), choices: ch.map(show), txt: true, steps: [{ h: P(ch.map((e) => `${show(e)} ＝ ${valOf(e)}`).join('<br>')), s: 'ひとつずつ こたえを だして みよう' }, { h: eq(`${show(ok)} ＝ <b>${tg}</b>`), s: `こたえが ${tg}なのは この かあど` }] }; } },
   ];
 })();
 
@@ -998,7 +999,7 @@ const TB_KOKUGO = (() => {
     else if (t === 2) { ri = R(0, n - 2); ai = ri + 1; q = `「${L[ri]}」の つぎは どれ？`; } else { ri = R(1, n - 1); ai = ri - 1; q = `「${L[ri]}」の まえは どれ？`; }
     const ng = L.filter((_, i) => i !== ai && i !== ri); const ch = opts(L[ai], ng.length >= 2 ? ng : [...ng, ...extra], d);
     const list = (hi) => `<div class="sk-story">${L.map((x, i) => `<div>${i + 1}. ${i === hi ? `<span class="mark">${D(x)}</span>` : D(x)}</div>`).join('')}</div>`;
-    return { text: `${D(title)}\n${D(q)}`, sayQ: Y(`${title}。${q}`), ans: D(L[ai]), choices: ch, txt: true,
+    return { text: `${D(title)}で、\n${D(q)}`, sayQ: Y(`${title}で、${q}`), ans: D(L[ai]), choices: ch, txt: true,
       steps: [{ h: list(-1), s: Y(`じゅんばんに ならべると、${L.join('、')}`) }, { h: list(ai), s: Y(`${t >= 2 ? `「${L[ri]}」の ${t === 2 ? 'つぎ' : 'まえ'}は、` : ''}${L[ai]}`) }] };
   };
   // かんじの よみ：{ s:'…[漢|よみ]…', ng:[まちがいの よみ], w:ひとこと }
@@ -1022,14 +1023,15 @@ const TB_KOKUGO = (() => {
   // ───── いろいろな ふね（ふくしゅう）
   const FUNE = ['きゃくせん', 'フェリーボート', 'ぎょせん', 'しょうぼうてい'];
   const FUNE_IL = { きゃくせん: 'kyakusen', フェリーボート: 'ferry', ぎょせん: 'gyosen', しょうぼうてい: 'fireboat' };
+  const FUNE_X = { きゃくせん: 'フェリーボート', フェリーボート: 'きゃくせん' }; // どちらも 人を はこぶので、いっしょに せんたくしに ださない
   const FUNE_YAKU = { きゃくせん: 'たくさんの {人|ひと}を はこぶ', フェリーボート: '{人|ひと}と じどう{車|しゃ}を いっしょに はこぶ', ぎょせん: 'さかなを とる', しょうぼうてい: '{火|か}じを けす' };
   const fune1 = [
-    ...FUNE.map((f) => ({ lv: 1, q: `${FUNE_YAKU[f]} ための ふねは どれ？`, a: f, ng: FUNE, il: FUNE_IL[f], w: `${FUNE_YAKU[f]} ための ふねは ${f}`, nw: Object.fromEntries(FUNE.map((g) => [g, { s: `${g}は、${FUNE_YAKU[g]} ための ふねだよ`, il: FUNE_IL[g] }])) })),
-    ...FUNE.map((f) => ({ lv: 2, q: `${f}は、なにを する ための ふね？`, a: FUNE_YAKU[f], ng: Object.values(FUNE_YAKU), iv: FUNE_IL[f], il: FUNE_IL[f], w: `${f}の おしごとは ${FUNE_YAKU[f]} こと`, nw: Object.fromEntries(FUNE.map((g) => [FUNE_YAKU[g], { s: `${FUNE_YAKU[g]} のは、${g}だよ`, il: FUNE_IL[g] }])) })),
+    ...FUNE.map((f) => ({ lv: 1, q: `${FUNE_YAKU[f]} ための ふねは どれ？`, a: f, ng: FUNE.filter((g) => g !== FUNE_X[f]), il: FUNE_IL[f], w: `${FUNE_YAKU[f]} ための ふねは ${f}`, nw: Object.fromEntries(FUNE.map((g) => [g, { s: `${g}は、${FUNE_YAKU[g]} ための ふねだよ`, il: FUNE_IL[g] }])) })),
+    ...FUNE.map((f) => ({ lv: 2, q: `${f}は、なにを する ための ふね？`, a: FUNE_YAKU[f], ng: FUNE.filter((g) => g !== FUNE_X[f]).map((g) => FUNE_YAKU[g]), iv: FUNE_IL[f], il: FUNE_IL[f], w: `${f}の おしごとは ${FUNE_YAKU[f]} こと`, nw: Object.fromEntries(FUNE.map((g) => [FUNE_YAKU[g], { s: `${FUNE_YAKU[g]} のは、${g}だよ`, il: FUNE_IL[g] }])) })),
     { lv: 2, t: 'きゃくせんの {中|なか}には、きゃくしつや しょくどうが あります。', q: 'きゃくせんの {中|なか}に あるのは？', a: 'きゃくしつや しょくどう', ng: ['ポンプや ホース', 'さかなを {見|み}つける きかい', 'あみ'], k: 'きゃくしつや しょくどう', iv: 'kyakusen' },
     { lv: 2, t: 'ぎょせんは、さかなの むれを {見|み}つける きかいや、あみを つんで います。', q: 'ぎょせんに つんで あるのは？', a: 'きかいや あみ', ng: ['ポンプや ホース', 'きゃくしつや しょくどう', 'たくさんの じどう{車|しゃ}'], k: 'きかいや、あみ', iv: 'gyosen' },
     { lv: 2, t: 'しょうぼうていは、ポンプや ホースを つんで います。', q: 'しょうぼうていに つんで あるのは？', a: 'ポンプや ホース', ng: ['あみ', 'きゃくしつや しょくどう', 'さかなを {見|み}つける きかい'], k: 'ポンプや ホース', iv: 'fireboat' },
-    { lv: 3, t: 'きゃくせんの {人|ひと}は、きゃくしつで {休|やす}んだり、しょくどうで しょくじを したり します。', q: 'きゃくしつで {人|ひと}は なにを する？', a: '{休|やす}む', ng: ['さかなを とる', '{火|ひ}を けす', '{車|くるま}を とめる'], k: 'きゃくしつで {休|やす}んだり' },
+    { lv: 3, t: 'きゃくせんに のった {人|ひと}は、きゃくしつで {休|やす}んだり、しょくどうで しょくじを したり します。', q: '{人|ひと}は きゃくしつで なにを する？', a: '{休|やす}む', ng: ['さかなを とる', '{火|ひ}を けす', '{車|くるま}を とめる'], k: 'きゃくしつで {休|やす}んだり' },
     { lv: 3, t: 'フェリーボートに のる {人|ひと}は、{車|くるま}を ふねに {入|い}れてから、きゃくしつで {休|やす}みます。', q: 'きゃくしつで {休|やす}む まえに なにを する？', a: '{車|くるま}を ふねに {入|い}れる', ng: ['さかなを とる', 'しょくどうで たべる', 'ホースで {水|みず}を かける'], k: '{車|くるま}を ふねに {入|い}れてから', iv: 'ferry' },
     { lv: 3, t: 'しょうぼうていは、{火|か}じが あると、{水|みず}や くすりを かけて、{火|ひ}を けします。', q: '{火|か}じが あると、どう する？', a: '{水|みず}や くすりを かけて けす', ng: ['あみで とる', 'きゃくしつで {休|やす}む', '{人|ひと}を たくさん のせる'], k: '{水|みず}や くすりを かけて', iv: 'fireboat' },
     { lv: 3, t: 'ぎょせんは、{見|み}つけた さかなを あみで とります。', q: '{見|み}つけた さかなを どう やって とる？', a: 'あみで とる', ng: ['ホースで とる', 'てで つかむ', 'つりざおで つる'], k: 'あみで とります', iv: 'gyosen' },
@@ -1040,7 +1042,7 @@ const TB_KOKUGO = (() => {
     F(1, (d) => ordQ('「いろいろな ふね」に {出|で}て きた じゅんばん', FUNE, d)),
     ...FUNE.map((f) => ({ lv: 1, q: 'この ふねの なまえは？', a: f, ng: FUNE, iv: FUNE_IL[f], sq: 'この ふねの なまえは なに？', w: `${FUNE_YAKU[f]} ふね` })),
     F(2, (d) => kjR(KJ_FUNE, d)), F(2, (d) => kjW(KW_FUNE, d)),
-    { lv: 3, q: 'いろいろな ふねは、なにに あうように つくられて いる？', a: 'それぞれの やく{目|め}', ng: ['うみの いろ', 'すきな かたち', 'ふねの なまえ'], k: 'それぞれの やく{目|め}に あうように', hs: 'さいごの まとめに かいて あるよ' },
+    { lv: 3, q: 'いろいろな ふねは、なにに あうように つくられて いる？', a: 'それぞれの やく{目|め}', ng: ['うみの いろ', 'すきな かたち', 'ふねの なまえ'], t: 'ふねは、それぞれの やく{目|め}に あうように つくられて います。', k: 'それぞれの やく{目|め}に あうように', hs: 'さいごの まとめに かいて あるよ' },
   ];
 
   // ───── 「のりものカード」を つくろう
@@ -1048,10 +1050,10 @@ const TB_KOKUGO = (() => {
   const TSUKURI = ['きゃくしつや しょくどうが あります。', 'ポンプや ホースを つんで います。', '{大|おお}きな にだいが あります。', 'あみを つんで います。'];
   const norimono = [
     { lv: 1, t: 'ダンプカーは、たくさんの {土|つち}や すなを はこぶ ための {車|くるま}です。', q: 'ダンプカーが はこぶ ものは？', a: '{土|つち}や すな', ng: ['{人|ひと}', 'さかな', 'ごみ'], k: 'たくさんの {土|つち}や すな', iv: 'dump_truck' },
-    { lv: 1, t: 'この {車|くるま}には、{大|おお}きな にだいが あります。にだいを かたむけて、{土|つち}や すなを おろします。', q: 'にだいを どう して おろす？', a: 'かたむける', ng: ['まわす', 'たたむ', 'あらう'], k: 'にだいを かたむけて', iv: 'dump_truck' },
-    { lv: 1, q: 'のりものの ことは、なにで しらべる？', a: '{本|ほん}や ずかん', ng: ['テレビの アニメ', 'てがみ', 'おりがみ'], k: '{本|ほん}や ずかんで しらべる' },
+    { lv: 1, t: 'この {車|くるま}には、{大|おお}きな にだいが あります。にだいを かたむけて、{土|つち}や すなを おろします。', q: '{土|つち}や すなは、にだいを どう して おろす？', a: 'かたむける', ng: ['まわす', 'たたむ', 'あらう'], k: 'にだいを かたむけて', iv: 'dump_truck' },
+    { lv: 1, q: 'のりものの ことは、なにで しらべる？', a: '{本|ほん}や ずかん', ng: ['テレビの アニメ', 'てがみ', 'おりがみ'], t: 'のりものの ことは、{本|ほん}や ずかんで しらべます。', k: '{本|ほん}や ずかんで しらべ' },
     F(2, (d) => ask({ q: '「やく{目|め}」が かいて ある {文|ぶん}は どれ？', sq: 'やくめ が かいて ある ぶんは どれ？', a: pick(YAKU), ng: TSUKURI, w: 'やくめは、その のりものが「なにを するか」。おしごとの こと', nw: Object.fromEntries(TSUKURI.map((x) => [x, 'これは、のりものに「なにが あるか」の ぶん。つくりの せつめいだよ'])) }, d)),
-    F(2, (d) => ask({ q: '「つくり」が かいて ある {文|ぶん}は どれ？', sq: 'つくり が かいて ある ぶんは どれ？', a: pick(TSUKURI), ng: YAKU, w: 'つくりは、のりものに「なにが あるか」', nw: Object.fromEntries(YAKU.map((x) => [x, 'これは、のりものが「なにを するか」の ぶん。やくめの せつめいだよ'])) }, d)),
+    F(2, (d) => ask({ q: '「つくり」が かいて ある {文|ぶん}は どれ？', sq: 'つくり が かいて ある ぶんは どれ？', a: pick(TSUKURI), ng: YAKU, w: 'つくりは、のりものの かたちや、ついて いる もの', nw: Object.fromEntries(YAKU.map((x) => [x, 'これは、のりものが「なにを するか」の ぶん。やくめの せつめいだよ'])) }, d)),
     F(2, (d) => (Math.random() < 0.5 ? kjR([{ s: '[本|ほん]で しらべる。', ng: ['き', 'もと', 'ぼん'] }, { s: 'ずかんの [本|ほん]を よむ。', ng: ['き', 'ひと', 'やす'] }], d) : kjR([{ s: '[車|くるま]の しごと。', ng: ['しゃ', 'くる', 'ま'] }, { s: '[土|つち]を はこぶ。', ng: ['ど', 'と', 'ち'] }], d))),
     F(3, (d) => kjW([{ s: '[本|ほん]で しらべる', ng: ['木', '休', '大'], w: 'きの したに よこぼう。きの ねもとを あらわす' }, { s: 'じどう[車|しゃ]', ng: ['東', '早', '日'], w: 'くるまを うえから みた かたち' }, { s: '[土|つち]や すな', ng: ['上', '士', '工'], w: 'したの よこぼうが ながいよ' }], d)),
     { lv: 2, t: 'しょうぼうていは、{火|か}じを けす ための ふねです。ポンプや ホースを つんで います。', q: 'しょうぼうていが つんで いる ものは？', a: 'ポンプや ホース', ng: ['あみ', 'きゃくしつ', '{土|つち}や すな'], k: 'ポンプや ホースを つんで います' },
@@ -1078,15 +1080,15 @@ const TB_KOKUGO = (() => {
   ];
 
   // ───── すきな きょうかを はなそう
-  const KENTA = '{一|ひと}つ{目|め}は、たいいくです。はしる ことが すきだからです。{二|ふた}つ{目|め}は、こくごです。かん{字|じ}を おぼえる ことが たのしいからです。';
+  const KENTA = 'けんたさんが すきな きょうかを はっぴょうしました。「{一|ひと}つ{目|め}は、たいいくです。はしる ことが すきだからです。{二|ふた}つ{目|め}は、こくごです。かん{字|じ}を おぼえる ことが たのしいからです。」';
   const kyouka = [
     { lv: 1, t: KENTA, q: 'けんたさんの すきな きょうかは？', a: 'たいいくと こくご', ng: ['さんすうと おんがく', 'ずこうと たいいく', 'こくごと せいかつ'], k: '{一|ひと}つ{目|め}は、たいいくです', hs: 'ひとつめと ふたつめを さがそう' },
     { lv: 2, t: KENTA, q: 'たいいくが すきな わけは？', a: 'はしる ことが すきだから', ng: ['かん{字|じ}を おぼえるのが たのしいから', 'うたが すきだから', 'えを かくのが すきだから'], k: 'はしる ことが すきだからです' },
     { lv: 2, t: KENTA, q: 'こくごが すきな わけは？', a: 'かん{字|じ}を おぼえるのが たのしいから', ng: ['はしる ことが すきだから', 'ボールあそびが できるから', 'きゅうしょくが おいしいから'], k: 'かん{字|じ}を おぼえる ことが たのしいからです' },
-    { lv: 2, q: '「わけ」を いって いる {文|ぶん}は どれ？', a: 'はしるのが たのしいからです。', ng: ['ぼくは、たいいくが すきです。', 'すきな きょうかは、なに。', 'いっしょに はしろうね。'], k: '「〜から」', hs: 'わけを いう ときは', w: '「からです」が わけの めじるし' },
+    { lv: 2, q: '「わけ」を いって いる {文|ぶん}は どれ？', a: 'はしるのが たのしいからです。', ng: ['ぼくは、たいいくが すきです。', 'すきな きょうかは なんですか。', 'いっしょに はしろうね。'], k: '「〜から」', hs: 'わけを いう ときは', w: '「からです」が わけの めじるし' },
     { lv: 1, q: 'みんなの まえで はなす ときは、どんな こえ？', a: 'うしろの {人|ひと}にも きこえる こえ', ng: ['となりの {人|ひと}だけに きこえる こえ', 'とても はやい こえ', 'ないしょばなしの こえ'], w: 'おおきな こえで、ゆっくり はなすと ききやすいね' },
     F(3, (d) => kjR([{ s: '[学校|がっこう]へ いく。', ng: ['がくこう', 'かっこう', 'がっこ'] }], d)),
-    F(3, (d) => kjW([{ s: '[学校|がっこう]で べんきょうする', ng: ['字校', '子校', '学木'], w: 'がっこうの がは、うえに てんが みっつ' }], d)),
+    F(3, (d) => kjW([{ s: '[学校|がっこう]に いく', ng: ['字校', '子校', '学木'], w: 'がっこうの がは、うえに てんが みっつ' }], d)),
   ];
 
   // ───── ことばで あそぼう
@@ -1104,7 +1106,7 @@ const TB_KOKUGO = (() => {
       steps: [{ h: beats(w, true), s: `${c.join('、')}。うしろから よもう` }, { h: beats(rv, true), s: `${[...rv].join('、')}。${w} を さかさまに よむと ${rv}` }] }; };
   const ACRO = [[['いつも すいすい', 'るんるん およぐよ', 'かわいい なきごえ'], 'いるか', ['くじら', 'さかな', 'らっこ']], [['かたい こうらで', 'めは かわいい'], 'かめ', ['かに', 'うさぎ', 'へび']],
     [['ねるのが だいすき', 'こたつで まるく なる'], 'ねこ', ['いぬ', 'うさぎ', 'ねずみ']], [['うしろあしで ぴょん', 'さっと はしるよ', 'ぎゅっと だっこ してね'], 'うさぎ', ['りす', 'ねこ', 'うま']],
-    [['かたい はさみ', 'にょきっと よこあるき'], 'かに', ['えび', 'かめ', 'たこ']], [['たくさんの あしで', 'こっそり かくれるよ'], 'たこ', ['いか', 'かに', 'たい']]];
+    [['かたい はさみ', 'にげる ときも よこあるき'], 'かに', ['えび', 'かめ', 'たこ']], [['たくさんの あしで', 'こっそり かくれるよ'], 'たこ', ['いか', 'かに', 'たい']]];
   const acroQ = (d) => { const [L, a, ng] = pick(ACRO); const ch = opts(a, ng, d); const lines = (m) => `<div class="sk-story">${L.map((x) => `<div>${m ? `<span class="mark">${x[0]}</span>${x.slice(1)}` : x}</div>`).join('')}</div>`;
     return { text: `${lines(false)}わたしは だあれ？`, sayQ: `${L.join('。')}。わたしは だあれ？`, ans: a, choices: ch, ...look(ch),
       steps: [{ h: lines(true), s: 'それぞれの ぎょうの はじめの じを みてね' }, { h: lines(true) + big(a), s: `はじめの じを つなげると、${L.map((x) => x[0]).join('、')}。${a}` }] }; };
@@ -1113,11 +1115,11 @@ const TB_KOKUGO = (() => {
     F(1, palQ), F(1, acroQ), F(2, revQ), F(3, revQ), F(3, acroQ),
     DJ('タイが たべ（　）', 'たい', ['たこ', 'たら', 'たね'], 'タイと たべたい。おなじ おとが はいって いるね'),
     DJ('パンダの （　）だ', 'パン', ['ごはん', 'おにぎり', 'ケーキ'], 'パンダと パンだ'),
-    DJ('ブドウ ひとつぶ （　）ですか', 'どう', ['なん', 'いくつ', 'だれ'], 'ブドウと どう'),
+    DJ('ブドウ ひとつぶ、（　）ですか', 'どう', ['なん', 'いくつ', 'だれ'], 'ブドウと どう'),
     DJ('ふとんが （　）', 'ふっとんだ', ['ほされた', 'たたまれた', 'しかれた'], 'ふとんと ふっとんだ'),
     DJ('イカは （　）ですか', 'いかが', ['どう', 'なに', 'すき'], 'イカと いかが'),
     DJ('ねこが （　）', 'ねころんだ', ['ないた', 'はしった', 'わらった'], 'ねこと ねころんだ'),
-    DJ('アルミかんの うえに ある （　）', 'みかん', ['りんご', 'バナナ', 'いちご'], 'アルミかんと ある みかん'),
+    DJ('アルミかんの うえに ある （　）', 'みかん', ['りんご', 'バナナ', 'いちご'], 'アルミかん と「ある みかん」。おなじ おとだね'),
   ];
 
   // ───── おもい出して かこう（じゅんじょ・かぎ）
@@ -1129,7 +1131,8 @@ const TB_KOKUGO = (() => {
     return { text: `${story(s)}かぎ（「」）を つける ところは？`, sayQ: `${s} かぎを つける ところは どれ？`, ans: a, choices: ch, ...look(ch),
       steps: [{ h: story(s, a), s: 'はなした ことばは どこかな' }, { h: `<div class="sk-story kgs">${D(s).replace(a, `<b class="kg">「</b><span class="mark">${a}。</span><b class="kg">」</b>`)}</div>`, s: `はなした ことばは ${a}。だから かぎを つけるよ` }, { h: `<div class="sk-story kgs">${D(s).replace(a, `<b class="kg">「</b>${a}。<b class="kg">」</b>`)}</div>`, s: 'かぎを つけると、こう なるね' }] }; };
   const junjo = [
-    F(1, (d) => ordQ('じゅんじょを あらわす ことばの じゅんばん', JW, d)),
+    { lv: 1, q: 'いちばん はじめに した ことを かく ときの ことばは？', a: 'はじめに', ng: ['つぎに', 'それから', 'さいごに'], w: '「はじめに」で かきはじめるよ' },
+    { lv: 1, q: 'いちばん さいごに した ことを かく ときの ことばは？', a: 'さいごに', ng: ['はじめに', 'つぎに', 'それから'], w: '「さいごに」で おわりを かくよ' },
     F(2, (d) => ordQ('めいさんが おべんとうを つくった じゅんばん', BENTO, d)),
     { lv: 1, q: 'かぎ（「」）は、どんな ときに つける？', sq: 'かぎは どんな ときに つける？', a: 'はなした ことばを かく とき', ng: ['なまえを かく とき', 'いちばん さいごの {文|ぶん}', 'すきな ことばを かく とき'], w: 'はなした ことばには かぎを つけるよ' },
     F(1, kagiQ), F(2, kagiQ),
@@ -1161,7 +1164,7 @@ const TB_KOKUGO = (() => {
     { lv: 1, t: 'チロは どんどん はしって いって、おかの てっぺんの {木|き}に のぼりました。', q: 'チロが のぼったのは どこ？', a: 'おかの てっぺんの {木|き}', ng: ['いえの やね', '{山|やま}の てっぺん', 'はしの 上'], k: 'おかの てっぺんの {木|き}' },
     { lv: 1, t: '{木|き}に {立|た}つと、たにを はさんで、たかい {山|やま}が {見|み}えました。おばあちゃんの うちは、あの {山|やま}の ずっと むこうがわです。', q: 'おばあちゃんの うちは どこ？', a: '{山|やま}の ずっと むこうがわ', ng: ['おかの {下|した}', 'たにの そこ', 'となりの いえ'], k: '{山|やま}の ずっと むこうがわ' },
     { lv: 2, t: '「おばあちゃあん……。」と よぶと、「おばあちゃあん、おばあちゃあん……。」と、こえが くりかえし ひびきながら、だんだん とおく なって いきました。', q: 'チロの こえは どう なって いった？', a: 'だんだん とおく なった', ng: ['だんだん {大|おお}きく なった', 'すぐに きえた', 'ずっと おなじだった'], k: 'だんだん とおく なって いきました' },
-    { lv: 2, t: 'チロは {大|おお}きく {口|くち}を あけ、いちばん だいじな ことを いいました。', q: 'チロが いった いちばん だいじな ことばは？', a: '「ぼくにも チョッキ、あんでね。」', ng: ['「ぼくは、チロだよう。」', '「チロのは ないよ。」', '「おばあちゃん、こんにちは。」'], k: 'いちばん だいじな こと', hs: 'チロが いちばん いいたかった ことは', w: 'チョッキが ほしかったんだね' },
+    { lv: 2, t: 'チロは {大|おお}きく {口|くち}を あけ、いちばん だいじな ことを いいました。', q: 'チロが いった いちばん だいじな ことばは？', a: '「ぼくにも チョッキ、あんでね。」', ng: ['「ぼくは、チロだよう。」', '「チロのは ないよ。」', '「おばあちゃん、こんにちは。」'], k: 'いちばん だいじな こと', hs: 'チロが いちばん いいたかった ことを さがそう', w: 'チョッキが ほしかったんだね' },
     { lv: 2, t: 'なん{日|にち}か たって、おばあちゃんから {小|こ}づつみが とどきました。{中|なか}には、けいとの チョッキが {三|さん}まい。', q: 'チョッキは なんまい？', a: '{三|さん}まい', ng: ['{一|いち}まい', '{二|に}まい', '{四|よん}まい'], k: 'チョッキが {三|さん}まい', il: 'vest' },
     { lv: 3, t: 'いちばん {大|おお}きいのが {赤|あか}。つぎが {青|あお}。{小|ちい}さいのは、{赤|あか}と {青|あお}の よこじま。', q: 'チロの チョッキは どれ？', a: '{赤|あか}と {青|あお}の よこじま', ng: ['{赤|あか}', '{青|あお}', '{白|しろ}と くろの しましま'], k: '{小|ちい}さいのは、{赤|あか}と {青|あお}の よこじま', w: 'チロは いちばん ちいさいね', il: 'vest' },
     { lv: 3, t: 'いちばん {大|おお}きいのが {赤|あか}。つぎが {青|あお}。{小|ちい}さいのは、{赤|あか}と {青|あお}の よこじま。', q: 'いちばん {大|おお}きい チョッキの いろは？', a: '{赤|あか}', ng: ['{青|あお}', 'よこじま', 'きいろ'], k: 'いちばん {大|おお}きいのが {赤|あか}' },
@@ -1172,7 +1175,7 @@ const TB_KOKUGO = (() => {
   const WHO = ['にいさんねずみ', 'ねえさんねずみ', 'チロ', 'おばあちゃん'];
   const KJ_CHIRO = [{ s: '[手|て]がみが とどく。', ng: ['め', 'け', 'しゅ'] }, { s: '[赤|あか]い チョッキ', ng: ['あお', 'しろ', 'あけ'] }, { s: '[青|あお]が すき。', ng: ['あか', 'みどり', 'せい'] }, { s: 'チロと いう [名|な]まえ', ng: ['め', 'ゆう', 'みょう'] },
     { lv: 2, s: '{木|き}に [立|た]つ。', ng: ['う', 'も', 'ま'] }, { lv: 2, s: '{大|おお}きく [口|くち]を あける。', ng: ['め', 'みみ', 'て'] }, { lv: 2, s: 'じっと [耳|みみ]を すます。', ng: ['め', 'くち', 'て'] }, { lv: 3, s: 'こえを はり[上|あ]げる。', ng: ['うえ', 'した', 'のぼ'] }, { lv: 3, s: '[小|こ]づつみが とどく。', ng: ['ちい', 'しょう', 'お'] }];
-  const KW_CHIRO = [{ s: '[赤|あか]い チョッキ', ng: ['青', '白', '黄'], w: 'あかは したに ひらいた かたち' }, { s: '[青|あお]い そら', ng: ['赤', '月', '春'], w: 'あおは したに つきの かたち' }, { s: '[手|て]がみ', ng: ['毛', '子', '午'], w: 'ゆびを ひろげた て の かたち' },
+  const KW_CHIRO = [{ s: '[赤|あか]い チョッキ', ng: ['青', '白', '黄'], w: 'あかは、うえが「土」、したは ひが もえる かたち' }, { s: '[青|あお]い そら', ng: ['赤', '月', '春'], w: 'あおは したに つきの かたち' }, { s: '[手|て]がみ', ng: ['毛', '子', '午'], w: 'ゆびを ひろげた て の かたち' },
     { lv: 2, s: '[口|くち]を あける', ng: ['日', '目', '田'], w: 'あいた くちの かたち' }, { lv: 2, s: '[耳|みみ]を すます', ng: ['目', '月', '自'], w: 'みみの かたち。よこぼうが みっつ' }, { lv: 3, s: '[名|な]まえを かく', ng: ['夕', '各', '石'], w: 'ゆうがたの ゆう に くち' }, { lv: 3, s: '{木|き}に [立|た]つ', ng: ['六', '文', '交'], w: 'じめんに ひとが たって いる かたち' }];
   const chiro3 = [
     F(1, (d) => ordQ('「おとうとねずみ チロ」の できごとの じゅんばん', CHIRO_EV, d)),
@@ -1216,7 +1219,7 @@ const TB_KOKUGO = (() => {
   const mukashi0 = [
     { lv: 1, q: 'ももたろうは なにから うまれた？', a: 'もも', ng: ['かぼちゃ', 'たけ', 'たまご'], il: 'peach' },
     { lv: 1, q: '「どんぶらこ、どんぶらこ。」と ながれて きたのは？', a: 'もも', ng: ['はこ', 'ふね', 'おむすび'], il: 'peach', w: 'ももたろうの おはなしだね' },
-    { lv: 1, q: 'かめに のって りゅうぐうじょうへ いくのは？', a: 'うらしまたろう', ng: MK, il: 'turtle' },
+    { lv: 1, q: 'かめに のって りゅうぐうじょうへ いく おはなしは？', a: 'うらしまたろう', ng: MK, il: 'turtle' },
     { lv: 2, q: 'たけを きったら、なかに ちいさな おひめさまが いた おはなしは？', a: 'かぐやひめ', ng: MK },
     { lv: 2, q: 'かにと さるが {出|で}て くる おはなしは？', a: 'さるかにがっせん', ng: MK },
     { lv: 2, q: 'うさぎと たぬきが {出|で}て くる おはなしは？', a: 'かちかち{山|やま}', ng: MK },
@@ -1235,7 +1238,7 @@ const TB_KOKUGO = (() => {
     { lv: 2, t: 'かぼちゃたろうは、とても {力|ちから}もちで、すもうが とくいです。', q: 'かぼちゃたろうの とくいな ことは？', a: 'すもう', ng: ['およぐ こと', 'うた', 'えかき'], k: 'すもうが とくい' },
     { lv: 2, t: 'かぼちゃたろうは、{大|おお}きく なって、{村|むら}の すもう{大|たい}かいに {出|で}ました。', q: 'かぼちゃたろうが {出|で}た {大|たい}かいは？', a: 'すもう{大|たい}かい', ng: ['かけっこ{大|たい}かい', 'うたの {大|たい}かい', 'つりの {大|たい}かい'], k: 'すもう{大|たい}かい' },
     { lv: 3, t: '{大|たい}かいで ゆうしょうして、なすたろうや トマトたろうと ともだちに なりました。', q: 'ともだちに なったのは？', a: 'なすたろうと トマトたろう', ng: ['ももたろうと きんたろう', 'きゅうりたろうと にんじんたろう', 'おじいさんと おばあさん'], k: 'なすたろうや トマトたろう' },
-    { lv: 3, q: 'けんたさんは、なにの まねを して この おはなしを かいた？', a: 'むかしばなし', ng: ['ずかん', 'しんぶん', 'てがみ'], k: 'むかしばなしの まねを して', hs: 'けんたさんは こう いって いたよ' },
+    { lv: 3, q: 'けんたさんは、なんの まねを して この おはなしを かいた？', a: 'むかしばなし', ng: ['ずかん', 'しんぶん', 'てがみ'], t: 'けんたさんは、むかしばなしの まねを して、おはなしを かきました。', k: 'むかしばなしの まねを して', hs: 'けんたさんは こう いって いたよ' },
     F(2, (d) => kjR([{ s: '[村|むら]の すもう{大|たい}かい', ng: ['まち', 'もり', 'はやし'] }, { lv: 3, s: 'すもう[大|たい]かい', ng: ['おお', 'だい', 'た'] }], d)),
   ];
 
@@ -1244,8 +1247,8 @@ const TB_KOKUGO = (() => {
   const hkQ = (d) => { const [h, k] = pick(HK); const rev = lvOf(d) === 3 && Math.random() < 0.6;
     const ans = rev ? h : k; const ch = opts(ans, HK.map((x) => (rev ? x[0] : x[1])), d);
     return { text: rev ? `かたかなの「${k}」と かたちが にて いる ひらがなは？` : `ひらがなの「${h}」と かたちが にて いる かたかなは？`, sayQ: rev ? 'この かたかなと かたちが にて いる ひらがなは どれ？' : `ひらがなの ${h} と かたちが にて いる かたかなは どれ？`, ans, choices: ch, bigC: true, ng: pairNg(ans),
-      steps: [{ h: `<div class="sk-sbs">${big(h)}<span class="ar">と</span>${big(`<b>${k}</b>`)}</div>`, s: `ひらがなの ${h} と、かたかなの ${h}。かたちが にて いるね` }] }; };
-  const TIP = { シ: 'シは てんを よこに ならべて、さいごは したから うえへ はらう', ツ: 'ツは てんを うえに ならべて、さいごは うえから したへ はらう', ソ: 'ソは てんを うえに かいて、ながい せんは うえから したへ', ン: 'ンは てんを ひだりうえに かいて、せんは したから うえへ はらう',
+      steps: [{ h: `<div class="sk-sbs">${big(h)}<span class="ar">と</span>${big(`<b>${k}</b>`)}</div>`, s: `ひらがなの「${h}」と かたかなの「${k}」。かたちが にて いるね` }] }; };
+  const TIP = { シ: 'シは てんを ひだりに たてに ならべて、さいごは したから うえへ はらう', ツ: 'ツは てんを うえに よこに ならべて、さいごは うえから したへ はらう', ソ: 'ソの てんは たてむき。ながい せんは うえから したへ', ン: 'ンの てんは よこむき。せんは したから うえへ はらう',
     ア: 'アは さいごに ななめの せんを ながく はらう', マ: 'マは さいごに みじかい てんを うつ', ク: 'クは はじめに ななめの みじかい せんを かく', ワ: 'ワは はじめに みじかい たての せんを かく' };
   const KW2 = [['sticker', 'シール', 0, 'ツ', 'ミ', ['ツール', 'ミール']], ['bucket', 'バケツ', 2, 'シ', 'ミ', ['バケシ', 'バケミ']], ['sausage', 'ソーセージ', 0, 'ン', 'リ', ['ンーセージ', 'リーセージ']], ['lion', 'ライオン', 3, 'ソ', 'リ', ['ライオソ', 'ライオリ']],
     ['koala', 'コアラ', 1, 'マ', 'フ', ['コマラ', 'コフラ']], ['cape', 'マント', 0, 'ア', 'フ', ['アント', 'フント']], ['necktie', 'ネクタイ', 1, 'ワ', 'タ', ['ネワタイ', 'ネタタイ']], ['shower', 'シャワー', 2, 'ク', 'ウ', ['シャクー', 'シャウー']]];
@@ -1289,7 +1292,7 @@ const TB_KOKUGO = (() => {
     { lv: 1, q: '{子|こ}どもを せなかに のせて はこぶのは？', a: 'オオアリクイ', ng: ANI, il: 'anteater' },
     { lv: 1, q: 'けがを した ふりを して、てきを ひなから とおざけるのは？', a: 'コチドリ', ng: ANI, il: 'plover' },
     { lv: 1, q: '{子|こ}どもを {口|くち}に くわえて はこぶのは？', a: 'ライオン', ng: ANI, il: 'lion' },
-    { lv: 2, q: 'オオアリクイと コチドリの にて いる ところは？', a: 'どちらも {子|こ}どもを くわえて はこべない', ng: ['どちらも そらを とぶ', 'どちらも ながい したが ある', 'どちらも じゃりに すを つくる'], w: 'くわえて はこべないから、べつの ちえを つかうんだね' },
+    { lv: 2, q: 'オオアリクイと コチドリの にて いる ところは？', a: 'どちらも {子|こ}どもを まもる ちえが ある', ng: ['どちらも そらを とぶ', 'どちらも ながい したが ある', 'どちらも じゃりに すを つくる'], w: 'やりかたは ちがうけれど、どちらも {子|こ}どもを まもって いるね' },
     { lv: 2, q: 'ふたつの ものを くらべて よむと、なにが {見|み}つかる？', a: 'にて いる ところや ちがう ところ', ng: ['ただしい かん{字|じ}', 'いちばん ながい {文|ぶん}', 'すきな いろ'], w: 'くらべて よむと、にて いる ところや ちがう ところが わかるね' },
     { lv: 3, t: 'どうぶつたちは、さまざまな ちえを つかって {子|こ}どもを てきから まもり、いのちを つないで います。', q: 'どうぶつたちは なにを つかって {子|こ}どもを まもる？', a: 'ちえ', ng: ['どうぐ', 'つよい きば', 'おかね'], k: 'さまざまな ちえを つかって' },
   ];
@@ -1305,7 +1308,7 @@ const TB_KOKUGO = (() => {
     { lv: 2, q: 'とびらを （　）。', sq: 'とびらを まる。まるに あう ことばは どれ？', a: 'たたく', ng: ['たべる', 'のむ', 'まるめる'], w: 'とびらを とんとん たたく' },
     { lv: 2, q: '{大|おお}きな かぶを （　）。', sq: 'おおきな かぶを まる。まるに あう ことばは どれ？', a: 'ひっぱる', ng: ['のむ', 'たたむ', 'およぐ'], w: 'うんとこしょ、どっこいしょ と ひっぱるね' },
     { lv: 3, q: 'けいとを （　）。', sq: 'けいとを まる。まるに あう ことばは どれ？', a: 'まるめる', ng: ['たべる', 'のむ', 'およぐ'], w: 'けいとを くるくる まるめる' },
-    { lv: 3, q: '{文|ぶん}に なって いるのは どれ？', a: 'あまい トマトを ゆっくり たべる。', ng: ['トマトを あまい たべる ゆっくり。', 'たべる あまい ゆっくり トマトを。', 'ゆっくり トマト あまい たべるを。'], w: 'ようす、もの、ようす、うごき の じゅんに つなぐと よく わかる' },
+    { lv: 3, q: '{文|ぶん}に なって いるのは どれ？', a: 'あまい トマトを ゆっくり たべる。', ng: ['トマトを あまい たべる ゆっくり。', 'たべる あまい ゆっくり トマトを。', 'ゆっくり トマト あまい たべるを。'], w: '「あまい トマト」を「ゆっくり たべる」。この じゅんばんで いみが よく わかるね' },
   ];
 
   // ───── 小学校の ことを しょうかいしよう
@@ -1323,7 +1326,7 @@ const TB_KOKUGO = (() => {
   const kanji3 = [
     F(1, (d) => kjR([{ s: '{山|やま}の [右|みぎ]がわ', ng: ['ひだり', 'うえ', 'いし'] }, { s: '{木|き}の [左|ひだり]がわ', ng: ['みぎ', 'した', 'ひだ'] }, { s: '[田|た]んぼが ひろがる。', ng: ['ひ', 'め', 'しろ'] }, { s: '[山|やま]の {右|みぎ}がわ', ng: ['かわ', 'き', 'やね'] },
       { lv: 2, s: '[八|はっ]さつの {本|ほん}', ng: ['はち', 'やっ', 'ろく'] }, { lv: 2, s: '[五|ご]{千|せん}{円|えん}', ng: ['いつ', 'ろく', 'に'] }, { lv: 2, s: '{五|ご}[千|せん]{円|えん}', ng: ['ひゃく', 'じゅう', 'まん'] }, { lv: 3, s: '[九|きゅう]{百|ひゃく}{円|えん}', ng: ['く', 'ここの', 'はち'] }, { lv: 3, s: '{九|きゅう}[百|ひゃく]{円|えん}', ng: ['せん', 'しろ', 'はく'] }, { lv: 3, s: '{九|きゅう}{百|ひゃく}[円|えん]', ng: ['まる', 'つき', 'めん'] }], d)),
-    F(2, (d) => kjW([{ s: '{山|やま}の [右|みぎ]がわ', ng: ['石', '左', '名'], w: 'みぎは、くち の かたち' }, { s: '{木|き}の [左|ひだり]がわ', ng: ['右', '在', '友'], w: 'ひだりは、こう の かたち' }, { s: '[田|た]んぼ', ng: ['日', '白', '目'], w: 'たんぼを よっつに わけた かたち' },
+    F(2, (d) => kjW([{ s: '{山|やま}の [右|みぎ]がわ', ng: ['石', '左', '名'], w: 'みぎは、したに「口」' }, { s: '{木|き}の [左|ひだり]がわ', ng: ['右', '在', '友'], w: 'ひだりは、したに「工」' }, { s: '[田|た]んぼ', ng: ['日', '白', '目'], w: 'たんぼを よっつに わけた かたち' },
       { lv: 3, s: '[千|せん]{円|えん}', ng: ['十', '干', '午'], w: 'じゅう の うえに ななめの せん' }, { lv: 3, s: '[百|ひゃく]{円|えん}', ng: ['白', '自', '日'], w: 'しろ の うえに よこぼう いっぽん' }, { lv: 3, s: '{百|ひゃく}[円|えん]', ng: ['月', '用', '内'], w: 'まるい おかねの えん' }], d)),
   ];
 
@@ -1345,7 +1348,7 @@ const TB_KOKUGO = (() => {
   const swimmy2 = [
     ...TATOE.map(([t, a, il]) => ({ lv: 1, q: `「${t}」のは なに？`, a, ng: [...TOBJ, 'うなぎ'], ...(il ? { il } : {}), w: `${t} ${a}` })),
     { lv: 2, q: 'かおを {見|み}る ころには、しっぽを わすれて いるほど ながいのは？', a: 'うなぎ', ng: TOBJ, il: 'eel', w: 'とても ながい うなぎ' },
-    ...TATOE.slice(0, 4).map(([t, a, il]) => ({ lv: 2, q: `${a}は、なにのように かいて ある？`, a: t, ng: TATOE.map((x) => x[0]), ...(il ? { iv: il } : {}) })),
+    ...TATOE.slice(0, 4).map(([t, a, il]) => ({ lv: 2, q: `${a}は、どのように かいて ある？`, a: t, ng: TATOE.map((x) => x[0]), ...(il ? { iv: il } : {}) })),
     F(2, (d) => kjR(KJ_SW, d)), F(3, (d) => kjW(KW_SW, d)), F(3, (d) => kjR(KJ_SW, d)),
   ];
   const SW_EV = ['{赤|あか}い きょうだいたちと くらす', 'まぐろが きょうだいを のみこむ', 'ひとりで くらい うみの そこを およぐ', 'おもしろい ものを {見|み}て げん{気|き}に なる', 'いわかげで きょうだいたちを {見|み}つける', '{大|おお}きな さかなの ふりを して およぐ', '{大|おお}きな さかなを おい{出|だ}す'];
@@ -1355,7 +1358,7 @@ const TB_KOKUGO = (() => {
     { lv: 2, t: '「そうだ。みんな いっしょに およぐんだ。うみで いちばん {大|おお}きな さかなの ふりを して。」', q: 'スイミーが かんがえた ことは？', a: '{大|おお}きな さかなの ふりを して およぐ', ng: ['ばらばらに にげる', 'いわかげに ずっと かくれる', 'まぐろと ともだちに なる'], k: 'いちばん {大|おお}きな さかなの ふりを して' },
     { lv: 2, t: 'スイミーは おしえた。けっして、はなればなれに ならない こと。みんな、もちばを まもる こと。', q: 'スイミーが おしえた ことは？', a: 'はなればなれに ならない こと', ng: ['はやく にげる こと', 'いわかげに かくれる こと', 'しずかに ねる こと'], k: 'はなればなれに ならない こと' },
     { lv: 2, t: 'みんなが、{一|いっ}ぴきの {大|おお}きな さかなみたいに およげるように なった とき、スイミーは いった。「ぼくが、{目|め}に なろう。」', q: 'スイミーは なにに なった？', a: '{目|め}', ng: ['しっぽ', 'ひれ', '{口|くち}'], k: '「ぼくが、{目|め}に なろう。」', w: 'まっくろな スイミーは め に ぴったり', sq: 'みんなが、いっぴきの おおきな さかなみたいに およげるように なった とき、スイミーは いった。ぼくが、めに なろう。スイミーは なにに なった？' },
-    { lv: 3, q: '{赤|あか}い さかなたちと スイミーは、さいごに どう なった？', a: '{大|おお}きな さかなを おい{出|だ}した', ng: ['まぐろに たべられた', 'ばらばらに なった', 'いわかげに もどった'], k: 'みんなは およぎ、{大|おお}きな さかなを おい{出|だ}した', hs: 'おはなしの さいごに' },
+    { lv: 3, q: '{赤|あか}い さかなたちと スイミーは、さいごに どう した？', a: '{大|おお}きな さかなを おい{出|だ}した', ng: ['まぐろに たべられた', 'ばらばらに なった', 'いわかげに もどった'], k: 'みんなは およぎ、{大|おお}きな さかなを おい{出|だ}した', hs: 'おはなしの さいごに' },
     F(2, (d) => ordQ('「スイミー」の できごとの じゅんばん', SW_EV, d)),
     F(3, (d) => ordQ('「スイミー」の できごとの じゅんばん', SW_EV, d)),
     { lv: 3, q: '「スイミー」を かいた {人|ひと}の、ほかの おはなしは どれ？', a: 'じぶんだけの いろ', ng: ['おとうとねずみ チロは げんき', 'はなの すきな うし', '11ぴきの ねこ'], w: 'レオ・レオニさんの えほん' },
@@ -1364,14 +1367,14 @@ const TB_KOKUGO = (() => {
   // ───── かたちの にて いる かん字
   const NI = [['{三|さん}（　）で へやに {入|はい}る。', '人', ['入', '八', '大'], 'ひと は ひだりが ながい'], ['{三|さん}{人|にん}で へやに （　）る。', '入', ['人', '八', '大'], 'はいる は みぎが ながい'],
     ['{小|ちい}さな （　）を {見|み}つけた。', '貝', ['見', '目', '具'], 'かい の したは ちいさな てん ふたつ'], ['{小|ちい}さな {貝|かい}を （　）つけた。', '見', ['貝', '目', '兄'], 'みる の したは ひとの あし'],
-    ['（　）{手|て}で {石|いし}を ひろう。', '右', ['石', '左', '名'], 'みぎ は うえに ななめの せんが でる'], ['{右|みぎ}{手|て}で （　）を ひろう。', '石', ['右', '名', '若'], 'いし は うえの よこぼうが みじかく ななめに つづく'],
+    ['（　）{手|て}で {石|いし}を ひろう。', '右', ['石', '若', '名'], 'みぎは ななめの せんを さきに かく'], ['{右|みぎ}{手|て}で （　）を ひろう。', '石', ['右', '名', '若'], 'いしは よこぼうを さきに、みぎは ななめの せんを さきに かく'],
     ['（　）のりを する {王|おう}さま。', '玉', ['王', '主', '土'], 'たま は みぎしたに てんが ある'], ['{玉|たま}のりを する （　）さま。', '王', ['玉', '主', '工'], 'おう は てんが ない'],
     ['（　）の {下|した}で {本|ほん}を よむ。', '木', ['本', '休', '水'], 'き には したの よこぼうが ない'], ['{木|き}の {下|した}で （　）を よむ。', '本', ['木', '休', '体'], 'ほん は きの したに よこぼう']];
   const niQ = (d) => { const [s, a, ng, w] = pick(NI); const ch = opts(a, ng, d);
     return { text: `（　）に あう かん字は？\n${D(s)}`, sayQ: end(Y(s)) + 'まるに あう かんじは どれ？', ans: a, choices: ch, bigC: true, kanji: true, ng: pairNg(a, 'kjs'),
       steps: [{ h: `<div class="sk-p">${D(s).replace('（　）', `<b class="mark big">${a}</b>`)}</div>`, s: `${w}。かたちの ちがいを よく みてね` }] }; };
   const MISS = [['{三|さん}{月|がつ}{十二|じゅうに}{日|にち} {火|か}よう[目|び]', '日', ['白', '月', '田'], 'ようびは ひ の じ'], ['[百|しろ]い {水|みず}{玉|たま}もよう', '白', ['日', '百', '自'], 'しろ には うえの よこぼうが ない'], ['[字|がっ]{校|こう}に いく。', '学', ['子', '字', '宇'], 'がっこうの が は うえに てんが みっつ'],
-    ['[石|みぎ]{手|て}を あげる。', '右', ['石', '左', '若'], 'みぎ の したは くち'], ['{三|さん}[入|にん]で あそぶ。', '人', ['入', '八', '大'], 'ひと は ひだりが ながい'], ['[本|き]の えだに とまる。', '木', ['本', '休', '林'], 'き には したの よこぼうが ない'], ['{小|ちい}さな [見|かい]がら', '貝', ['見', '目', '具'], 'かい の したは ちいさな てん ふたつ'], ['[玉|おう]さまに あう。', '王', ['玉', '主', '土'], 'おう は てんが ない']];
+    ['[石|みぎ]{手|て}を あげる。', '右', ['石', '左', '若'], 'みぎは ななめの せんを さきに、いしは よこぼうを さきに かく'], ['{三|さん}[入|にん]で あそぶ。', '人', ['入', '八', '大'], 'ひと は ひだりが ながい'], ['[本|き]の えだに とまる。', '木', ['本', '休', '林'], 'き には したの よこぼうが ない'], ['{小|ちい}さな [見|かい]がら', '貝', ['見', '目', '具'], 'かい の したは ちいさな てん ふたつ'], ['[玉|おう]さまに あう。', '王', ['玉', '主', '土'], 'おう は てんが ない']];
   const missQ = (d) => { const [s, a, ng, w] = pick(MISS); const [, bad, yo] = s.match(TG); const ch = opts(a, ng.filter((x) => x !== a), d);
     return { text: `まちがって いる かん字が あるよ。\n${D(s.replace(TG, `<b class="mark">${bad}</b>`))}\nただしい かん字は？`, sayQ: 'まちがって いる かんじが あるよ。いろの ついた ところの ただしい かんじは どれ？', ans: a, choices: ch, bigC: true, kanji: true, ng: pairNg(a, 'kjs'),
       steps: [{ h: `<div class="sk-pair"><div class="ngp"><span class="lab">まちがい</span>${big(bad, 'kjs')}</div><div class="okp"><span class="lab">ただしい</span>${big(a, 'kjs')}</div></div>`, s: `${yo} は この かんじ。${w}` }, { h: `<div class="sk-p">${D(s.replace(TG, `<b class="mark big">${a}</b>`))}</div>`, s: Y(s.replace(TG, '$2')) }] }; };
@@ -1398,7 +1401,7 @@ const TB_KOKUGO = (() => {
 
   // ───── 花さかじいさん
   const hana1 = [
-    { lv: 1, t: 'ばあさまが {川|かわ}で せんたくを して いると、くろぬりの りっぱな はこが ぷかりぷかりと ながれて きた。', q: 'はこは どこから きた？', a: '{川|かわ}を ながれて きた', ng: ['{山|やま}から ころがって きた', 'そらから おちて きた', 'となりの いえから きた'], k: 'ぷかりぷかりと ながれて きた' },
+    { lv: 1, t: 'ばあさまが {川|かわ}で せんたくを して いると、くろぬりの りっぱな はこが ぷかりぷかりと ながれて きた。', q: 'はこは どう やって きた？', a: '{川|かわ}を ながれて きた', ng: ['{山|やま}から ころがって きた', 'そらから おちて きた', 'となりの いえから きた'], k: 'ぷかりぷかりと ながれて きた' },
     { lv: 1, t: 'はこを ひろい{上|あ}げると、まっ{白|しろ}な {子|こ}{犬|いぬ}が {一|いっ}ぴき {入|はい}って おった。', q: 'はこの {中|なか}に いたのは？', a: 'まっ{白|しろ}な {子|こ}{犬|いぬ}', ng: ['くろい ねこ', '{小|ちい}さな ねずみ', 'きいろい ひよこ'], k: 'まっ{白|しろ}な {子|こ}{犬|いぬ}', il: 'white_dog' },
     { lv: 1, t: 'ふたりは {子|こ}{犬|いぬ}に シロと {名|な}まえを つけて、たいせつに そだてた。', q: '{子|こ}{犬|いぬ}の {名|な}まえは？', a: 'シロ', ng: ['ポチ', 'クロ', 'チロ'], k: 'シロと {名|な}まえを つけて', il: 'white_dog' },
     { lv: 2, t: 'シロが「ここ ほれ、わんわん。」と いうので ほって みると、{土|つち}の {中|なか}から {大|おお}ばん {小|こ}ばんが きんきん きらきら。', q: 'ほって みると {出|で}て きたのは？', a: '{大|おお}ばん {小|こ}ばん', ng: ['むかでや へび', 'うまの ふん', 'さくらの {花|はな}'], k: '{大|おお}ばん {小|こ}ばん' },
@@ -1412,7 +1415,7 @@ const TB_KOKUGO = (() => {
     { lv: 1, t: 'ふたりは、かまどの はいを すくって もって かえった。はいを まくと、かれ{木|き}に つぎつぎと {花|はな}が さいた。', q: 'はいを まくと どう なった？', a: 'かれ{木|き}に {花|はな}が さいた', ng: ['{雨|あめ}が ふった', 'おもちが {出|で}た', 'かれ{木|き}が たおれた'], k: 'かれ{木|き}に つぎつぎと {花|はな}が さいた' },
     { lv: 2, t: 'とのさまは「あっぱれ、{日|に}{本|ほん}{一|いち}の {花|はな}さかじい。」と いって、ほうびを くれた。', q: 'とのさまは じいさまを なんと よんだ？', a: '{日|に}{本|ほん}{一|いち}の {花|はな}さかじい', ng: ['はたらきものの じいさま', 'なまけものの じいさま', 'やさしい おじいさん'], k: '{日|に}{本|ほん}{一|いち}の {花|はな}さかじい', sq: 'とのさまは、あっぱれ、にっぽんいちの はなさかじい、と いって、ほうびを くれた。とのさまは じいさまを なんと よんだ？' },
     { lv: 2, t: 'なまけものの じいさまが はいを まくと、はいは とのさまの {目|め}や はなや {口|くち}に {入|はい}って しまった。', q: 'はいは どこに {入|はい}った？', a: 'とのさまの {目|め}や はなや {口|くち}', ng: ['かれ{木|き}の えだ', 'かまどの {中|なか}', 'はたけの {土|つち}'], k: 'とのさまの {目|め}や はなや {口|くち}' },
-    { lv: 3, q: 'さいごに なまけものの じいさまは どう なった？', a: 'ろうやに {入|い}れられた', ng: ['ほうびを もらった', '{花|はな}さかじいに なった', 'とのさまの けらいに なった'], k: 'ろうやに {入|い}れられて しまった', hs: 'おはなしの さいごに' },
+    { lv: 3, q: 'さいごに なまけものの じいさまは どう なった？', a: 'ろうやに {入|い}れられた', ng: ['ほうびを もらった', '{花|はな}さかじいに なった', 'とのさまの けらいに なった'], t: 'なまけものの じいさまは、ろうやに {入|い}れられて しまった。', k: 'ろうやに {入|い}れられて しまった', hs: 'おはなしの さいごに' },
     { lv: 2, q: '「ここ ほれ、わんわん」で たからを {見|み}つけたのは？', a: 'はたらきものの じいさま', ng: ['なまけものの じいさま', 'とのさま', 'となりの ばあさま'], w: 'シロを たいせつに そだてた じいさまだね', il: 'white_dog' },
     F(2, (d) => ordQ('「{花|はな}さかじいさん」の できごとの じゅんばん', HANA_EV, d)),
     F(3, (d) => ordQ('「{花|はな}さかじいさん」の できごとの じゅんばん', HANA_EV, d)),
@@ -1426,7 +1429,7 @@ const TB_KOKUGO = (() => {
     ['ほうきで （　）。', 'はく', ['うたう', 'のむ', 'かぞえる']], ['ぞうきんで （　）。', 'ふく', ['のぼる', 'うたう', 'たべる']], ['ボールを （　）。', 'なげる', ['のむ', 'うたう', 'しめる']], ['おちゃを （　）。', 'のむ', ['なげる', 'はく', 'のぼる']]];
   const douQ = (d) => { const [s, a, ng] = pick(DOU); const ch = opts(a, ng, d);
     return { text: `（　）に あう ことばは？\n${s}`, sayQ: `${end(Y(s))}まるに あう ことばは どれ？`, ans: a, choices: ch, ...look(ch), steps: [{ h: `<div class="sk-p">${s.replace('（　）', `<b class="mark">${a}</b>`)}</div>`, s: Y(s.replace('（　）', a)) }] }; };
-  const TIME = [['あさ', ['かおを あらう', 'あさごはんを たべる', 'めを さます']], ['よる', ['ふとんで ねる', 'つきや ほしを {見|み}る', 'ばんごはんを たべる']], ['ひる', ['ひるごはんを たべる', 'そうじを する', 'べんきょうを する']]];
+  const TIME = [['あさ', ['めを さます', 'かおを あらう', 'あさごはんを たべる']], ['よる', ['ふとんで ねる', 'つきや ほしを {見|み}る', 'ばんごはんを たべる']], ['ひる', ['ひるごはんを たべる', 'そうじを する', 'こうえんで あそぶ']]];
   const timeQ = (d) => { const i = R(0, 2); const [t, L] = TIME[i]; const a = pick(L); const ng = TIME.filter((_, j) => j !== i).flatMap((x) => x[1]); const ch = opts(a, ng, d);
     return { text: `${t}に する ことは どれ？`, sayQ: `${t}に する ことは どれ？`, ans: D(a), choices: ch, txt: true, steps: [{ h: `<div class="sk-p">${t}</div><div class="sk-story">${L.map((x) => `<div>${D(x)}</div>`).join('')}</div>`, s: Y(`${t}は、${L.join('、')}`) }] }; };
   const hiroba1 = [F(1, oppQ), F(1, douQ), F(1, timeQ), F(2, oppQ), F(2, douQ), F(3, douQ)];

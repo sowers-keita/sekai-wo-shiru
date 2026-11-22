@@ -224,11 +224,11 @@ const VTOK = /(\d+(?:じ(?=\d|はん|ちょうど|$|[^ゃゅょ])|ふん|ぷん|
 const vToks = (t) => t.split(VTOK).map((s) => s.trim()).filter((s) => s && s.replace(/[ 、。]/g, '') && s !== ':');
 function speakParts(hs, opt) { return new Promise((res) => { let done = false; const fin = () => { if (!done) { done = true; speakingN = Math.max(0, speakingN - 1); res(); } }; speakingN++; const g = sayGen;
   Promise.all(hs.map((h) => vBuf(h))).then((bs) => { const c = ac(); if (g !== sayGen || !c || bs.some((b) => !b)) { fin(); return; } const rate = opt.fast ? 1.12 : 1; let t = c.currentTime + 0.02, last = null; const srcs = [];
-    for (const b of bs) { const s = c.createBufferSource(); s.buffer = b; s.playbackRate.value = rate; s.connect(c.destination); s.start(t); t += b.duration / rate - 0.06; srcs.push(s); last = s; }
+    for (const b of bs) { const s = c.createBufferSource(); s.buffer = b; s.playbackRate.value = rate; s.connect(out(c)); s.start(t); t += b.duration / rate - 0.06; srcs.push(s); last = s; }
     curSrc = { stop: () => srcs.forEach((s) => { try { s.stop(); } catch (e) {} }) }; last.onended = fin; setTimeout(fin, (t - c.currentTime) * 1000 + 800); }).catch(fin); }); }
 function enFileH(text, slow) { if (!VM) return null; const k = 'en|' + String(text).trim(); let h = vHash(k + (slow ? '|s' : '')); if (!VM.has(h)) h = vHash(k); return VM.has(h) ? h : null; } // えいごは ネイティブの こえの ファイル（ゆっくりは ゆっくり よんだ ファイル）
 function playH(h, text, opt) { return new Promise((res) => { let done = false; const fin = () => { if (!done) { done = true; speakingN = Math.max(0, speakingN - 1); res(); } }; speakingN++; const g = sayGen;
-  vBuf(h).then((b) => { const c = ac(); if (g !== sayGen) { fin(); return; } if (!b || !c) { ttsNow(text, opt).then(fin); return; } const s = c.createBufferSource(); s.buffer = b; s.connect(c.destination); s.onended = fin; curSrc = s; s.start(); setTimeout(fin, b.duration * 1000 + 700); }).catch(() => { ttsNow(text, opt).then(fin); }); }); }
+  vBuf(h).then((b) => { const c = ac(); if (g !== sayGen) { fin(); return; } if (!b || !c) { ttsNow(text, opt).then(fin); return; } const s = c.createBufferSource(); s.buffer = b; s.connect(out(c)); s.onended = fin; curSrc = s; s.start(); setTimeout(fin, b.duration * 1000 + 700); }).catch(() => { ttsNow(text, opt).then(fin); }); }); }
 const rbStrip = (t) => String(t ?? '').replace(/<rt>[\s\S]*?<\/rt>/g, '').replace(/<\/?(ruby|rb|rp)>/g, '');
 function speakNow(text, opt = {}) { text = rbStrip(text);
   if (voiceOn && opt.en && VM && location.protocol !== 'file:') { const h = enFileH(text, opt.slow); if (h) return playH(h, text, opt); }
@@ -237,7 +237,7 @@ function speakNow(text, opt = {}) { text = rbStrip(text);
     let done = false; const fin = () => { if (!done) { done = true; speakingN = Math.max(0, speakingN - 1); res(); } }; speakingN++; const g = sayGen;
     if (location.protocol === 'file:') { try { const a = new Audio(VB + h + '.mp3'); a.playbackRate = opt.fast ? 1.12 : 1; a.onended = fin; a.onerror = () => ttsNow(text, opt).then(fin); curSrc = { stop: () => a.pause() }; a.play().catch(() => ttsNow(text, opt).then(fin)); setTimeout(fin, 9000); } catch (e) { fin(); } return; } // パソコンで ファイルを ひらいた とき
     vBuf(h).then((b) => { const c = ac(); if (g !== sayGen) { fin(); return; } if (!b || !c) { ttsNow(text, opt).then(fin); return; }
-      const s = c.createBufferSource(); s.buffer = b; s.playbackRate.value = opt.fast ? 1.12 : 1; s.connect(c.destination); s.onended = fin; curSrc = s; s.start(); setTimeout(fin, (b.duration / s.playbackRate.value) * 1000 + 700); })
+      const s = c.createBufferSource(); s.buffer = b; s.playbackRate.value = opt.fast ? 1.12 : 1; s.connect(out(c)); s.onended = fin; curSrc = s; s.start(); setTimeout(fin, (b.duration / s.playbackRate.value) * 1000 + 700); })
       .catch(() => { ttsNow(text, opt).then(fin); }); }); }
   return ttsNow(text, opt);
 }
@@ -258,7 +258,9 @@ function ttsNow(text, opt = {}) {
 
 // ───────── おと
 let AC = null; const ac = () => { if (!AC) try { AC = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) {} if (AC && AC.state === 'suspended') AC.resume(); return AC; };
-function tone(f, d = 0.12, type = 'sine', v = 0.12, slide = 0, delay = 0) { const c = ac(); if (!c) return; const t = c.currentTime + delay; const o = c.createOscillator(), g = c.createGain(); o.type = type; o.frequency.setValueAtTime(f, t); if (slide) o.frequency.exponentialRampToValueAtTime(Math.max(40, f + slide), t + d); g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(v, t + 0.01); g.gain.exponentialRampToValueAtTime(0.001, t + d); o.connect(g); g.connect(c.destination); o.start(t); o.stop(t + d + 0.02); }
+// おとを ぜんたいに おおきく（2026-11-22 木原さん「もうすこし おおきく」）：ゲイン2ばい＋コンプレッサーで われない ように
+function out(c) { if (!c.__o) { const comp = c.createDynamicsCompressor(); comp.threshold.value = -16; comp.knee.value = 10; comp.ratio.value = 6; comp.attack.value = 0.003; comp.release.value = 0.2; const g = c.createGain(); g.gain.value = 2.2; g.connect(comp); comp.connect(c.destination); c.__o = g; } return c.__o; }
+function tone(f, d = 0.12, type = 'sine', v = 0.12, slide = 0, delay = 0) { const c = ac(); if (!c) return; const t = c.currentTime + delay; const o = c.createOscillator(), g = c.createGain(); o.type = type; o.frequency.setValueAtTime(f, t); if (slide) o.frequency.exponentialRampToValueAtTime(Math.max(40, f + slide), t + d); g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(v, t + 0.01); g.gain.exponentialRampToValueAtTime(0.001, t + d); o.connect(g); g.connect(out(c)); o.start(t); o.stop(t + d + 0.02); }
 const SE = {
   ok(combo) { const k = Math.min(combo, 12), b = 523 * Math.pow(1.0595, k); [1, 1.26, 1.5, 2].forEach((m, i) => tone(b * m, 0.16, 'triangle', 0.11, 0, i * 0.065)); if (combo >= 5) tone(b * 3, 0.3, 'sine', 0.05, 0, 0.28); },
   ng() { tone(587, 0.12, 'sine', 0.05); tone(494, 0.18, 'sine', 0.045, 0, 0.11); }, // やわらかい「ぽろん」（しっぱいを つよく しない）
@@ -267,7 +269,7 @@ const SE = {
   tap() { tone(700, 0.05, 'sine', 0.08, 200); },
   step() { tone(880, 0.07, 'sine', 0.06, 0); },
   card() { [784, 988, 1175, 1568, 1976].forEach((f, i) => tone(f, 0.3, 'sine', 0.08, 0, i * 0.09)); },
-  clap() { for (let i = 0; i < 1; i++) { const c = ac(); if (!c) return; const b = c.createBuffer(1, c.sampleRate * 0.06, c.sampleRate), a = b.getChannelData(0); for (let j = 0; j < a.length; j++) a[j] = (Math.random() * 2 - 1) * (1 - j / a.length); const s = c.createBufferSource(), g = c.createGain(); g.gain.value = 0.15; s.buffer = b; s.connect(g); g.connect(c.destination); s.start(); } },
+  clap() { for (let i = 0; i < 1; i++) { const c = ac(); if (!c) return; const b = c.createBuffer(1, c.sampleRate * 0.06, c.sampleRate), a = b.getChannelData(0); for (let j = 0; j < a.length; j++) a[j] = (Math.random() * 2 - 1) * (1 - j / a.length); const s = c.createBufferSource(), g = c.createGain(); g.gain.value = 0.15; s.buffer = b; s.connect(g); g.connect(out(c)); s.start(); } },
 };
 
 // ───────── ずの パーツ
@@ -1798,6 +1800,7 @@ b.ngm{color:#d65a5a;text-decoration:underline wavy}
 .sk-eqs{width:100%;text-align:center;font-size:30px;font-weight:900;margin-bottom:10px}.sk-eqs b{color:#2d86cc}.sk-eqs b.r{color:#ff5a8a}
 .subj-row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:6px}.sk-ch.map .subj-row button{display:block;width:auto;min-height:52px;font-size:20px;padding:6px 14px;text-align:center}.sk-ch.map .subj-row button.on{background:#ffd34d}
 .sk-novoice{background:#fff3cd;border-radius:14px;padding:8px 14px;font-weight:800;font-size:18px;text-align:center}.sk-novoice small{font-size:14px;font-weight:600}
+.sk-roul h1{margin:0 0 6px}.sk-rw{position:relative;display:inline-block;filter:drop-shadow(0 8px 14px #0002)}.sk-rw .pin{position:absolute;left:50%;top:-14px;transform:translateX(-50%);width:0;height:0;border-left:18px solid transparent;border-right:18px solid transparent;border-top:34px solid #ff4f8f;filter:drop-shadow(0 3px 0 #fff)}.sk-rleg{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:10px;font-weight:900;font-size:18px}.sk-rleg span{display:flex;align-items:center;gap:6px}.sk-rleg b{width:18px;height:18px;border-radius:5px;background:var(--c)}.sk-rleg em{font-style:normal;font-size:12px;background:#ff4f8f;color:#fff;border-radius:8px;padding:1px 6px}.sk-rres{min-height:52px;margin-top:8px;font-weight:900;font-size:clamp(26px,4.5vh,40px);opacity:0;transform:scale(.4)}.sk-rres.on{animation:skrr .6s cubic-bezier(.2,1.7,.4,1) forwards}@keyframes skrr{to{opacity:1;transform:scale(1)}}
 .sk-ch.pick .retryv{grid-column:1 / -1;min-height:64px!important;font-size:22px}
 .sk-now{display:flex;align-items:center;gap:14px;font-size:34px;font-weight:900;background:#fff;border-radius:24px;padding:14px 28px;box-shadow:0 6px 0 #f0d8e2}.sk-now .ic{font-size:64px}
 .sk-ch.nowsel button{min-height:84px;font-size:26px}
@@ -1980,8 +1983,8 @@ export function openSekai(opt0 = {}) {
     const fav = p.fav != null && p.cards.includes(p.fav) ? CARDS[p.fav] : null;
     main.innerHTML = `<div class="sk-home"><h1 class="sk-logo"><img src="${ILL_BASE}okz_icon.webp" onerror="if(!this.dataset.r){this.dataset.r=1;this.src='${SEKAI_HOST}ill/okz_icon.webp'}" alt="" draggable="false">おこづかいクエスト</h1><div class="sub">きょう ${td}もん ・ カード ${p.cards.length}/${CARDS.length}まい</div><button class="sk-go">▶ はじめる</button>${RW ? `<div class="sk-hstat">${cardPips()}${fav ? `<span class="fav">${fav[0]}</span>` : ''}</div>` : ''}<div class="sk-subs"></div>${RW && !opt.wallet ? walletCard() : ''}<div class="sk-row"><button class="mapb">🌸 わたしの まなび</button><button class="cards">🃏 せかいの カード</button><button class="code">🔑 まなびコード</button><button class="parent">おうちの ひと</button>${RW && opt.onCoins ? `<button class="txb">🧾 おかねの きろく${txList().some((x) => mineTx(x) && x.st === 'pending') ? ' <b style="color:#e0464e">●</b>' : ''}</button>` : ''}<button class="voice">${voiceOn ? '🔊 こえ あり' : '🔇 こえ なし'}</button></div></div>`;
     const subs = main.querySelector('.sk-subs');
-    main.querySelector('.sk-go').onclick = () => start(null); setTimeout(() => { const g = main.querySelector('.sk-go'); g && g.focus({ preventScroll: true }); }, 60);
-    for (const k of Object.keys(SUBJ)) { const S = SUBJ[k], r = p.subj[k].r, lv = Math.floor(r) + 1; const b = el('button', '', `<span>${S.ic}</span>${S.n}<small>レベル ${lv}：${S.L[Math.min(S.L.length - 1, Math.floor(r))].n}</small><div class="sk-lvl" style="--c:${S.col}"><i style="width:${(r / S.L.length) * 100}%"></i></div>`); b.onclick = () => start(k); subs.appendChild(b); }
+    main.querySelector('.sk-go').onclick = () => roulette(null).then((r) => start(r)); setTimeout(() => { const g = main.querySelector('.sk-go'); g && g.focus({ preventScroll: true }); }, 60);
+    for (const k of Object.keys(SUBJ)) { const S = SUBJ[k], r = p.subj[k].r, lv = Math.floor(r) + 1; const b = el('button', '', `<span>${S.ic}</span>${S.n}<small>レベル ${lv}：${S.L[Math.min(S.L.length - 1, Math.floor(r))].n}</small><div class="sk-lvl" style="--c:${S.col}"><i style="width:${(r / S.L.length) * 100}%"></i></div>`); b.onclick = () => roulette(k).then((r) => start(r)); subs.appendChild(b); }
     main.querySelector('.mapb').onclick = showMap; main.querySelector('.cards').onclick = () => showCards(); main.querySelector('.code').onclick = showCode; main.querySelector('.parent').onclick = () => parentGate(showParent); if (main.querySelector('.txb')) main.querySelector('.txb').onclick = showTx; main.querySelector('.voice').onclick = () => { voiceOn = !voiceOn; home(); };
      { const wl = main.querySelector('.sk-wlist'); if (wl) wl.onclick = () => showShop(home); }
   }
@@ -1989,10 +1992,37 @@ export function openSekai(opt0 = {}) {
   function showNow() {
  main.classList.remove('qmode');    const k = p.pickSubj || ''; const ic = k ? SUBJ[k].ic : '🌈', n = k ? SUBJ[k].n : 'おまかせ';
     main.innerHTML = `<div class="sk-home"><div class="sk-now"><span class="ic">${ic}</span><div>いまは <b>${n}</b></div></div><div class="sk-ch nowsel"><button class="go1">▶ このまま はじめる</button><button class="chg">🔄 きょうかを かえる</button></div></div>`;
-    let tm = setTimeout(() => go(), 3500); const go = () => { clearTimeout(tm); start(k || null); };
+    let tm = setTimeout(() => go(), 3500); const go = () => { clearTimeout(tm); roulette(k || null).then((r) => start(r)); };
     main.querySelector('.go1').onclick = go; main.querySelector('.chg').onclick = () => { clearTimeout(tm); showPick(); };
     setTimeout(() => { const b = main.querySelector('.go1'); b && b.focus(); }, 50); say(`いまは ${n}`);
   }
+
+  // ───────── きょうか ルーレット（2026-11-22 木原さん）：20マス。レベルが ひくい きょうかと、じぶんで えらんだ きょうかが おおめ。どの きょうかも かならず 1マス（20ぶんの1）は ある
+  function rouletteSlots(chosen) {
+    const ks = Object.keys(SUBJ).filter((k) => k !== 'eigo' || hasEn()); if (ks.length < 2) return ks.map(() => ks[0]);
+    const lv = ks.map((k) => p.subj[k].r || 0), lo = Math.min(...lv), hi = Math.max(...lv), span = Math.max(1, hi - lo);
+    const w = ks.map((k, i) => 1 + 4 * (hi - lv[i]) / span + (k === chosen ? 7 : 0));
+    const free = 20 - ks.length, sum = w.reduce((a, b) => a + b, 0), raw = w.map((x) => (x / sum) * free), cnt = raw.map((x) => 1 + Math.floor(x));
+    let left = 20 - cnt.reduce((a, b) => a + b, 0); raw.map((x, i) => [x - Math.floor(x), i]).sort((a, b) => b[0] - a[0]).forEach(([, i]) => { if (left > 0) { cnt[i]++; left--; } });
+    const out = [], rem = [...cnt]; let prev = -1; for (let n = 0; n < 20; n++) { let best = -1; ks.forEach((_, i) => { if (rem[i] && i !== prev && (best < 0 || rem[i] > rem[best])) best = i; }); if (best < 0) best = rem.findIndex((x) => x > 0); out.push(ks[best]); rem[best]--; prev = best; }
+    return out; }
+  function roulette(chosen) { return new Promise((resolve) => {
+    if (!RW && !opt.gate) return resolve(chosen || null);
+    const slots = rouletteSlots(chosen); if (new Set(slots).size < 2) return resolve(slots[0] || chosen || null);
+    const win = Math.floor(Math.random() * 20), res = slots[win]; // 20マスの どれかに とまる（1マス＝20ぶんの1）
+    main.classList.remove('qmode'); const cnt = {}; slots.forEach((k) => cnt[k] = (cnt[k] || 0) + 1);
+    main.innerHTML = `<div class="sk-home sk-roul"><h1>ルーレット スタート！</h1><div class="sk-rw"><canvas></canvas><i class="pin"></i></div><div class="sk-rleg">${Object.keys(cnt).map((k) => `<span style="--c:${SUBJ[k].col}"><b></b>${SUBJ[k].n}${k === chosen ? '<em>えらんだ</em>' : ''}</span>`).join('')}</div><div class="sk-rres"></div></div>`;
+    const cv = main.querySelector('canvas'), g = cv.getContext('2d'), Z = Math.min(innerWidth * 0.78, innerHeight * 0.5, 420), D = Math.min(2, devicePixelRatio || 1); cv.width = cv.height = Z * D; cv.style.width = cv.style.height = Z + 'px';
+    const A = (Math.PI * 2) / 20, draw = (rot) => { g.setTransform(D, 0, 0, D, Z / 2, Z / 2); g.clearRect(-Z / 2, -Z / 2, Z, Z); const r = Z / 2 - 6;
+      slots.forEach((k, i) => { const a0 = rot + i * A - Math.PI / 2 - A / 2; g.beginPath(); g.moveTo(0, 0); g.arc(0, 0, r, a0, a0 + A); g.closePath(); g.fillStyle = SUBJ[k].col; g.globalAlpha = i % 2 ? 0.86 : 1; g.fill(); g.globalAlpha = 1; g.strokeStyle = '#fff'; g.lineWidth = 2; g.stroke();
+        g.save(); g.rotate(a0 + A / 2); g.fillStyle = '#fff'; g.font = `900 ${Math.max(10, Z * 0.042)}px sans-serif`; g.textAlign = 'right'; g.textBaseline = 'middle'; g.fillText(SUBJ[k].n, r - 10, 0); g.restore(); });
+      g.beginPath(); g.arc(0, 0, r, 0, 6.283); g.lineWidth = 7; g.strokeStyle = '#fff'; g.stroke(); g.beginPath(); g.arc(0, 0, Z * 0.09, 0, 6.283); g.fillStyle = '#fff'; g.fill(); g.lineWidth = 4; g.strokeStyle = '#ffb3cf'; g.stroke(); };
+    // とまる いち：win の マスの まんなかが うえの ピンに くるように、すこし ずらして（まんなか ぴったり に しない）
+    const end = Math.PI * 2 * 6 - win * A + (Math.random() - 0.5) * A * 0.7, T = REDUCE ? 1 : 3600; let t0 = 0, lastI = -1;
+    const fin = () => { draw(end); const rr = main.querySelector('.sk-rres'); rr.innerHTML = `<b style="color:${SUBJ[res].col}">${SUBJ[res].n}</b> に けってい！`; rr.classList.add('on'); SE.card(); say(`${SUBJ[res].n} に けってい！`).then(() => setTimeout(() => resolve(res), 300)); };
+    const fr = (now) => { if (!main.isConnected || !root.isConnected) return; if (!t0) t0 = now; const k = Math.min(1, (now - t0) / T), e = 1 - Math.pow(1 - k, 3.2), rot = end * e; draw(rot); const ci = Math.floor((rot + A / 2) / A); if (ci !== lastI) { lastI = ci; tone(900 + (ci % 2) * 200, 0.03, 'square', 0.035); } if (k < 1) requestAnimationFrame(fr); else fin(); };
+    SE.tap(); requestAnimationFrame(fr);
+  }); }
   // どれに ちょうせん する？（こどもが えらぶ。えらばなければ 10びょうで おまかせ）
   function showPick() {
  main.classList.remove('qmode');    const due = (sj) => dueReview(p, 0, sj).length; const rec = Object.keys(SUBJ).filter((k) => k !== 'eigo' || hasEn()).sort((a, b) => due(b) - due(a))[0];
@@ -2000,7 +2030,7 @@ export function openSekai(opt0 = {}) {
     const novoice = !hasEn() ? `<div class="sk-novoice">🔇 おとが でない みたい。えいごは おとが でる ときに できるよ<br><small>おとなの ひとへ：おんりょう・マナーモードを たしかめてください</small></div>` : '';
     main.innerHTML = `<div class="sk-home"><h1>どれに ちょうせん する？</h1>${novoice}<div class="sk-ch pick">${opts.map(([k, ic, n, sub]) => `<button data-k="${k}"><span class="ic">${ic}</span><span>${n}</span><small>${sub}</small>${k && k === rec && due(k) ? '<em>おすすめ</em>' : ''}</button>`).join('')}</div>${novoice ? '<button class="retryv">🔊 もういちど ためす</button>' : ''}</div><div class="sub">えらばないと「${p.pickSubj && SUBJ[p.pickSubj] ? SUBJ[p.pickSubj].n : 'おまかせ'}」に なるよ</div></div>`;
     const rv = main.querySelector('.retryv'); if (rv) { main.querySelector('.sk-ch.pick').appendChild(rv); rv.onclick = () => { try { speechSynthesis.getVoices(); } catch (e) {} clearTimeout(tm); setTimeout(showPick, 300); }; }
-    let tm = setTimeout(() => go(p.pickSubj || ''), opt.gate && opt.gate.pick === 'always' ? 30000 : 10000); /* えらばない ときは まえと おなじ きょうか */ const go = (k) => { clearTimeout(tm); SE.tap(); p.pickSubj = k || ''; saveProgress(p); start(k || null); };
+    let tm = setTimeout(() => go(p.pickSubj || ''), opt.gate && opt.gate.pick === 'always' ? 30000 : 10000); /* えらばない ときは まえと おなじ きょうか */ const go = (k) => { clearTimeout(tm); SE.tap(); p.pickSubj = k || ''; saveProgress(p); roulette(k || null).then((r) => start(r)); };
     main.querySelectorAll('.sk-ch.pick button').forEach((b) => b.onclick = () => go(b.dataset.k));
     setTimeout(() => { const bs = [...main.querySelectorAll('.sk-ch.pick button')]; const b0 = bs.find((b) => p.pickSubj !== undefined && b.dataset.k === p.pickSubj) || bs[0]; b0 && b0.focus(); }, 50); // まえに えらんだ きょうかに はじめから あわせておく say('どれに ちょうせん する？');
   }
@@ -2271,7 +2301,7 @@ export function openSekai(opt0 = {}) {
   // ・おかねは もんだいを といた ときに もう ほぞん ずみ（とちゅうで とじても なくならない）。ここは みせかた だけ
   const SFX = {}; const sfxBase = () => ILL_BASE.replace(/ill\/?$/, 'sfx/');
   const sfxLoad = () => { const c = ac(); if (!c) return; for (const n of ['coin', 'suck', 'pop', 'drop', 'fanfare']) if (!SFX[n]) SFX[n] = fetch(sfxBase() + n + '.mp3').then((r) => (r.ok ? r : fetch(SEKAI_HOST + 'sfx/' + n + '.mp3'))).catch(() => fetch(SEKAI_HOST + 'sfx/' + n + '.mp3')).then((r) => r.arrayBuffer()).then((b) => new Promise((ok) => { const pr = c.decodeAudioData(b, ok, () => ok(null)); if (pr && pr.catch) pr.catch(() => ok(null)); })).catch(() => null); };
-  const sfx = async (n, rate = 1, vol = 0.8, loop = false) => { const c = ac(); if (!c || !SFX[n]) return null; const b = await SFX[n]; if (!b) return null; const s = c.createBufferSource(), g = c.createGain(); s.buffer = b; s.playbackRate.value = rate; s.loop = loop; g.gain.value = vol; s.connect(g).connect(c.destination); s.start(); return { s, g }; };
+  const sfx = async (n, rate = 1, vol = 0.8, loop = false) => { const c = ac(); if (!c || !SFX[n]) return null; const b = await SFX[n]; if (!b) return null; const s = c.createBufferSource(), g = c.createGain(); s.buffer = b; s.playbackRate.value = rate; s.loop = loop; g.gain.value = vol; s.connect(g).connect(out(c)); s.start(); return { s, g }; };
   const IMG = {}; const imgLoad = () => { for (const n of ['okz_c_gold', 'okz_c_pink', 'okz_c_mint', 'okz_c_bag', 'okz_pouch', 'piggy']) if (!IMG[n]) { const im = new Image(); im.onerror = () => { if (!im.dataset.r) { im.dataset.r = 1; im.src = SEKAI_HOST + 'ill/' + n + '.webp'; } }; im.src = ILL_BASE + n + '.webp'; IMG[n] = im; } };
   const pouchUI = () => { const b = top.querySelector('.sk-pouch'); if (!b) return; const n = (session && session.pend) || 0; b.classList.toggle('on', n > 0); b.querySelector('b').textContent = n ? `+${n}` : ''; b.classList.remove('bump'); void b.offsetWidth; b.classList.add('bump'); };
   function collect(amount) { return new Promise((resolve) => {

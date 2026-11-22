@@ -1,4 +1,4 @@
-// せかいを しる — 小学1年・11月ごろの こくご／さんすう／えいご
+// おこづかいクエスト（旧名：せかいを しる。2026-11-22 改名）— 小学1年・11月ごろの こくご／さんすう／えいご
 // ・1もん とくと 5えん（おうちの ひとに いえば げんきんにも できる・ほかの ゲームでも つかえる おかね）
 // ・せいかいが つづくと ほんの すこしずつ むずかしく（スキルの はしご＋こまかい レート）
 // ・まちがえたら こえと ずで ゆっくり ぶんかいして せつめい
@@ -1876,6 +1876,20 @@ b.ngm{color:#d65a5a;text-decoration:underline wavy}
 #sk.sk-lcol .sk-ch.emo:not(.map):not(.pick):not(.quitsel):not(.cardsel):not(.nowsel) button:not(.sk-chsp){font-size:clamp(56px,9vh,96px)}
 #sk.sk-split.sk-lcol .sk-main.qmode>.sk-ch.emo:not(.map):not(.pick):not(.quitsel):not(.cardsel):not(.nowsel) button:not(.sk-chsp){font-size:clamp(56px,12vh,96px)}
 .sk-exp .sk-ask button .sk-ill{font-size:clamp(56px,10vh,90px)}
+/* おこづかいクエスト：ふくろ と すいこみ */
+.sk-pouch{display:none;margin-left:auto;align-items:center;gap:2px;background:#fff;border-radius:30px;padding:3px 14px 3px 6px;box-shadow:0 3px 0 #e6ded3;font-weight:900;font-size:22px;color:#d2452f}
+.sk-pouch.on{display:flex}.sk-pouch img{width:40px;height:40px;object-fit:contain}.sk-pouch.on+.sk-coin{margin-left:8px}
+.sk-pouch.bump img{animation:skpouch .45s}@keyframes skpouch{30%{transform:scale(1.35) rotate(-10deg)}60%{transform:scale(.95) rotate(6deg)}}
+.sk-collect{position:absolute;inset:0;z-index:40;background:radial-gradient(ellipse at 50% 62%,#4a3470 0%,#251a3e 55%,#140e24 100%);touch-action:none;animation:skfade .3s;overflow:hidden;user-select:none;-webkit-user-select:none}
+.sk-collect canvas{position:absolute;inset:0;touch-action:none}
+.sk-collect.out{opacity:0;transition:opacity .45s}
+.sk-cl-pig{position:absolute;top:3%;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:6px;color:#ffe066;font-weight:900;font-size:clamp(32px,6.5vh,58px);text-shadow:0 3px 0 #b87800,0 0 18px #ffbf2a88;pointer-events:none;white-space:nowrap}
+.sk-cl-pig img{width:clamp(96px,18vh,160px);height:auto;filter:drop-shadow(0 6px 10px #0006)}.sk-cl-pig span{font-size:.55em}
+.sk-cl-pig.bump img{animation:skpig .22s}@keyframes skpig{45%{transform:scale(1.14) rotate(-5deg)}}
+.sk-cl-pig.win img{animation:skpigw .45s ease-in-out infinite alternate}@keyframes skpigw{from{transform:translateY(0) rotate(-4deg)}to{transform:translateY(-14px) rotate(4deg)}}
+.sk-cl-tot{position:absolute;left:50%;top:52%;transform:translate(-50%,-50%) scale(.2);opacity:0;pointer-events:none;color:#fff;font-weight:900;font-size:clamp(80px,18vh,170px);text-shadow:0 0 34px #ffcf3a,0 8px 0 #c98a00;white-space:nowrap}
+.sk-cl-tot span{font-size:.4em;margin-left:6px}.sk-cl-tot.on{animation:sktot .7s cubic-bezier(.2,1.7,.4,1) forwards}@keyframes sktot{to{transform:translate(-50%,-50%) scale(1);opacity:1}}
+.sk-home h1.sk-logo{display:flex;align-items:center;gap:12px;justify-content:center}.sk-home h1.sk-logo img{width:clamp(44px,7vh,64px);height:auto;border-radius:22%;box-shadow:0 4px 10px #0002}
 `;
 function el(tag, cls, html) { const e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; }
 
@@ -1892,7 +1906,7 @@ export function openSekai(opt0 = {}) {
   if (!p.tb1) { const st = { math: SUBJ.math.L.findIndex((s) => s.id === 'tm_hiku9'), kokugo: SUBJ.kokugo.L.findIndex((s) => TB_PAGE[s.id] >= 49) }; for (const k in st) if (st[k] > 0 && p.subj[k].r < st[k]) p.subj[k].r = st[k]; p.tb1 = 1; saveProgress(p); }
   if (opt.illBase) ILL_BASE = opt.illBase; else try { ILL_BASE = new URL('ill/', import.meta.url).href; } catch (e) {}
   const root = el('div'); root.id = 'sk'; if (REDUCE) root.classList.add('sk-reduce'); if (!RW) root.classList.add('sk-norw'); document.body.appendChild(root); deEmo(root); try { new MutationObserver((ms) => { for (const m of ms) { if (m.type === 'characterData') deEmoText(m.target); else m.addedNodes.forEach(deEmo); } }).observe(root, { childList: true, subtree: true, characterData: true }); } catch (e) {}
-  const top = el('div', 'sk-top', `<button class="sk-x" title="もどる">✕</button><div class="sk-combo"></div><div class="sk-coin"><i class="sk-jar"><b></b></i><span>${opt.wallet ? opt.wallet() : p.coins}</span><small>えん</small></div>`); root.appendChild(top);
+  const top = el('div', 'sk-top', `<button class="sk-x" title="もどる">✕</button><div class="sk-combo"></div><div class="sk-pouch"><img src="${ILL_BASE}okz_pouch.webp" onerror="if(!this.dataset.r){this.dataset.r=1;this.src='${SEKAI_HOST}ill/okz_pouch.webp'}" alt="" draggable="false"><b></b></div><div class="sk-coin"><i class="sk-jar"><b></b></i><span>${opt.wallet ? opt.wallet() : p.coins}</span><small>えん</small></div>`); root.appendChild(top);
   const bar = el('div', 'sk-bar', '<i></i>'); root.appendChild(bar); bar.style.visibility = 'hidden';
   const main = el('div', 'sk-main'); root.appendChild(main);
   let session = null; const T0 = Date.now(); let ended = false;
@@ -1939,7 +1953,7 @@ export function openSekai(opt0 = {}) {
     padRaf = requestAnimationFrame(padLoop); };
   if (opt.gamepad !== false) padRaf = requestAnimationFrame(padLoop);
   const wallet = () => (opt.wallet ? opt.wallet() : p.coins);
-  const coinUI = () => { const c = top.querySelector('.sk-coin'); const sp = c.querySelector('span'); const to = wallet(), from = +sp.textContent || 0; const jar = c.querySelector('.sk-jar b'); if (jar) jar.style.height = ((to % 100) / 100) * 100 + '%';
+  const coinUI = () => { const c = top.querySelector('.sk-coin'); const sp = c.querySelector('span'); const to = wallet() - ((session && session.pend) || 0), from = +sp.textContent || 0; const jar = c.querySelector('.sk-jar b'); if (jar) jar.style.height = ((to % 100) / 100) * 100 + '%';
     c.classList.remove('bump'); void c.offsetWidth; c.classList.add('bump'); if (to <= from || REDUCE) { sp.textContent = to; return; } const t0 = performance.now(); const step = (t) => { const k = Math.min(1, (t - t0) / 600); sp.textContent = Math.round(from + (to - from) * k); if (k < 1) requestAnimationFrame(step); }; requestAnimationFrame(step);
     if (Math.floor(to / 100) > Math.floor(from / 100) && from > 0) setTimeout(() => { const d = el('div', 'sk-milestone', `<b>${Math.floor(to / 100) * 100}えん</b> たまった！<span>${shopLine(to)}</span>`); root.appendChild(d); confetti(50, false); SE.card(); setTimeout(() => d.remove(), 2600); }, 650); };
   const shopLine = (bal) => { const ok = SHOP.filter((x) => x[0] <= bal); if (!ok.length) return ''; const it = pick(ok.slice(-6)); return `${it[2]}が ${cnt(Math.floor(bal / it[0]), it[3])} かえるよ`; };
@@ -1960,15 +1974,15 @@ export function openSekai(opt0 = {}) {
   else top.querySelector('.sk-x').onclick = () => { if (opt.gate) return; SE.tap(); if (session && session.n > 0) finish(); else close(); };
 
   function home() {
-    main.classList.remove('qmode'); session = null; root.classList.remove('fever'); bar.style.visibility = 'hidden'; top.querySelector('.sk-combo').classList.remove('on');
+    main.classList.remove('qmode'); session = null; pouchUI(); coinUI(); root.classList.remove('fever'); bar.style.visibility = 'hidden'; top.querySelector('.sk-combo').classList.remove('on');
     const td = p.days[today()] || 0;
     const fav = p.fav != null && p.cards.includes(p.fav) ? CARDS[p.fav] : null;
-    main.innerHTML = `<div class="sk-home"><h1>🌍 せかいを しる</h1><div class="sub">きょう ${td}もん ・ カード ${p.cards.length}/${CARDS.length}まい</div><button class="sk-go">▶ 5もん はじめる</button>${RW ? `<div class="sk-hstat">${cardPips()}${fav ? `<span class="fav">${fav[0]}</span>` : ''}</div>` : ''}<div class="sk-subs"></div>${RW && !opt.wallet ? walletCard() : ''}<div class="sk-row"><button class="mapb">🌸 わたしの まなび</button><button class="cards">🃏 せかいの カード</button><button class="code">🔑 まなびコード</button><button class="parent">おうちの ひと</button>${RW && opt.onCoins ? `<button class="txb">🧾 おかねの きろく${txList().some((x) => mineTx(x) && x.st === 'pending') ? ' <b style="color:#e0464e">●</b>' : ''}</button>` : ''}<button class="voice">${voiceOn ? '🔊 こえ あり' : '🔇 こえ なし'}</button></div></div>`;
+    main.innerHTML = `<div class="sk-home"><h1 class="sk-logo"><img src="${ILL_BASE}okz_icon.webp" onerror="if(!this.dataset.r){this.dataset.r=1;this.src='${SEKAI_HOST}ill/okz_icon.webp'}" alt="" draggable="false">おこづかいクエスト</h1><div class="sub">きょう ${td}もん ・ カード ${p.cards.length}/${CARDS.length}まい</div><button class="sk-go">▶ 5もん はじめる</button>${RW ? `<div class="sk-hstat">${cardPips()}${fav ? `<span class="fav">${fav[0]}</span>` : ''}</div>` : ''}<div class="sk-subs"></div>${RW && !opt.wallet ? walletCard() : ''}<div class="sk-row"><button class="mapb">🌸 わたしの まなび</button><button class="cards">🃏 せかいの カード</button><button class="code">🔑 まなびコード</button><button class="parent">おうちの ひと</button>${RW && opt.onCoins ? `<button class="txb">🧾 おかねの きろく${txList().some((x) => mineTx(x) && x.st === 'pending') ? ' <b style="color:#e0464e">●</b>' : ''}</button>` : ''}<button class="voice">${voiceOn ? '🔊 こえ あり' : '🔇 こえ なし'}</button></div></div>`;
     const subs = main.querySelector('.sk-subs');
     main.querySelector('.sk-go').onclick = () => start(null); setTimeout(() => { const g = main.querySelector('.sk-go'); g && g.focus({ preventScroll: true }); }, 60);
     for (const k of Object.keys(SUBJ)) { const S = SUBJ[k], r = p.subj[k].r, lv = Math.floor(r) + 1; const b = el('button', '', `<span>${S.ic}</span>${S.n}<small>レベル ${lv}：${S.L[Math.min(S.L.length - 1, Math.floor(r))].n}</small><div class="sk-lvl" style="--c:${S.col}"><i style="width:${(r / S.L.length) * 100}%"></i></div>`); b.onclick = () => start(k); subs.appendChild(b); }
     main.querySelector('.mapb').onclick = showMap; main.querySelector('.cards').onclick = () => showCards(); main.querySelector('.code').onclick = showCode; main.querySelector('.parent').onclick = () => parentGate(showParent); if (main.querySelector('.txb')) main.querySelector('.txb').onclick = showTx; main.querySelector('.voice').onclick = () => { voiceOn = !voiceOn; home(); };
-    say('せかいを しる。どれに する？'); { const wl = main.querySelector('.sk-wlist'); if (wl) wl.onclick = () => showShop(home); }
+     { const wl = main.querySelector('.sk-wlist'); if (wl) wl.onclick = () => showShop(home); }
   }
   // 2かいめ から：「いまは ○○」を みじかく だして、そのまま はじまる（かえる ときは ▼で「かえる」）
   function showNow() {
@@ -2070,7 +2084,7 @@ export function openSekai(opt0 = {}) {
   }
 
   // 1もん おわった（はじめから せいかい・せつめいの あとで できた・いっしょに できた どれも おなじ）：5えん と カードの わく 1つ
-  function doneOne(btn) { if (!RW) return false; session.earned += YEN_PER_Q; earnYen(p, YEN_PER_Q); p.games[gameId] = (p.games[gameId] || 0) + YEN_PER_Q; payOut(YEN_PER_Q); if (btn && !REDUCE) flyCoins(btn, 5); setTimeout(coinUI, REDUCE ? 0 : 500);
+  function doneOne(btn) { if (!RW) return false; session.earned += YEN_PER_Q; session.pend = (session.pend || 0) + YEN_PER_Q; top.querySelector('.sk-pouch').classList.add('on'); earnYen(p, YEN_PER_Q); p.games[gameId] = (p.games[gameId] || 0) + YEN_PER_Q; payOut(YEN_PER_Q); if (btn && !REDUCE) flyCoins(btn, 5); setTimeout(pouchUI, REDUCE ? 0 : 700); if (session.n <= 1) { sfxLoad(); imgLoad(); }
     if (p.cards.length >= CARDS.length) return false; p.cardProg = (p.cardProg || 0) + 1; if (p.cardProg < 5) return false; p.cardProg = 0; session.cardDue = (session.cardDue || 0) + 1; return true; }
   function start(prefer) { session = { prefer, k: 0, slot: 0, plan: [], id: Date.now(), miss: {}, n: opt.gate ? (opt.gate.start || 0) : 0, indep: 0, retryOk: 0, assistN: 0, revOk: 0, wrong: 0, ok: 0, combo: 0, best: 0, earned: 0, fever: false, goal: opt.gate ? opt.gate.goal : 5 }; bar.style.visibility = 'visible'; if (p.easyNext) { session.down = true; delete p.easyNext; saveProgress(p); } next(); } // まえに むずかしくて おわった ときは やさしめ から
   function updBar() { const G = session.goal; if (G <= 12) { bar.classList.add('seg'); if (bar.children.length !== G) bar.innerHTML = '<span></span>'.repeat(G); [...bar.children].forEach((x, i) => x.classList.toggle('on', i < session.n)); } else { bar.classList.remove('seg'); if (!bar.querySelector('i')) bar.innerHTML = '<i></i>'; bar.querySelector('i').style.width = Math.min(100, (session.n / G) * 100) + '%'; } const gt = top.querySelector('.sk-gate'); if (gt) gt.innerHTML = `🌍 ${session.n} / ${session.goal} もん　<span style="color:#ff7a3c">${session.n >= session.goal ? 'クリア！' : `あと ${session.goal - session.n}もん！`}</span>`; const c = top.querySelector('.sk-combo'); c.classList.toggle('on', session.combo >= 2); const tier = session.combo >= 10 ? 4 : session.combo >= 5 ? 3 : session.combo >= 3 ? 2 : 1; c.className = `sk-combo${session.combo >= 2 ? ' on' : ''} t${tier}`; c.innerHTML = `${session.fever ? icon('fire') : icon('star')}<b>${session.combo}</b> れんぞく`; if (session.combo >= 2) { c.classList.remove('pop'); void c.offsetWidth; c.classList.add('pop'); } }
@@ -2195,7 +2209,7 @@ export function openSekai(opt0 = {}) {
     rk.style.left = at(from) + 'px'; requestAnimationFrame(() => requestAnimationFrame(() => { rk.style.left = at(to) + 'px'; }));
     setTimeout(() => say(line), 500); setTimeout(() => d.classList.add('out'), 3100); setTimeout(() => d.remove(), 3500);
   }
-  function flyCoins(from, n) { const r = from.getBoundingClientRect(), t = top.querySelector('.sk-coin').getBoundingClientRect(); for (let i = 0; i < n; i++) { const c = el('div', 'sk-fx', '<i class="sk-en">円</i>'); const x = r.left + r.width / 2 + (Math.random() - 0.5) * 60, y = r.top + (Math.random() - 0.5) * 30; c.style.left = x + 'px'; c.style.top = y + 'px'; c.style.setProperty('--tx', t.left - x + 'px'); c.style.setProperty('--ty', t.top - y + 'px'); c.style.animationDelay = i * 0.06 + 's'; root.appendChild(c); setTimeout(() => { SE.coin(); c.remove(); }, 900 + i * 60); } }
+  function flyCoins(from, n) { const r = from.getBoundingClientRect(), t = (top.querySelector('.sk-pouch.on, .sk-pouch') || top.querySelector('.sk-coin')).getBoundingClientRect(); for (let i = 0; i < n; i++) { const c = el('div', 'sk-fx', '<i class="sk-en">円</i>'); const x = r.left + r.width / 2 + (Math.random() - 0.5) * 60, y = r.top + (Math.random() - 0.5) * 30; c.style.left = x + 'px'; c.style.top = y + 'px'; c.style.setProperty('--tx', t.left - x + 'px'); c.style.setProperty('--ty', t.top - y + 'px'); c.style.animationDelay = i * 0.06 + 's'; root.appendChild(c); setTimeout(() => { SE.coin(); c.remove(); }, 900 + i * 60); } }
   function showTx() { hush(); main.classList.remove('qmode'); const L = txList().filter((x) => x.app === gameId).slice(-15).reverse(); const pend = L.filter((x) => x.st === 'pending' && mineTx(x)).length;
     const row = (x) => { const t = new Date(x.t); return `<tr><td>${t.getMonth() + 1}/${t.getDate()} ${t.getHours()}:${String(t.getMinutes()).padStart(2, '0')}</td><td>+${x.n}えん</td><td>${x.st === 'done' ? '✅ ゲームに はいった' : x.st === 'pending' && !mineTx(x) ? '🔒 べつの たんまつの ぶん（ここでは いれない）' : x.st === 'pending' ? `⏳ まだ${x.err ? `<br><small>${String(x.err).replace(/</g, '&lt;')}（${x.tries || 1}かい）</small>` : ''}` : 'ー'}</td></tr>`; };
     main.innerHTML = `<div class="sk-home"><h1>🧾 おかねの きろく</h1><div class="sub">${pend ? `まだ ゲームに はいって いない おかねが ${pend}けん あるよ` : 'ぜんぶ ゲームに はいって いるよ'}</div><table class="sk-tx" style="width:min(92vw,620px);background:#fff;border-radius:14px;padding:8px;font-size:18px;font-weight:700">${L.map(row).join('') || '<tr><td>まだ ないよ</td></tr>'}</table><div class="sk-row">${pend ? '<button class="rt">🔁 もういちど いれる</button>' : ''}<button class="back">← もどる</button></div></div>`;
@@ -2249,7 +2263,75 @@ export function openSekai(opt0 = {}) {
       play();
     });
   }
-  function finish(goal) {
+  // ───────── おこづかいクエスト：さいごに おかねを すいこむ（2026-11-22 木原さん「ルイージマンションの そうじきで すいこむ みたいな そうかいかん」）
+  // ・もんだいの あいだは「ふくろ」に たまる だけ → おわったら ふくろが はじけて コインが ちらばる → ゆびで なぞると すいこまれて ぶたの ちょきんばこへ
+  // ・リモコン／キーボード：ボタンを おすと じどうで すいこむ。だれも さわらなくても 7びょうで じどう（とまらない）
+  // ・おかねは もんだいを といた ときに もう ほぞん ずみ（とちゅうで とじても なくならない）。ここは みせかた だけ
+  const SFX = {}; const sfxBase = () => ILL_BASE.replace(/ill\/?$/, 'sfx/');
+  const sfxLoad = () => { const c = ac(); if (!c) return; for (const n of ['coin', 'suck', 'pop', 'drop', 'fanfare']) if (!SFX[n]) SFX[n] = fetch(sfxBase() + n + '.mp3').then((r) => (r.ok ? r : fetch(SEKAI_HOST + 'sfx/' + n + '.mp3'))).catch(() => fetch(SEKAI_HOST + 'sfx/' + n + '.mp3')).then((r) => r.arrayBuffer()).then((b) => new Promise((ok, ng) => c.decodeAudioData(b, ok, ng))).catch(() => null); };
+  const sfx = async (n, rate = 1, vol = 0.8, loop = false) => { const c = ac(); if (!c || !SFX[n]) return null; const b = await SFX[n]; if (!b) return null; const s = c.createBufferSource(), g = c.createGain(); s.buffer = b; s.playbackRate.value = rate; s.loop = loop; g.gain.value = vol; s.connect(g).connect(c.destination); s.start(); return { s, g }; };
+  const IMG = {}; const imgLoad = () => { for (const n of ['okz_gold', 'okz_silver', 'okz_pouch', 'okz_bag', 'piggy']) if (!IMG[n]) { const im = new Image(); im.onerror = () => { if (!im.dataset.r) { im.dataset.r = 1; im.src = SEKAI_HOST + 'ill/' + n + '.webp'; } }; im.src = ILL_BASE + n + '.webp'; IMG[n] = im; } };
+  const pouchUI = () => { const b = top.querySelector('.sk-pouch'); if (!b) return; const n = (session && session.pend) || 0; b.classList.toggle('on', n > 0); b.querySelector('b').textContent = n ? `+${n}` : ''; b.classList.remove('bump'); void b.offsetWidth; b.classList.add('bump'); };
+  function collect(amount) { return new Promise((resolve) => {
+    hush(); sfxLoad(); imgLoad();
+    const ov = el('div', 'sk-collect', `<canvas></canvas><div class="sk-cl-pig"><img src="${ILL_BASE}piggy.webp" onerror="if(!this.dataset.r){this.dataset.r=1;this.src='${SEKAI_HOST}ill/piggy.webp'}" alt="" draggable="false"><b>0</b><span>えん</span></div><div class="sk-cl-tot"></div>`); root.appendChild(ov);
+    const cv = ov.querySelector('canvas'), g = cv.getContext('2d'), pigEl = ov.querySelector('.sk-cl-pig'), cntEl = pigEl.querySelector('b'); let W = 0, H = 0, D = 1;
+    const fit = () => { D = Math.min(2, window.devicePixelRatio || 1); W = ov.clientWidth; H = ov.clientHeight; cv.width = W * D; cv.height = H * D; cv.style.width = W + 'px'; cv.style.height = H + 'px'; }; fit(); addEventListener('resize', fit);
+    const S = Math.max(46, Math.min(W, H) * 0.1); // コインの おおきさ
+    // かずを わける：5えん（きん）と 1えん（ぎん）。おおい ときは 50えんの ふくろも
+    const items = []; let r = amount; while (r > 120) { items.push({ v: 50, k: 'okz_bag', s: S * 1.9 }); r -= 50; } const n5 = Math.floor(r / 10); for (let i = 0; i < n5; i++) items.push({ v: 5, k: 'okz_gold', s: S * 1.12 }); for (let i = 0; i < r - n5 * 5; i++) items.push({ v: 1, k: 'okz_silver', s: S });
+    const bag = { x: W / 2, y: H * 0.55, sc: 0, t: 0, open: false }; const parts = []; let got = 0, streak = 0, phase = 'bag', t0 = performance.now(), lastTouch = performance.now(), shake = 0;
+    const N = { x: W / 2, y: H * 0.6, on: false, auto: false, R: Math.min(W, H) * 0.24, ang: 0, pow: 0 }; let loop = null;
+    const pigPos = () => { const b = pigEl.getBoundingClientRect(), o = ov.getBoundingClientRect(); return { x: b.left - o.left + b.width * 0.42, y: b.top - o.top + b.height * 0.42 }; };
+    const spark = (x, y, n, col, sp = 5) => { for (let i = 0; i < n; i++) { const a = Math.random() * 6.283, v = sp * (0.4 + Math.random()); parts.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 1, life: 1, dec: 0.02 + Math.random() * 0.03, col, s: 2 + Math.random() * 4 }); } };
+    const burst = () => { if (bag.open) return; bag.open = true; phase = 'suck'; sfx('pop', 1, 0.9); shake = 14; spark(bag.x, bag.y, 60, '#ffd84a', 9);
+      items.forEach((c, i) => { const a = -Math.PI / 2 + (Math.random() - 0.5) * 2.6, v = 9 + Math.random() * 11; Object.assign(c, { x: bag.x, y: bag.y - 20, vx: Math.cos(a) * v, vy: Math.sin(a) * v, rot: Math.random() * 6, vr: (Math.random() - 0.5) * 0.5, spin: Math.random() * 6, st: 'idle', sc: 1, dl: i * 0.012 }); }); };
+    const capture = (c) => { c.st = 'fly'; c.ft = 0; c.sx = c.x; c.sy = c.y; const P = pigPos(); c.cx = (c.x + P.x) / 2 + (Math.random() - 0.5) * 120; c.cy = Math.min(c.y, P.y) - 80 - Math.random() * 80; streak++; sfx('coin', Math.pow(2, Math.min(streak, 18) / 18), 0.55); spark(c.x, c.y, 8, '#fff6b0', 4); };
+    const land = (c) => { c.st = 'gone'; got += c.v; cntEl.textContent = got; pigEl.classList.remove('bump'); void pigEl.offsetWidth; pigEl.classList.add('bump'); sfx('drop', 0.9 + Math.random() * 0.2, 0.5); const P = pigPos(); spark(P.x, P.y - 10, 10, '#ffe066', 5);
+      if (items.every((x) => x.st === 'gone')) win(); };
+    const win = () => { if (phase === 'win') return; phase = 'win'; stopSuck(); sfx('fanfare', 1, 0.9); const P = pigPos(); for (let i = 0; i < 4; i++) setTimeout(() => spark(P.x, P.y, 40, ['#ffd84a', '#ff8ab0', '#7ad7ff', '#9cf09c'][i], 10), i * 120);
+      const tot = ov.querySelector('.sk-cl-tot'); tot.innerHTML = `<b>+${amount}</b><span>えん</span>`; tot.classList.add('on'); pigEl.classList.add('win');
+      setTimeout(() => { ov.classList.add('out'); setTimeout(() => { removeEventListener('resize', fit); window.removeEventListener('keydown', key, true); ov.remove(); resolve(); }, 450); }, 2300); };
+    const startSuck = async () => { if (loop || phase !== 'suck') return; loop = 'p'; const h = await sfx('suck', 1, 0.0001, true); if (!h) { loop = null; return; } if (loop !== 'p') { try { h.s.stop(); } catch (e) {} return; } loop = h; h.g.gain.setTargetAtTime(0.45, ac().currentTime, 0.05); };
+    const stopSuck = () => { const h = loop; loop = null; if (h && h.g) { try { h.g.gain.setTargetAtTime(0.0001, ac().currentTime, 0.06); h.s.stop(ac().currentTime + 0.3); } catch (e) {} } };
+    const ptr = (e) => { const o = cv.getBoundingClientRect(); N.x = e.clientX - o.left; N.y = e.clientY - o.top; lastTouch = performance.now(); };
+    cv.addEventListener('pointerdown', (e) => { e.preventDefault(); ptr(e); if (phase === 'bag') { burst(); return; } N.on = true; N.auto = false; startSuck(); try { cv.setPointerCapture(e.pointerId); } catch (er) {} });
+    cv.addEventListener('pointermove', (e) => { if (N.on) ptr(e); });
+    const up = () => { if (N.auto) return; N.on = false; stopSuck(); }; cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', up);
+    const key = (e) => { if (!ov.isConnected) return; e.preventDefault(); e.stopImmediatePropagation(); if (phase === 'bag') burst(); else { N.auto = true; N.on = true; startSuck(); } }; window.addEventListener('keydown', key, true);
+    let prev = performance.now();
+    const frame = (now) => { if (!ov.isConnected) { stopSuck(); return; } const dt = Math.min(2.2, (now - prev) / 16.67); prev = now; const T = (now - t0) / 1000;
+      if (phase === 'bag' && T > 1.4) burst();
+      if (phase === 'suck' && !N.on && now - lastTouch > 7000) { N.auto = true; N.on = true; startSuck(); } // だれも さわらない ときは じどうで
+      if (phase === 'suck' && T > 25) items.forEach((c) => c.st === 'idle' && capture(c)); // ぜったいに おわる
+      if (N.auto && N.on) { const left = items.filter((c) => c.st === 'idle'); if (left.length) { let best = left[0], bd = 1e9; for (const c of left) { const d = Math.hypot(c.x - N.x, c.y - N.y); if (d < bd) { bd = d; best = c; } } N.x += (best.x - N.x) * 0.12 * dt; N.y += (best.y - N.y) * 0.12 * dt; } }
+      N.pow += ((N.on ? 1 : 0) - N.pow) * 0.15 * dt; N.ang += 0.25 * dt * (0.3 + N.pow);
+      g.setTransform(D, 0, 0, D, 0, 0); g.clearRect(0, 0, W, H); if (shake > 0) { g.translate((Math.random() - 0.5) * shake, (Math.random() - 0.5) * shake); shake *= 0.86; if (shake < 0.5) shake = 0; }
+      // ふくろ
+      if (!bag.open || bag.sc > 0.01) { bag.sc = bag.open ? bag.sc * 0.8 : Math.min(1, bag.sc + 0.08 * dt); const bob = bag.open ? 1.4 - bag.sc * 0.4 : 1 + Math.sin(T * 9) * 0.04 * Math.min(1, T * 2); const im = IMG.okz_pouch, bw = Math.min(W, H) * 0.42 * bag.sc * bob; if (im && im.complete) g.drawImage(im, bag.x - bw / 2, bag.y - bw / 2 - (bag.open ? 0 : Math.abs(Math.sin(T * 4.5)) * 18), bw, bw * im.height / im.width); }
+      // すいこみ：うずまき
+      if (N.pow > 0.02 && phase !== 'win') { g.save(); g.translate(N.x, N.y); for (let k = 0; k < 3; k++) { g.rotate(2.094); g.beginPath(); for (let a = 0; a < 5.5; a += 0.12) { const rr = N.R * (1 - a / 5.5) * (0.55 + 0.45 * N.pow); const x = Math.cos(a + N.ang) * rr, y = Math.sin(a + N.ang) * rr; a ? g.lineTo(x, y) : g.moveTo(x, y); } g.strokeStyle = `rgba(150,220,255,${0.35 * N.pow})`; g.lineWidth = 5; g.lineCap = 'round'; g.stroke(); }
+        const gr = g.createRadialGradient(0, 0, 0, 0, 0, N.R * 0.5); gr.addColorStop(0, `rgba(255,255,255,${0.75 * N.pow})`); gr.addColorStop(1, 'rgba(160,220,255,0)'); g.fillStyle = gr; g.beginPath(); g.arc(0, 0, N.R * 0.5, 0, 6.283); g.fill(); g.restore();
+        if (Math.random() < 0.6 * N.pow * dt) { const a = Math.random() * 6.283, rr = N.R * (0.8 + Math.random() * 0.4); parts.push({ x: N.x + Math.cos(a) * rr, y: N.y + Math.sin(a) * rr, tx: N.x, ty: N.y, life: 1, dec: 0.05, col: '#bfe8ff', s: 2 + Math.random() * 3, pull: 1 }); } }
+      // コイン
+      const P = pigPos(), floor = H - S * 0.8;
+      for (const c of items) { if (c.st === 'gone' || !bag.open) continue; const im = IMG[c.k]; const rest = c.st === 'idle' && c.vy === 0 && !(N.on && Math.hypot(N.x - c.x, N.y - c.y) < N.R); if (rest) c.spin += (Math.round(c.spin / Math.PI) * Math.PI - c.spin) * 0.15 * dt; else c.spin += 0.18 * dt; // ゆかに おちたら おもてを むく
+        if (c.st === 'idle') { if (c.dl > 0) { c.dl -= dt / 60; continue; }
+          c.vy += 0.55 * dt; c.x += c.vx * dt; c.y += c.vy * dt; c.rot += c.vr * dt;
+          if (c.y > floor) { c.y = floor; c.vy *= -0.45; c.vx *= 0.8; c.vr *= 0.8; if (Math.abs(c.vy) < 1.2) c.vy = 0; } if (c.x < S * 0.7 || c.x > W - S * 0.7) { c.vx *= -0.6; c.x = Math.max(S * 0.7, Math.min(W - S * 0.7, c.x)); } if (c.y < S) { c.y = S; c.vy = Math.abs(c.vy) * 0.5; }
+          if (N.on && phase === 'suck') { const dx = N.x - c.x, dy = N.y - c.y, d = Math.hypot(dx, dy); if (d < N.R) { const f = (1 - d / N.R) * 2.6 * N.pow + 0.4; c.vx += (dx / d) * f * dt; c.vy += (dy / d) * f * dt - 0.55 * dt; c.vx *= 0.9; c.vy *= 0.9; c.vr += 0.08 * dt; c.sc = Math.max(0.55, d / N.R); if (d < S * 0.7) capture(c); } else c.sc += (1 - c.sc) * 0.2; } }
+        else if (c.st === 'fly') { c.ft += dt / 26; const k = Math.min(1, c.ft), e = k * k; const x = (1 - e) * (1 - e) * c.sx + 2 * (1 - e) * e * c.cx + e * e * P.x, y = (1 - e) * (1 - e) * c.sy + 2 * (1 - e) * e * c.cy + e * e * P.y; c.x = x; c.y = y; c.sc = 1 - k * 0.55; c.spin += 0.5 * dt; if (Math.random() < 0.5) parts.push({ x, y, vx: 0, vy: 0, life: 0.7, dec: 0.06, col: '#fff3a0', s: 3 }); if (k >= 1) land(c); }
+        if (c.st !== 'gone' && im && im.complete) { const w = c.s * c.sc; g.save(); g.translate(c.x, c.y); g.rotate(c.st === 'fly' ? 0 : c.rot * 0.2); g.scale(c.k === 'okz_bag' ? 1 : Math.max(0.15, Math.abs(Math.cos(c.spin))), 1); g.drawImage(im, -w / 2, -w / 2 * im.height / im.width, w, w * im.height / im.width); g.restore(); } }
+      // きらきら
+      for (let i = parts.length - 1; i >= 0; i--) { const q = parts[i]; if (q.pull) { q.x += (q.tx - q.x) * 0.15 * dt; q.y += (q.ty - q.y) * 0.15 * dt; } else { q.x += q.vx * dt; q.y += q.vy * dt; q.vy += 0.12 * dt; } q.life -= q.dec * dt; if (q.life <= 0) { parts.splice(i, 1); continue; } g.globalAlpha = Math.max(0, q.life); g.fillStyle = q.col; g.beginPath(); g.arc(q.x, q.y, q.s * q.life, 0, 6.283); g.fill(); } g.globalAlpha = 1;
+      requestAnimationFrame(frame); };
+    if (REDUCE) { got = amount; cntEl.textContent = amount; win(); return; }
+    requestAnimationFrame(frame);
+  }); }
+  function finish(goal) { const s = session; // さいごに おかねを すいこんでから まとめ（チャレンジは すいこみおわってから どうがに もどる）
+    if (RW && s && (s.pend || 0) > 0 && !s.collecting) { s.collecting = true; s.lock = true; const a = s.pend; collect(a).then(() => { s.pend = 0; s.collecting = false; pouchUI(); coinUI(); finish0(goal); }); return; }
+    finish0(goal); }
+  function finish0(goal) {
     main.classList.remove('qmode'); const s = session; p.lastPlan = s.plan; saveProgress(p); root.classList.remove('fever');
     if (opt.gate) { if (s.gateDone) return; s.gateDone = true;
       // 5もん クリアの ごほうび：せかいの カードを 1まい

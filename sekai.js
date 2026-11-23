@@ -1907,6 +1907,7 @@ b.ngm{color:#d65a5a;text-decoration:underline wavy}
 .sk-exopts{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;max-width:min(92vw,640px)}.sk-exopts button{border:4px solid #ffe2a8;border-radius:20px;background:#fff;padding:14px 22px;font:inherit;font-weight:900;font-size:24px;color:#a06a00;box-shadow:0 4px 0 #ecd29a;cursor:pointer}.sk-exopts button.on{border-color:#ff8a3c;background:#fff1dc;color:#e0560a;transform:scale(1.06)}.sk-newcard.exq .exgo:disabled{opacity:.4}.sk-newcard.exq .sub{text-align:center;padding:0 16px}.sk-newcard.exq .sub b{color:#e07a00;font-size:1.3em}
 .sk-exfx .sk-cl-tot{top:73%;font-size:clamp(40px,min(10vh,14vw),96px)}.sk-exend{position:absolute;left:0;right:0;bottom:5%;display:flex;flex-direction:column;align-items:center;gap:10px;font-weight:900;font-size:clamp(20px,3.6vh,30px);color:#ff4f9a;text-shadow:0 2px 0 #fff,0 -2px 0 #fff,2px 0 0 #fff,-2px 0 0 #fff;opacity:0;pointer-events:none;transition:opacity .4s}.sk-exend.on{opacity:1;pointer-events:auto}.sk-exend button{border:none;border-radius:999px;padding:12px 48px;font:inherit;font-weight:900;font-size:24px;color:#fff;background:linear-gradient(#ff9ec6,#ff5f9e);box-shadow:0 5px 0 #d23f7d;text-shadow:none;cursor:pointer}
 .sk-plog.exl button{border:none;border-radius:10px;padding:5px 10px;font:inherit;font-weight:900;font-size:14px;background:#ffe9e9;color:#c0392b}.sk-plog.exl button.on{background:#e3f6e8;color:#1e8a4a}
+.sk-spt{font-size:clamp(34px,7vh,64px);font-weight:900;color:#3a7bd5;text-align:center;padding:0 16px}.sk-mic{position:relative;width:110px;height:110px;border-radius:50%;background:#c9c2d6;display:flex;align-items:center;justify-content:center;transition:background .2s}.sk-mic.on{background:#ff5f9e}.sk-mic i{position:absolute;inset:0;border-radius:50%;background:#ff5f9e44;transition:transform .08s}.sk-mic svg{position:relative}.sk-spm{font-size:24px;font-weight:900;color:#8a7a6a;min-height:34px}.sk-newcard.spk.ok .sk-spm b{color:#ff4f9a;font-size:30px}.sk-newcard.spk.ok .sk-mic{background:#ffb347}.sk-newcard.spk .quitsel{margin-top:46px}
 .sk-roul h1{margin:0 0 6px}.sk-rw{position:relative;display:inline-block;filter:drop-shadow(0 8px 14px #0002)}.sk-rw .pin{position:absolute;left:50%;top:-14px;transform:translateX(-50%);width:0;height:0;border-left:18px solid transparent;border-right:18px solid transparent;border-top:34px solid #ff4f8f;filter:drop-shadow(0 3px 0 #fff)}.sk-rleg{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:10px;font-weight:900;font-size:18px}.sk-rleg span{display:flex;align-items:center;gap:6px}.sk-rleg b{width:18px;height:18px;border-radius:5px;background:var(--c)}.sk-rleg em{font-style:normal;font-size:12px;background:#ff4f8f;color:#fff;border-radius:8px;padding:1px 6px}.sk-rres{min-height:52px;margin-top:8px;font-weight:900;font-size:clamp(26px,4.5vh,40px);opacity:0;transform:scale(.4)}.sk-rres.on{animation:skrr .6s cubic-bezier(.2,1.7,.4,1) forwards}@keyframes skrr{to{opacity:1;transform:scale(1)}}
 .sk-ch.pick .retryv{grid-column:1 / -1;min-height:64px!important;font-size:22px}
 .sk-now{display:flex;align-items:center;gap:14px;font-size:34px;font-weight:900;background:#fff;border-radius:24px;padding:14px 28px;box-shadow:0 6px 0 #f0d8e2}.sk-now .ic{font-size:64px}
@@ -2342,6 +2343,32 @@ export function openSekai(opt0 = {}) {
     if (q.assist) { ch.style.visibility = 'hidden'; const vz = main.querySelector('.sk-viz'); say('いっしょに かぞえよう').then(sayQ).then(() => countRun('.sk-d', 1)(vz, () => document.contains(vz))).then(() => { ch.style.visibility = ''; focus0(); }); }
     else { focus0(); if (q.sayEn) { clearInterval(session.rep); let nrep = 0; session.rep = setInterval(() => { if (!root.isConnected || session.q !== q) { clearInterval(session.rep); return; } if (session.lock || root.querySelector('.sk-exp,.sk-lvup2,.sk-newcard') || isSpeaking()) return; if (++nrep > 10) { clearInterval(session.rep); return; } say(q.sayQ, { en: true, slow: nrep % 2 === 0 }); }, 4000); } const sq = q.retry ? say(q.retry.replace(/（.*）/, '')).then(sayQ) : sayQ(); if (tut && !p.tutSaid) { p.tutSaid = 1; sq.then(() => say('うえと したで えらんで、まんなかの ボタンで こたえてね')); } }
   }
+
+  // ───────── えいご：まねして いってみよう（2026-11-23 木原さん）。こえが でたら OK（はつおんの ○× は つけない）→ じぶんの こえと おてほんを きく
+  let micNo = false, spkN = 0;
+  const spkPhrase = (q) => { if (q.sj !== 'eigo' || q.retry || micNo || REDUCE || !navigator.mediaDevices || !window.MediaRecorder) return null; const t = q.en && /^[A-Za-z]/.test(String(q.ans)) ? String(q.ans) : q.sayEn ? q.sayQ : null; return t && t.length <= 40 ? t : null; };
+  function speakUp(text) { return new Promise((resolve) => { hush();
+    const d = el('div', 'sk-newcard spk', `<h2 style="margin:0;font-size:28px">まねして いってみよう！</h2><div class="sk-spt">${text}</div><div class="sk-mic"><i></i><svg viewBox="0 0 24 24" width="56" height="56"><rect x="9" y="2" width="6" height="12" rx="3" fill="#fff"/><path d="M5 11a7 7 0 0 0 14 0M12 18v4M8 22h8" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div><div class="sk-spm">おてほんを きいてね</div><div class="sk-ch quitsel"><button class="cont">とばす ▶</button></div>`);
+    root.appendChild(d); const msg = d.querySelector('.sk-spm'), mic = d.querySelector('.sk-mic'), ring = mic.querySelector('i'); let done = false, stream = null, rec = null, raf = 0, url = null;
+    const fin = () => { if (done) return; done = true; cancelAnimationFrame(raf); hush(); try { rec && rec.state !== 'inactive' && rec.stop(); } catch (e) {} try { stream && stream.getTracks().forEach((t) => t.stop()); } catch (e) {} if (url) setTimeout(() => URL.revokeObjectURL(url), 500); d.remove(); resolve(); };
+    d.querySelector('.cont').onclick = fin; setTimeout(() => d.querySelector('.cont').focus(), 50); setTimeout(fin, 20000);
+    (async () => { try {
+      await say(text, { en: true }); if (done) return;
+      try { stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } }); } catch (e) { micNo = true; return fin(); } if (done) { stream.getTracks().forEach((t) => t.stop()); return; }
+      const c = ac(), src = c.createMediaStreamSource(stream), an = c.createAnalyser(); an.fftSize = 1024; src.connect(an); const buf = new Float32Array(an.fftSize); const chunks = []; rec = new MediaRecorder(stream); rec.ondataavailable = (e) => e.data.size && chunks.push(e.data); rec.start();
+      mic.classList.add('on'); msg.textContent = 'どうぞ！ おおきな こえで'; SE.tap();
+      const t0 = performance.now(); let floor = 0, fn = 0, loud = 0, last = 0, heard = false;
+      await new Promise((r) => { const tick = () => { if (done) return r(); an.getFloatTimeDomainData(buf); let sum = 0; for (let i = 0; i < buf.length; i++) sum += buf[i] * buf[i]; const rms = Math.sqrt(sum / buf.length), t = performance.now() - t0;
+        if (t < 250) { floor += rms; fn++; } else { const th = Math.max(0.02, (floor / Math.max(1, fn)) * 3); if (rms > th) { loud += 16.7; last = t; if (loud > 220) heard = true; } }
+        ring.style.transform = `scale(${1 + Math.min(1.2, rms * 9)})`; if ((heard && t - last > 800) || t > (heard ? 5000 : 4200)) return r(); raf = requestAnimationFrame(tick); }; tick(); });
+      if (done) return; mic.classList.remove('on'); ring.style.transform = ''; const stopped = new Promise((r) => { rec.onstop = r; }); try { rec.stop(); } catch (e) {} await stopped; try { stream.getTracks().forEach((t) => t.stop()); src.disconnect(); } catch (e) {}
+      if (!heard) { msg.textContent = 'また こんど いってみよう'; await wait(900); return fin(); }
+      msg.innerHTML = '<b>いえたね！ +1えん</b>'; d.classList.add('ok'); SE.card(); earnYen(p, 1); session.pend = (session.pend || 0) + 1; p.spk = (p.spk || 0) + 1; saveProgress(p); pouchUI(); { const r0 = root.getBoundingClientRect(), r1 = mic.getBoundingClientRect(); spark3(r1.left - r0.left + r1.width / 2, r1.top - r0.top + r1.height / 2); }
+      await wait(700); if (done) return; msg.textContent = 'じぶんの こえ'; url = URL.createObjectURL(new Blob(chunks, { type: rec.mimeType || 'audio/webm' })); await new Promise((r) => { const a = new Audio(url); a.onended = a.onerror = r; setTimeout(r, 6000); a.play().catch(r); });
+      if (done) return; msg.textContent = 'おてほん'; await say(text, { en: true }); await wait(300); fin();
+    } catch (e) { fin(); } })();
+  }); }
+  const spark3 = (x, y) => { for (let i = 0; i < 3; i++) setTimeout(() => { if (!root.isConnected) return; const r = el('div', 'sk-ring'); r.style.cssText = `left:${x}px;top:${y}px;--c:hsl(${330 + i * 30} 90% 65%)`; root.appendChild(r); setTimeout(() => r.remove(), 700); }, i * 120); };
   async function answer(btn, c) {
     const q = session.q; if (session.lock) return; ac();
     const firstTry = session.tries === 0; if (firstTry && q.plan != null) session.plan[q.plan].ok = c === q.ans; if (firstTry) p.tut = (p.tut || 0) + 1;
@@ -2372,7 +2399,8 @@ export function openSekai(opt0 = {}) {
       if (lvUp) lvUpFx(lvUp, q.sj);
       saveProgress(p); updBar(); if (opt.gate) call('onProgress', opt.gate.onProgress, session.n);
       if (cardNow && !opt.gate) { session.cardDue--; setTimeout(() => newCard(), 900); return; } // チャレンジ（opt.gate）は さいごの がめんで わたす
-      setTimeout(() => { session.lock = false; if (SELF && session.assistRun >= 3) offerExit(); else next(nx); }, lvUp && !REDUCE ? 3600 : session.combo >= 3 ? 1000 : 1050);
+      const sp = first && nx == null ? spkPhrase(q) : null, spOn = sp && (spkN++ % 2 === 0); // えいごは 2もんに 1かい「まねして いってみよう」
+      setTimeout(() => { const go = () => { session.lock = false; if (SELF && session.assistRun >= 3) offerExit(); else next(nx); }; if (spOn && root.isConnected && session.q === q) speakUp(sp).then(go); else go(); }, lvUp && !REDUCE ? 3600 : session.combo >= 3 ? 1000 : 1050);
     } else {
       btn.classList.add('ng'); btn.disabled = true; SE.ng(); session.tries++; p.total.ng++; session.wrong++;
       if (!q.chal) { session.combo = 0; if (session.fever) { session.fever = false; root.classList.remove('fever'); } } updBar(); // チャレンジの まちがいでは れんぞくを きらない（2026-11-20）

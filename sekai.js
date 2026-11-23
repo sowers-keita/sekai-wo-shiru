@@ -320,7 +320,7 @@ const M = [
   { id: 'm_borrow', n: 'くりさがりの ひきざん', q() { const m = R(3, 9), n = R(11, 9 + m); return borrowQ(n, m); } },
   { id: 'm_three', n: '3つの かず', q() { if (Math.random() < 0.55) { const a = R(2, 6), b = R(1, 3), c = R(1, 10 - a - b); const s = a + b + c; /* くりあがりの まえの たんげん：とちゅうも こたえも 10まで（アストラ 2026-11-23） */ return { text: `${a} ＋ ${b} ＋ ${c} ＝ ？`, sayQ: `${a} たす ${b} たす ${c} は？`, ans: String(s), choices: numChoices(s, 2, 20), steps: [
       { h: eq(`<b>${a} ＋ ${b}</b> ＋ ${c}`), s: `まえから じゅんばんに。まず ${a} たす ${b}` }, { h: eq(`${a + b} ＋ ${c}`), s: `${a} たす ${b} は ${a + b}` }, { h: eq(`${a + b} ＋ ${c} ＝ <b>${s}</b>`), s: `${a + b} たす ${c} は ${s}` }] }; }
-    const a = R(12, 18), b = R(1, 4), c = R(1, 4), s = a - b - c; return { text: `${a} − ${b} − ${c} ＝ ？`, sayQ: `${a} ひく ${b} ひく ${c} は？`, ans: String(s), choices: numChoices(s, 0, 18), steps: [
+    const a = R(5, 10), b = R(1, Math.min(4, a - 3)), c = R(1, Math.min(4, a - b - 1)), s = a - b - c; return { text: `${a} − ${b} − ${c} ＝ ？`, sayQ: `${a} ひく ${b} ひく ${c} は？`, ans: String(s), choices: numChoices(s, 0, 10), steps: [
       { h: eq(`<b>${a} − ${b}</b> − ${c}`), s: `まえから じゅんばんに。まず ${a} ひく ${b}` }, { h: eq(`${a - b} − ${c}`), s: `${a - b} に なったね` }, { h: eq(`${a - b} − ${c} ＝ <b>${s}</b>`), s: `${a - b} ひく ${c} は ${s}` }] }; } },
   { id: 'm_clock', n: 'とけい', q() { const h = R(1, 12), half = Math.random() < 0.5, ans = half ? `${h}じはん` : `${h}じ`; const ch = shuffle(uniq([ans, half ? `${h}じ` : `${h}じはん`, `${h % 12 + 1}じ${half ? 'はん' : ''}`, `${(h + 5) % 12 + 1}じ`]).slice(0, 3)); if (!ch.includes(ans)) ch[0] = ans;
     return { text: 'とけいは なんじ？', sayQ: 'とけいは なんじ？', viz: clock(h, half), ans, choices: shuffle(ch), steps: [
@@ -410,7 +410,7 @@ const READ = [
 ];
 const kTip = (k) => { const n = String(k).normalize('NFD'); const t = []; if (/\u3099/.test(n)) t.push('「゛」'); if (/\u309A/.test(n)) t.push('「゜」'); if (/ッ/.test(k)) t.push('ちいさい「ッ」'); if (/[ャュョァィゥェォ]/.test(k)) t.push('ちいさい じ'); if (/ー/.test(k)) t.push('のばす「ー」'); return t.length ? `${t.join('、')}に きを つけようね` : 'ひとつずつ たしかめようね'; };
 const K = [
-  { id: 'k_kana1', n: 'カタカナ 1もじ', q(d) { const i = R(0, Math.min(KANA_H.length - 1, 10 + d * 30 | 0)); const h = KANA_H[i], k = KANA_K[i]; const ng = shuffle([...KANA_K].filter((c) => c !== k)).slice(0, 2); return { text: `「${h}」の カタカナは？`, sayQ: `${h} の カタカナは どれ？`, ans: k, choices: shuffle([k, ...ng]), bigC: true, steps: [{ h: big(`${h} → <b>${k}</b>`), s: `${h} は カタカナで こう かくよ` }, { h: big(`<b>${k}</b>`), s: 'かたちを よく みてね' }] }; } },
+  { id: 'k_kana1', n: 'カタカナ 1もじ', q(d) { const i = R(0, Math.min(KANA_H.length - 1, 10 + d * 36 | 0)); const h = KANA_H[i], k = KANA_K[i]; const ng = shuffle([...KANA_K].filter((c) => c !== k)).slice(0, 2); return { text: `「${h}」の カタカナは？`, sayQ: `${h} の カタカナは どれ？`, ans: k, choices: shuffle([k, ...ng]), bigC: true, steps: [{ h: big(`${h} → <b>${k}</b>`), s: `${h} は カタカナで こう かくよ` }, { h: big(`<b>${k}</b>`), s: 'かたちを よく みてね' }] }; } },
   { id: 'k_kata', n: 'カタカナの ことば', q(d) { const [e, h, k, ng] = pick(KATA_W); const ch = shuffle([k, ...shuffle(ng).slice(0, d > 0.5 ? 3 : 2)]);
     const diff = [...k].map((c, i) => { const w = ng[0][i]; return c !== w ? `<b class="mark">${c}</b>` : c; }).join('');
     return { text: `${e}「${h}」を カタカナで かくと？`, sayQ: `${h} を カタカナで かくと どれ？`, ans: k, choices: ch, bigC: true, steps: [{ h: big(e) + big(`${[...h].join(' ')}`), s: `${h}。ひとつずつ カタカナに しよう` }, { h: big(`${[...h].map((c) => `<span>${c}</span>`).join('')}<br>↓<br>${k}`), s: `${h} は ${k}` }, { h: big(diff), s: kTip(k) }] }; } },
@@ -483,7 +483,7 @@ const JUN2 = [['🌱', ['まず、たねを まきました。', 'それから�
   ['🪁', ['まず、たこに いとを つけました。', 'それから、かぜに むかって はしりました。', 'すると、たこが たかく あがりました。'], ['まず', 'それから', 'すると']]];
 const sent = (parts) => `<div class="sk-sent">${parts.map(([w, lab]) => lab ? `<span class="w mark">${w}<em>${lab}</em></span>` : `<span class="w">${w}</span>`).join('')}</div>`;
 const NEWK = [
-  { id: 'k_kana1', n: 'カタカナ 1もじ', q(d) { const i = R(0, Math.min(KANA_H.length - 1, 10 + d * 30 | 0)); const h = KANA_H[i], k = KANA_K[i]; const ng = shuffle([...KANA_K].filter((c) => c !== k)).slice(0, 2); return { text: `「${h}」の カタカナは？`, sayQ: `${h} の カタカナは どれ？`, ans: k, choices: shuffle([k, ...ng]), bigC: true,
+  { id: 'k_kana1', n: 'カタカナ 1もじ', q(d) { const i = R(0, Math.min(KANA_H.length - 1, 10 + d * 36 | 0)); const h = KANA_H[i], k = KANA_K[i]; const ng = shuffle([...KANA_K].filter((c) => c !== k)).slice(0, 2); return { text: `「${h}」の カタカナは？`, sayQ: `${h} の カタカナは どれ？`, ans: k, choices: shuffle([k, ...ng]), bigC: true,
     ng: (c) => { const ch = kanaH(c); return ch ? { h: `<div class="sk-pair">${pairH(ch, c, 'ngp', 'えらんだ のは')}${pairH(h, k, 'okp', 'こたえ')}</div>`, s: `えらんだ ${c} は「${ch}」の カタカナ。「${h}」の カタカナは ${k} だよ` } : null; },
     steps: [{ h: `<div class="sk-sbs">${big(h)}<span class="ar">と</span>${big(`<b>${k}</b>`)}</div>`, s: SIM.includes(h) ? `${h} と ${k}。かたちが にているね` : `${h} と ${k}。かたちを よく みて おぼえよう` }] }; } },
   { id: 'k_kata', n: 'カタカナの ことば', q(d) { const [e, h, k, ng] = pick(KATA_W); const ch = shuffle([k, ...shuffle(ng).slice(0, d > 0.5 ? 3 : 2)]);
@@ -524,7 +524,9 @@ const enPairOld = (cE, cW, cJ, aE, aW, aJ) => ({ h: `<div class="sk-pair"><div c
 const enPair = (cE, cW, cJ, aE, aW, aJ) => ({ h: `<div class="sk-enok"><div class="ngs"><span>えらんだ のは</span>${big(cE, 'emos')}</div><div class="okb">${big(aE, 'emo')}<div class="sk-ear">👂</div></div></div>`, s: 'もういちど きいて みよう 🔊', seq: [['もういちど きいて みよう'], [aW, 1]], chk: [cE, aE] });
 const enNgFor = (ans) => (c) => { const x = ED[c], a = ED[ans]; if (!x || !a) return null; return enPair(c, x[0], x[1], ans, a[0], a[1]); };
 const enEar = (e, w, j) => [{ h: big(e, 'emo') + big(j), s: `${j}は えいごで 🔊`, seq: [[`${j}は えいごで`], [w, 1]] }, { h: big(e, 'emo') + '<div class="sk-ear">👂</div>', s: 'いっしょに いってみよう', seq: [['いっしょに いってみよう'], [w, 1]] }]; // はじめは もじを ださない（おとと え だけ）
-const listen = (id, n, list, mk) => ({ id, n, q(d) { const L = list.slice(0, Math.max(6, Math.min(list.length, 8 + (d * 10 | 0)))); const [e, w, j] = mk(pick(L)); const ng = shuffle(L.map(mk).filter((x) => x[1] !== w)).slice(0, 2).map((x) => x[0]);
+const KIN = [['bird', 'owl', 'penguin', 'chicken', 'duck'], ['fish', 'shark']]; /* とり と ふくろう、さかな と さめ は いっしょに ださない（アストラ r2） */
+const kin = (a, b) => a !== b && KIN.some((g) => g.includes(a) && g.includes(b) && (a === g[0] || b === g[0]));
+const listen = (id, n, list, mk) => ({ id, n, q(d) { const L = list.slice(0, Math.max(6, Math.min(list.length, 8 + (d * 10 | 0)))); const [e, w, j] = mk(pick(L)); const ng = shuffle(L.map(mk).filter((x) => x[1] !== w && !kin(x[1], w))).slice(0, 2).map((x) => x[0]);
   return { text: '🔊 きいて えらんでね', sayQ: w, sayEn: true, viz: '<div class="sk-ear">👂</div>', ans: e, choices: shuffle([e, ...ng]), emoji: true, ng: enNgFor(e), steps: enEar(e, w, j) }; } });
 const NEWE = [
   listen('e_listen', 'きいて えらぶ', EN, (x) => x),
@@ -562,23 +564,29 @@ const enPl = (w) => (w === 'fish' ? 'fish' : /(x|s|ch|sh)$/.test(w) ? w + 'es' :
 const cap1 = (t) => t[0].toUpperCase() + t.slice(1);
 const eSub = (list, d) => list.slice(0, Math.max(6, Math.min(list.length, 8 + (d * 12 | 0))));
 // え → えいごを えらぶ（せんたくしの 🔊 で きける）
-const eSay = (id, n, list) => ({ id, n, q(d) { const L = eSub(list, d); const [e, w, j] = pick(L); const ng = shuffle(L.filter((x) => x[1] !== w)).slice(0, 2).map((x) => x[1]); return { text: 'えいごで なんて いう？', sayQ: 'えいごで なんて いう？', viz: big(e, 'emo'), ans: w, choices: shuffle([w, ...ng]), en: true, steps: enSteps(e, w, j) }; } });
+const eSay = (id, n, list) => ({ id, n, q(d) { const L = eSub(list, d); const [e, w, j] = pick(L); const ng = shuffle(L.filter((x) => x[1] !== w && !kin(x[1], w))).slice(0, 2).map((x) => x[1]); return { text: 'えいごで なんて いう？', sayQ: 'えいごで なんて いう？', viz: big(e, 'emo'), ans: w, choices: shuffle([w, ...ng]), en: true, steps: enSteps(e, w, j) }; } });
 // ぶんを きいて えを えらぶ
-const eSen = (id, n, list, mkS, mkJ) => ({ id, n, q(d) { const L = eSub(list, d); const it = pick(L); const [e, w, j] = it; const s = mkS(it), ja = mkJ(it); const ng = shuffle(L.filter((x) => x[1] !== w)).slice(0, 2).map((x) => x[0]);
+const eSen = (id, n, list, mkS, mkJ) => ({ id, n, q(d) { const L = eSub(list, d); const it = pick(L); const [e, w, j] = it; const s = mkS(it), ja = mkJ(it); const ng = shuffle(L.filter((x) => x[1] !== w && !kin(x[1], w))).slice(0, 2).map((x) => x[0]);
   return { text: '🔊 きいて えらんでね', sayQ: s, sayEn: true, viz: '<div class="sk-ear">👂</div>', ans: e, choices: shuffle([e, ...ng]), emoji: true, ng: enNgFor(e), steps: [{ h: big(e, 'emo') + big(ja), s: ja, seq: [[ja], [s, 1]] }, { h: big(e, 'emo') + '<div class="sk-ear">👂</div>', s: 'いっしょに いってみよう', seq: [['いっしょに いってみよう'], [s, 1]] }] }; } });
 // しつもんを きいて こたえを えらぶ（かいわ）
 const eQA = (id, n, gen) => ({ id, n, q(d) { const g = gen(d); return { text: g.text || '🔊 しつもんに こたえよう', sayQ: g.q, sayEn: true, viz: g.viz, ans: g.a, choices: shuffle([g.a, ...g.ng]), en: true,
   steps: [{ h: g.viz + big(g.ja), s: g.ja, seq: [[g.ja], [g.q, 1]] }, { h: g.viz + big(g.a), s: g.a, seq: [['こたえは'], [g.a, 2]] }, { h: g.viz + '<div class="sk-ear">👂</div>', s: 'いっしょに いってみよう', seq: [['いっしょに いってみよう'], [g.q, 1], [g.a, 1]] }] }; } });
 const eU = {};
+/* おなじ えで、しつもんに よって こたえが かわる（アストラ r2）。3つとも えには あって いるので、しつもんを きかないと えらべない */
+const QA3 = [['🍎', 'apple', 'red', 'りんご', 'あか'], ['🍌', 'banana', 'yellow', 'バナナ', 'きいろ'], ['🐷', 'pig', 'pink', 'ぶた', 'ピンク'], ['🐻', 'bear', 'brown', 'くま', 'ちゃいろ'], ['🍓', 'strawberry', 'red', 'いちご', 'あか'], ['🥕', 'carrot', 'orange', 'にんじん', 'オレンジ'], ['🍋', 'lemon', 'yellow', 'レモン', 'きいろ']];
+const qa3 = () => { const [e, w, c, j, cj] = pick(QA3); const A = ['One.', `It's ${c}.`, `It's ${enA(w)}.`]; const t = R(0, 2); const q = ['How many?', 'What color is it?', "What's this?"][t]; const ja = [`いくつ？「1」`, `なにいろ？「${cj}」`, `これは なに？「${j}」`][t]; const viz = big(e, 'emo');
+  return { text: '🔊 しつもんに こたえよう', sayQ: q, sayEn: true, viz, ans: A[t], choices: shuffle(A.slice()), en: true, steps: [{ h: viz + big(ja), s: ja, seq: [[ja], [q, 1]] }, { h: viz + big(A[t]), s: A[t], seq: [['こたえは'], [A[t], 2]] }] }; };
+/* えいごの ぶんの いみを にほんごで えらぶ（すき・もって いる・ほしい） */
+const imiQ = (d) => { const x = pick(eSub(FOOD, d)); const V = [[`I like ${x[3]}.`, `${x[2]}が すき`], [`I have ${x[3]}.`, `${x[2]}を もって いる`], [`I want ${x[3]}.`, `${x[2]}が ほしい`]]; const v = pick(V); return { e: x[0], s: v[0], a: v[1], ch: shuffle(V.map((y) => y[1])), steps: [{ h: big(x[0], 'emo') + big(v[0]), s: v[1], seq: [[v[1]], [v[0], 2]] }] }; };
 const qaFeel = () => { const [e, w, j] = pick(FEEL); return { text: '🔊 この こなら なんて こたえる？', viz: big(e, 'emo'), q: 'How are you?', a: `I'm ${w}.`, ng: shuffle(FEEL.filter((x) => x[1] !== w)).slice(0, 2).map((x) => `I'm ${x[1]}.`), ja: `げんき？ ときかれて「${j}」と こたえる` }; };
 const qaMany = () => { const n = R(1, 10); const [e, w, j] = pick(ZOO.slice(0, 8)); return { viz: `<div class="sk-big emos">${e.repeat(n)}</div>`, q: 'How many?', a: cap1(NUM[n]) + '.', ng: numChoices(n, 1, 10).filter((x) => +x !== n).slice(0, 2).map((x) => cap1(NUM[+x]) + '.'), ja: `いくつ？ ${n}ひき（${NUM[n]}）` }; };
 const qaWx = () => { const [e, w, j] = pick(WX); return { viz: big(e, 'emo'), q: "How's the weather?", a: `It's ${w}.`, ng: shuffle(WX.filter((x) => x[1] !== w)).slice(0, 2).map((x) => `It's ${x[1]}.`), ja: `てんきは？「${j}」` }; };
 const qaCol = () => { const [w, j, e] = pick(COLE); return { viz: big(e, 'emo'), q: 'What color is it?', a: `It's ${w}.`, ng: shuffle(COLE.filter((x) => x[0] !== w)).slice(0, 2).map((x) => `It's ${x[0]}.`), ja: `なにいろ？「${j}」` }; };
-const qaWhat = (d) => { const L = eSub([...ZOO, ...THING, ...VEH], d || 0); const [e, w, j] = pick(L); return { viz: big(e, 'emo'), q: "What's this?", a: `It's ${enA(w)}.`, ng: shuffle(L.filter((x) => x[1] !== w)).slice(0, 2).map((x) => `It's ${enA(x[1])}.`), ja: `これは なに？「${j}」` }; };
+const qaWhat = (d) => { const L = eSub([...ZOO, ...THING, ...VEH], d || 0); const [e, w, j] = pick(L); return { viz: big(e, 'emo'), q: "What's this?", a: `It's ${enA(w)}.`, ng: shuffle(L.filter((x) => x[1] !== w && !kin(x[1], w))).slice(0, 2).map((x) => `It's ${enA(x[1])}.`), ja: `これは なに？「${j}」` }; };
 const abcQ = (lo, hi) => () => { const A = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.slice(lo, hi).split(''); const c = pick(A); const ng = shuffle(A.filter((x) => x !== c)).slice(0, 2); return { text: '🔊 きいて もじを えらんでね', sayQ: c, sayEn: true, viz: '<div class="sk-ear">👂</div>', ans: c, choices: shuffle([c, ...ng]), bigC: true, steps: [{ h: big(`${c} ${c.toLowerCase()}`), s: 'この もじの なまえは', seq: [['この もじの なまえは'], [c, 2]] }] }; };
 const READ3 = [['🐱', 'cat', 'ねこ'], ['🐶', 'dog', 'いぬ'], ['🐷', 'pig', 'ぶた'], ['☀️', 'sun', 'たいよう'], ['🛏️', 'bed', 'ベッド'], ['🚌', 'bus', 'バス'], ['🦊', 'fox', 'きつね'], ['🥚', 'egg', 'たまご'], ['🎒', 'bag', 'かばん']]; /* はじめは a e i o u が そのまま よめる ことば だけ（bee・car は あとで） */
 const READ_ALL = [...new Map([...ZOO, ...FOOD, ...VEH, ...THING, ...NATURE].map((x) => [x[1], x])).values()].filter((x) => !/ |-/.test(x[1]));
-const readQ = (list) => (d) => { const L = eSub(list, d); const [e, w, j] = pick(L); const ng = shuffle(L.filter((x) => x[1] !== w && x[0] !== e)).slice(0, 2).map((x) => x[0]); return { text: `<div class="sk-big">${w}</div>よんで えを えらぼう`, sayQ: 'よんで えを えらぼう', ans: e, choices: shuffle([e, ...ng]), emoji: true, steps: enSteps(e, w, j) }; };
+const readQ = (list) => (d) => { const L = eSub(list, d); const [e, w, j] = pick(L); const ng = shuffle(L.filter((x) => x[1] !== w && x[0] !== e && !kin(x[1], w))).slice(0, 2).map((x) => x[0]); return { text: `<div class="sk-big">${w}</div>よんで えを えらぼう`, sayQ: 'よんで えを えらぼう', ans: e, choices: shuffle([e, ...ng]), emoji: true, steps: enSteps(e, w, j) }; };
 const SENS = [[FOOD, (x) => `I like ${x[3]}.`, (x) => `${x[2]}が すき`], [ZOO, (x) => `I see ${enA(x[1])}.`, (x) => `${x[2]}が みえる`], [THING, (x) => `I have ${enA(x[1])}.`, (x) => `${x[2]}を もって いる`], [FOOD, (x) => `I want ${x[3]}.`, (x) => `${x[2]}が ほしい`]];
 const NEWE2 = [
   listen('e_food_l', 'たべもの（きく）', FOOD, (x) => x),
@@ -592,7 +600,7 @@ const NEWE2 = [
   eQA('e_howru', 'How are you?（かいわ）', qaFeel),
   { id: 'e_num20', n: 'かず 11〜20（きく）', q() { const n = R(11, 20); return { text: '🔊 きいて えらんでね', sayQ: NUM20[n], sayEn: true, viz: '<div class="sk-ear">👂</div>', ans: String(n), choices: numChoices(n, 11, 20), bigC: true, steps: [{ h: big(String(n)), s: `${n}は ${NUM20[n]}`, seq: [[`${n}は`], [NUM20[n], 2]] }] }; } },
   eQA('e_howmany', 'How many?（かいわ）', qaMany),
-  { id: 'e_numnoun', n: 'かずと ことば（three dogs）', q() { const n = R(2, 10); const [e, w, j] = pick(ZOO.slice(0, 10)); const s = `${NUM[n]} ${enPl(w)}`; return { text: `${e} 🔊 いくつ いる？`, sayQ: s, sayEn: true, ans: String(n), choices: numChoices(n, 1, 10), bigC: true, steps: [{ h: `<div class="sk-big emos">${e.repeat(n)}</div>`, s: `${j}が ${n}`, seq: [[`${j}が ${n}`], [s, 2]] }] }; } },
+  { id: 'e_numnoun', n: 'かずと ことば（three dogs）', q() { const n = R(2, 10); const [e, w, j] = pick(ZOO.slice(0, 10)); const s = `${NUM[n]} ${enPl(w)}`; return { text: `${e} 🔊 いくつって きこえた？`, sayQ: s, sayEn: true, ans: String(n), choices: numChoices(n, 1, 10), bigC: true, steps: [{ h: `<div class="sk-big emos">${e.repeat(n)}</div>`, s: `${j}が ${n} いるよ`, seq: [[`${j}が ${n} いるよ`], [s, 2]] }] }; } },
   listen('e_veh_l', 'のりもの（きく）', VEH, (x) => x),
   listen('e_things_l', 'もちもの（きく）', THING, (x) => x),
   eSen('e_have', 'I have 〜.（もって いる）', THING, (x) => `I have ${enA(x[1])}.`, (x) => `${x[2]}を もって いる`),
@@ -600,9 +608,9 @@ const NEWE2 = [
   eQA('e_wxq', "How's the weather?（かいわ）", qaWx),
   { id: 'e_colnoun', n: 'いろと ことば（a red car）', q() { const [cw, cj, ce] = pick(COLE.slice(0, 8)); const [e, w, j] = pick(THING.slice(0, 6).concat(VEH.slice(0, 3))); const s = `${enA(cw)} ${w}`.replace(/^an? /, /^[aeiou]/.test(cw) ? 'an ' : 'a '); const ja = `${cj}の ${j}`;
       if (Math.random() < 0.5) { const ng = shuffle(COLE.slice(0, 8).filter((x) => x[0] !== cw)).slice(0, 2).map((x) => x[2]); return { text: '🔊 きこえた いろは どれ？', sayQ: s, sayEn: true, ans: ce, choices: shuffle([ce, ...ng]), emoji: true, steps: [{ h: big(ce, 'emo') + big(e, 'emo'), s: ja, seq: [[ja], [s, 2]] }] }; }
-      const ng = shuffle(THING.slice(0, 6).concat(VEH.slice(0, 3)).filter((x) => x[1] !== w)).slice(0, 2).map((x) => x[0]); return { text: '🔊 きこえた ものは どれ？', sayQ: s, sayEn: true, ans: e, choices: shuffle([e, ...ng]), emoji: true, steps: [{ h: big(ce, 'emo') + big(e, 'emo'), s: ja, seq: [[ja], [s, 2]] }] }; } },
+      const oc = pick(COLE.slice(0, 8).filter((x) => x[0] !== cw))[2], ot = pick(THING.slice(0, 6).concat(VEH.slice(0, 3)).filter((x) => x[1] !== w))[0]; /* いろ と もの の りょうほうを きく（アストラ r2） */ return { text: '🔊 きこえたのは どれ？', sayQ: s, sayEn: true, ans: ce + e, choices: shuffle([ce + e, oc + e, ce + ot, oc + ot]), emoji: true, steps: [{ h: big(ce + e, 'emos'), s: ja, seq: [[ja], [s, 2]] }] }; } },
   eQA('e_whatcol', 'What color is it?（かいわ）', qaCol),
-  { id: 'e_isit', n: 'Is it 〜?（Yes / No）', q(d) { const L = eSub(ZOO, d); const [e, w, j] = pick(L); const yes = Math.random() < 0.5; const o = yes ? [e, w, j] : pick(L.filter((x) => x[1] !== w)); const s = `Is it ${enA(o[1])}?`; const a = yes ? 'Yes' : 'No';
+  { id: 'e_isit', n: 'Is it 〜?（Yes / No）', q(d) { const L = eSub(ZOO, d); const [e, w, j] = pick(L); const yes = Math.random() < 0.5; const o = yes ? [e, w, j] : pick(L.filter((x) => x[1] !== w && !kin(x[1], w))); const s = `Is it ${enA(o[1])}?`; const a = yes ? 'Yes' : 'No';
       return { text: '🔊 きいて こたえよう', sayQ: s, sayEn: true, viz: big(e, 'emo'), ans: a, choices: ['Yes', 'No'], en: true, steps: [{ h: big(e, 'emo') + big(j), s: `これは ${j}`, seq: [[`これは ${j}。えいごで`], [w, 1]] }, { h: big(e, 'emo') + big(a), s: yes ? `${o[2]}ですか？ → はい` : `${o[2]}ですか？ → いいえ`, seq: [[yes ? `${o[2]}ですか？ はい` : `${o[2]}ですか？ いいえ`], [s, 1], [yes ? 'Yes, it is.' : "No, it isn't.", 1]] }] }; } },
   eQA('e_whats', "What's this?（かいわ）", qaWhat),
   listen('e_home_l', 'おうちの もの（きく）', HOME, (x) => x),
@@ -623,13 +631,13 @@ const NEWE2 = [
       return { text: `${e} 🔊 ただしい つづりは？`, sayQ: w, sayEn: true, ans: w, choices: shuffle([w, ...bad]), steps: enSteps(e, w, j) }; } },
   { id: 'e_days', n: 'ようび（きく）', q() { const [w, j] = pick(DAYS); const ng = shuffle(DAYS.filter((x) => x[0] !== w)).slice(0, 2).map((x) => x[1]); return { text: '🔊 なんようび？', sayQ: w, sayEn: true, viz: '<div class="sk-ear">👂</div>', ans: j, choices: shuffle([j, ...ng]), steps: [{ h: big(j) + big(w), s: `${j}は ${w}`, seq: [[`${j}は`], [w, 2]] }] }; } },
   { id: 'e_can', n: 'Can 〜?（できる？）', q() { const [e, w, v, y] = pick(CAN); const s = `Can ${enA(w)} ${v}?`; const a = y ? 'Yes' : 'No'; const ja = `${ED[w] ? ED[w][1] : w}は ${CAN_JA[v]}？`; return { text: '🔊 きいて こたえよう', sayQ: s, sayEn: true, viz: big(e, 'emo'), ans: a, choices: ['Yes', 'No'], en: true, steps: [{ h: big(e, 'emo') + big(ja), s: ja, seq: [[ja], [s, 1]] }, { h: big(e, 'emo') + big(a), s: y ? 'できる → Yes' : 'できない → No', seq: [[y ? 'できるね' : 'できないね'], [y ? 'Yes, it can.' : "No, it can't.", 1]] }] }; } },
-  { id: 'e_readsen1', n: 'ぶんを よむ（I like 〜.）', q(d) { const L = eSub(FOOD, d); const x = pick(L); const s = `I like ${x[3]}.`; const ng = shuffle(L.filter((y) => y[1] !== x[1])).slice(0, 2).map((y) => y[0]); return { text: `<div class="sk-big">${s}</div>よんで えを えらぼう`, sayQ: 'よんで えを えらぼう', ans: x[0], choices: shuffle([x[0], ...ng]), emoji: true, steps: [{ h: big(x[0], 'emo') + big(s), s: `${x[2]}が すき`, seq: [[`${x[2]}が すき`], [s, 2]] }] }; } },
-  { id: 'e_readsen2', n: 'ぶんを よむ（いろいろ）', q(d) { const [list, mkS, mkJ] = pick(SENS); const L = eSub(list, d); const x = pick(L); const s = mkS(x), ja = mkJ(x); const ng = shuffle(L.filter((y) => y[1] !== x[1])).slice(0, 2).map((y) => y[0]); return { text: `<div class="sk-big">${s}</div>よんで えを えらぼう`, sayQ: 'よんで えを えらぼう', ans: x[0], choices: shuffle([x[0], ...ng]), emoji: true, steps: [{ h: big(x[0], 'emo') + big(s), s: ja, seq: [[ja], [s, 2]] }] }; } },
-  { id: 'e_qamix', n: 'かいわ まぜまぜ', q(d) { return eU[pick(['e_howru', 'e_howmany', 'e_wxq', 'e_whatcol', 'e_whats'])].q(d); } },
-  { id: 'e_senmix', n: 'ぶんを きく まぜまぜ', q(d) { return eU[pick(['e_like', 'e_see', 'e_iam', 'e_have', 'e_want'])].q(d); } },
+  { id: 'e_readsen1', n: 'ぶんを よむ（I like 〜.）', q(d) { const L = eSub(FOOD, d); const x = pick(L); const s = `I like ${x[3]}.`; const ng = shuffle(L.filter((y) => y[1] !== x[1] && !kin(y[1], x[1]))).slice(0, 2).map((y) => y[0]); return { text: `<div class="sk-big">${s}</div>よんで えを えらぼう`, sayQ: 'よんで えを えらぼう', ans: x[0], choices: shuffle([x[0], ...ng]), emoji: true, steps: [{ h: big(x[0], 'emo') + big(s), s: `${x[2]}が すき`, seq: [[`${x[2]}が すき`], [s, 2]] }] }; } },
+  { id: 'e_readsen2', n: 'ぶんを よむ（いろいろ）', q(d) { if (Math.random() < 0.4) { const m = imiQ(d); return { text: `<div class="sk-big">${m.s}</div>${m.e} どういう いみ？`, sayQ: 'どういう いみかな？', ans: m.a, choices: m.ch, txt: true, steps: m.steps }; } const [list, mkS, mkJ] = pick(SENS); const L = eSub(list, d); const x = pick(L); const s = mkS(x), ja = mkJ(x); const ng = shuffle(L.filter((y) => y[1] !== x[1] && !kin(y[1], x[1]))).slice(0, 2).map((y) => y[0]); return { text: `<div class="sk-big">${s}</div>よんで えを えらぼう`, sayQ: 'よんで えを えらぼう', ans: x[0], choices: shuffle([x[0], ...ng]), emoji: true, steps: [{ h: big(x[0], 'emo') + big(s), s: ja, seq: [[ja], [s, 2]] }] }; } },
+  { id: 'e_qamix', n: 'かいわ まぜまぜ', q(d) { if (Math.random() < 0.5) return qa3(); return eU[pick(['e_howru', 'e_howmany', 'e_wxq', 'e_whatcol', 'e_whats'])].q(d); } },
+  { id: 'e_senmix', n: 'ぶんを きく まぜまぜ', q(d) { if (Math.random() < 0.3) { const m = imiQ(d); return { text: '🔊 どういう いみ？', sayQ: m.s, sayEn: true, viz: big(m.e, 'emo'), ans: m.a, choices: m.ch, txt: true, en: true, steps: m.steps }; } return eU[pick(['e_like', 'e_see', 'e_iam', 'e_have', 'e_want'])].q(d); } },
   { id: 'e_story', n: 'みじかい おはなし（2つの ぶん）', q(d) { // 2つの ぶんを りょうほう きかないと えらべない（アストラ 2026-11-23）
-      const two = (s, ja, a1, a2, o1, o2) => ({ text: '🔊 おはなしに あう えは どれ？', sayQ: s, sayEn: true, viz: '<div class="sk-ear">👂</div>', ans: a1 + a2, choices: shuffle([a1 + a2, o1 + a2, a1 + o2]), emoji: true, steps: [{ h: big(a1 + a2, 'emos') + big(ja), s: ja, seq: [[ja], [s, 2]] }] });
-      if (R(0, 1) === 0) { const [we, ww, wj] = pick(WX); const L = eSub(ZOO, d); const x = pick(L); const ow = pick(WX.filter((y) => y[1] !== ww)), ox = pick(L.filter((y) => y[1] !== x[1])); return two(`It's ${ww}. I see ${enA(x[1])}.`, `${wj}。${x[2]}が みえる`, we, x[0], ow[0], ox[0]); }
+      const two = (s, ja, a1, a2, o1, o2) => ({ text: '🔊 おはなしに あう えは どれ？', sayQ: s, sayEn: true, viz: '<div class="sk-ear">👂</div>', ans: a1 + a2, choices: shuffle([a1 + a2, o1 + a2, a1 + o2, o1 + o2]), emoji: true, steps: [{ h: big(a1 + a2, 'emos') + big(ja), s: ja, seq: [[ja], [s, 2]] }] });
+      if (R(0, 1) === 0) { const [we, ww, wj] = pick(WX); const L = eSub(ZOO, d); const x = pick(L); const ow = pick(WX.filter((y) => y[1] !== ww)), ox = pick(L.filter((y) => y[1] !== x[1] && !kin(y[1], x[1]))); return two(`It's ${ww}. I see ${enA(x[1])}.`, `${wj}。${x[2]}が みえる`, we, x[0], ow[0], ox[0]); }
       const F4 = FEEL.slice(0, 4); const [fe, fw] = pick(F4); const L = eSub(THING, d); const x = pick(L); const of = pick(F4.filter((y) => y[1] !== fw)), ox = pick(L.filter((y) => y[1] !== x[1])); return two(`I'm ${fw}. I have ${enA(x[1])}.`, `${FEEL_SAY[fw]}。${x[2]}を もって いる`, fe, x[0], of[0], ox[0]); } },
 ];
 NEWE2.forEach((u) => { eU[u.id] = u; });
@@ -904,7 +912,7 @@ const TB_MATH = (() => {
       if (t === 1) { const q0 = R(1, 19), sh = (v) => v % 5 === 0; // p96 ▲2 かずの せん
         return { text: 'かずの せんの ？に はいる かずは？', sayQ: 'かずの せんの はてなに はいる かずは？', viz: NL(rng(0, 20), { q: q0, show: sh }), ans: String(q0), choices: numChoices(q0, 0, 20), bigC: true, steps: [{ h: NL(rng(0, 20), { q: q0, show: (v) => sh(v) || Math.abs(v - q0) < 3 }), s: `ちかくの かずから かぞえよう` }, { h: NL(rng(0, 20), { q: q0, reveal: true }), s: `こたえは ${q0}` }] }; }
       if (t === 2) { const add = Math.random() < 0.5; const c = add ? (d < 0.5 ? 6 : R(5, 9)) : (d < 0.5 ? 13 : R(11, 15)); const pt = add ? pick([6, 9, 5, 7, 0, 4, 8, 2]) : pick([8, 0, 3, 2, 7, 4, 9, 5].filter((v) => v <= c)); // p97 ▲3 はなの けいさん
-        const q = cq(c, add ? '+' : '-', pt); q.viz = P(`まんなかの ${c}に はなびらの ${pt}を ${add ? 'たす' : 'ひく'}`); return q; }
+        const q = cq(c, add ? '+' : '-', pt); q.viz = P(`まんなかの ${c}${add ? 'に' : 'から'} はなびらの ${pt}を ${add ? 'たす' : 'ひく'}`); return q; }
       if (t === 3) { const ok = pick([`${R(8, 9)}+${R(3, 5)}`, `${R(17, 19)}-${R(5, 6)}`]); const ng = [`${R(2, 4)}+${R(3, 6)}`, `${R(11, 12)}-${R(2, 5)}`, `${R(5, 6)}+${R(2, 4)}`, `${R(13, 15)}-${R(4, 6)}`].filter((e) => valOf(e) <= 10); const ch = shuffle([ok, ...shuffle(ng).slice(0, 2)]); // ❗p97 ▲5
         return { text: 'こたえが 10より おおきく なるのは どれ？', sayQ: 'こたえが じゅうより おおきく なるのは どれ？', ans: show(ok), choices: ch.map(show), txt: true, steps: [{ h: P(ch.map((e) => `${show(e)} ＝ ${valOf(e)}`).join('<br>')), s: 'ひとつずつ けいさん して みよう' }, { h: eq(`${show(ok)} ＝ <b>${valOf(ok)}</b>`), s: `10より おおきいのは ${valOf(ok)}` }] }; }
       const a = d < 0.5 ? 13 : R(11, 16), b = d < 0.5 ? 6 : R(a - 9, 9), r = a - b; // ❗p97 ▲6 すずめ13 はと6
@@ -938,13 +946,13 @@ const TB_MATH = (() => {
       const coins = (n10, n5, n1) => `<div class="sk-objs">${[...Array(n10).fill('coin10'), ...Array(n5).fill('coin5'), ...Array(n1).fill('coin1')].map((x) => `<i class="sk-d emo-d">${ill(x)}</i>`).join('')}</div>`;
       if (k === 0) return { text: `10えんだまが ${t}まいと 1えんだまが ${o}まい。ぜんぶで なんえん？`, sayQ: `じゅうえんだまが ${t}まいと いちえんだまが ${o}まい。ぜんぶで なんえん？`, viz: coins(t, 0, o), ans: `${price}えん`, choices: chT(`${price}えん`, [`${o * 10 + t}えん`, `${t + o}えん`, `${price + 10}えん`, `${price - 1}えん`]), txt: true, steps: [{ h: coins(t, 0, 0), s: `10えんが ${t}まいで ${t * 10}えん` }, { h: `<span class="sk-grp">${coins(t, 0, 0)}<b>${t * 10}えん</b></span>` + OP('＋') + `<span class="sk-grp">${coins(0, 0, o)}<b>${o}えん</b></span>`, s: `10えんだまで ${t * 10}えん。1えんだまで ${o}えん` }, { h: eq(`${t * 10}えん ＋ ${o}えん ＝ <b>${price}えん</b>`), s: `${t * 10}えんと ${o}えん。あわせて ${price}えん` }] }; // p107 そら「10が2つと1が8つ」
       if (k === 1) { const f = Math.floor(price / 5), r1 = price % 5; return { text: `5えんだまが ${f}まいと 1えんだまが ${r1}まい。ぜんぶで なんえん？`, sayQ: `ごえんだまが ${f}まいと いちえんだまが ${r1}まい。ぜんぶで なんえん？`, viz: coins(0, f, r1), ans: `${price}えん`, choices: chT(`${price}えん`, [`${f + r1}えん`, `${price + 5}えん`, `${price - 5}えん`, `${price + 1}えん`]), txt: true, steps: [{ h: coins(0, f, 0), s: Array.from({ length: f }, (_, i) => (i + 1) * 5).join('、') }, { h: coins(0, f, r1) + eq(`<b>${price}</b>えん`), s: r1 ? `${f * 5}から ${Array.from({ length: r1 }, (_, i) => f * 5 + i + 1).join('、')}。${price}えん` : `${price}えん` }] }; } // p107 れん「5、10、15…」
-      return { text: `${price}えんの ${nm}を かいます。10えんだまを ${t}まいと、1えんだまを なんまい だせば いい？`, sayQ: `${price}えんの ${nm}を かいます。じゅうえんだまを ${t}まいと、いちえんだまを なんまい だせば いい？`, viz: coins(t, 0, 0), ans: `${o}まい`, choices: chT(`${o}まい`, [`${t}まい`, `${o + 1}まい`, `${o > 1 ? o - 1 : o + 2}まい`, `${price}まい`]), txt: true, steps: [{ h: PV(t, o), s: `${price}は 10が ${t}つと 1が ${o}つ` }, { h: coins(t, 0, o), s: `1えんだまは ${o}まい` }] }; } },
+      return { text: `${price}えんの ${nm}を かいます。ぴったり はらいます。10えんだまを ${t}まいと、1えんだまを なんまい だせば いい？`, sayQ: `${price}えんの ${nm}を かいます。ぴったり はらいます。じゅうえんだまを ${t}まいと、いちえんだまを なんまい だせば いい？`, viz: coins(t, 0, 0), ans: `${o}まい`, choices: chT(`${o}まい`, [`${t}まい`, `${o + 1}まい`, `${o > 1 ? o - 1 : o + 2}まい`, `${price}まい`]), txt: true, steps: [{ h: PV(t, o), s: `${price}は 10が ${t}つと 1が ${o}つ` }, { h: coins(t, 0, o), s: `1えんだまは ${o}まい` }] }; } },
     { id: 'tm_100koe', n: '100より おおきい かず', page: 108, m: 2, q(d) { const t = R(0, 2);
       if (t === 0) { const x = d < 0.4 ? pick([13, 20, 6]) : R(1, 20), n = 100 + x; // p108 113・120・106
         return { text: 'ぼうは なんぼん？', sayQ: 'ぼうは なんぼん あるかな？', viz: BD(n), ans: String(n), choices: chT(n, [100 + (x % 10) * 10 + Math.floor(x / 10), n + 1, n - 1, n + 10, x < 10 ? 100 + x * 10 : n - 10].filter((v) => v > 100 && v <= 130)), bigC: true, steps: [{ h: O('stick100', 1), s: '10の たばが 10こで 100' }, { h: BD(n), s: `100と ${x}` }, { h: eq(`100 と ${x} で <b>${n}</b>`), s: `ひゃくと ${x}で ${n}` }] }; }
       if (t === 1) { const lo = d < 0.5 ? R(90, 100) : R(95, 110), vals = rng(lo, lo + 10), q0 = pick(vals.slice(1, -1).filter((v) => v % 5)); // p109 ▲4 かずの せん
         return { text: 'かずの せんの ？に はいる かずは？', sayQ: 'かずの せんの はてなに はいる かずは？', viz: NL(vals, { q: q0, show: (v) => v % 5 === 0 || v === lo }), ans: String(q0), choices: chT(q0, [q0 + 1, q0 - 1, q0 + 10, q0 - 10, q0 > 100 ? q0 - 100 : q0 + 2].filter((v) => v > 0)), bigC: true, steps: [{ h: NL(vals, { q: q0, show: (v) => v % 5 === 0 || v === lo || Math.abs(v - q0) < 2 }), s: '1めもりは 1。となりの かずから かぞえよう' }, { h: NL(vals, { q: q0, reveal: true }), s: `こたえは ${q0}` }] }; }
-      const items = shuffle([['はさみ', 120], ['のり', 95], ['けしゴム', 78], ['ノート', 103]].map(([a, p]) => [a, Math.random() < 0.5 ? p : p > 100 ? R(101, 120) : R(60, 99)])); const ok = items.find((x) => x[1] <= 100), ng = items.filter((x) => x[1] > 100); // p109 ▲3 100えんで かえる？
+      const items = shuffle(shuffle(['はさみ', 'のり', 'けしゴム', 'ノート']).map((a, i) => [a, i === 0 ? R(60, 100) : 100 + i * 7 + R(0, 6)])); /* どの しなものが かえるかは まいかい かわる（アストラ r2） */ const ok = items.find((x) => x[1] <= 100), ng = items.filter((x) => x[1] > 100); // p109 ▲3 100えんで かえる？
       const lab = (x) => `${x[0]}（${x[1]}えん）`; const ch = shuffle([ok, ...ng]).map(lab);
       return { text: '100えんで かえるのは どれ？', sayQ: 'ひゃくえんで かえるのは どれ？', viz: O('coin100', 1), ans: lab(ok), choices: ch, txt: true, steps: [{ h: P(items.map((x) => `${lab(x)} ${x[1] <= 100 ? '100より ちいさい' : '100より おおきい'}`).join('<br>')), s: '100より おおきいと、100えんでは たりない' }, { h: big(ok[0]), s: `${ok[0]}は ${ok[1]}えん。100えんで かえる` }] }; } },
 
@@ -978,7 +986,7 @@ const TB_MATH = (() => {
         const chain = (k) => `${s0} ${seq.slice(0, k).map(([op, b]) => `→ ${b}を ${op === '+' ? 'たす' : 'ひく'}`).join(' ')}`;
         return { text: `けいさんの りれえ。${chain(ops)} → ？`, sayQ: `けいさんの りれえ。${s0} から、${seq.map(([op, b]) => `${b}を ${op === '+' ? 'たす' : 'ひく'}`).join('、')}。こたえは いくつ？`, ans: String(v), choices: numChoices(v, 0, 20), bigC: true,
           steps: seq.map(([op, b, x], i) => { const y = op === '+' ? x + b : x - b; return { h: eq(`${x} ${SY(op)} ${b} ＝ <b>${y}</b>`), s: `${x} ${WD(op)} ${b} は ${y}` }; }).concat([{ h: big(String(v)), s: `さいごは ${v}` }]) }; }
-      if (t === 1) { const add = Math.random() < 0.5, c = add ? 7 : 14, pt = add ? pick([2, 6, 9, 5, 7, 0, 3, 8]) : pick([5, 6, 8, 3, 2, 7, 4, 9]); const q = cq(c, add ? '+' : '-', pt); q.viz = P(`まんなかの ${c}に はなびらの ${pt}を ${add ? 'たす' : 'ひく'}`); return q; } // p118 ▲2
+      if (t === 1) { const add = Math.random() < 0.5, c = add ? 7 : 14, pt = add ? pick([2, 6, 9, 5, 7, 0, 3, 8]) : pick([5, 6, 8, 3, 2, 7, 4, 9]); const q = cq(c, add ? '+' : '-', pt); q.viz = P(`まんなかの ${c}${add ? 'に' : 'から'} はなびらの ${pt}を ${add ? 'たす' : 'ひく'}`); return q; } // p118 ▲2
       if (t === 2) { const k = R(0, 2); // p118 ▲1・p119 ▲7
         if (k === 0) { const x = R(1, 19), n = 100 + x; return { text: `${n}は 100と いくつを あわせた かず？`, sayQ: `${n}は ひゃくと いくつを あわせた かず？`, ans: String(x), choices: chT(x, [x + 10, x - 1, x + 1, n - 10, Math.floor(x / 10) + (x % 10)].filter((v) => v > 0 && v < 120)), bigC: true, steps: [{ h: BD(n), s: `${n}は 100と ${x}` }, { h: eq(`100 と <b>${x}</b> で ${n}`), s: `こたえは ${x}` }] }; }
         if (k === 1) { const t2 = R(2, 9), n = t2 * 10; return { text: `${n}は 10が いくつ？`, sayQ: `${n}は じゅうが いくつ？`, ans: String(t2), choices: numChoices(t2, 1, 10), bigC: true, steps: [{ h: B10(n), s: `10の たばが ${t2}こ` }, { h: big(String(t2)), s: `${n}は 10が ${t2}こ` }] }; }
@@ -1022,11 +1030,11 @@ const TB_MATH = (() => {
 
     // ════ かえますか？ かえませんか？  p128〜129
     { id: 'tm_kaeru', n: 'かえますか？', page: 128, m: 3, q(d) { const IT = [['チョコレート', 'choco', 48], ['ガム', 'gum', 47], ['せんべい', 'senbei', 52], ['あめ', 'candy', 55]];
-      const pr = (p) => (Math.random() < 0.5 ? p : p < 50 ? R(40, 49) : R(51, 59)); const opts = ['やすいから かえます', 'たかいから かえません', 'やすいから かえません', 'たかいから かえます'];
+      const pr = () => (Math.random() < 0.5 ? R(40, 49) : R(51, 59)); /* しなものの なまえで こたえが きまらない（アストラ r2） */ const opts = ['やすいから かえます', 'たかいから かえません', 'やすいから かえません', 'たかいから かえます'];
       if (d < 0.5 || Math.random() < 0.5) { const [nm, k, p0] = pick(IT), p = pr(p0), cheap = p < 50, a = cheap ? opts[0] : opts[1]; // p128 ▲1あ・い、p129 ▲2
         return { text: `50えんだま 1まいで、${nm}（${p}えん）は かえますか？「50えんより ……」`, sayQ: `ごじゅうえんだま いちまいで、${p}えんの ${nm}は かえますか？`, viz: `<div style="display:flex;gap:24px;align-items:center;justify-content:center">${O('coin50', 1)}${LB(`${p}えん`, O(k, 1))}</div>`, ans: a, choices: shuffle(opts.slice()), txt: true,
           steps: [{ h: NL(rng(Math.min(p, 50) - 1, Math.max(p, 50) + 1), { q: p, reveal: true, hl: [50] }), s: `${p}と 50を くらべると、${p}の ほうが ${cheap ? 'ちいさい' : 'おおきい'}` }, { h: big(a), s: `${nm}は 50えんより ${cheap ? 'やすいから かえます' : 'たかいから かえません'}` }] }; }
-      const cheapP = Math.random() < 0.5, both = cheapP ? [IT[0], IT[1]] : [IT[2], IT[3]], ps = both.map((x) => (Math.random() < 0.5 ? x[2] : cheapP ? R(40, 49) : R(51, 59))); // p128 ▲1う、p129 ▲2う
+      const cheapP = Math.random() < 0.5, both = shuffle(IT.slice()).slice(0, 2), ps = both.map(() => (cheapP ? R(40, 49) : R(51, 59))); // p128 ▲1う、p129 ▲2う
       const o2 = ['どちらも やすいから かえます', 'どちらも たかいから かえません', 'どちらも やすいから かえません', 'どちらも たかいから かえます'], cc = cheapP, aa = cc ? o2[0] : o2[1];
       return { text: `50えんだまを 1まいずつ つかって、${both[0][0]}（${ps[0]}えん）と ${both[1][0]}（${ps[1]}えん）を 1つずつ かえますか？`, sayQ: `ごじゅうえんだまを いちまいずつ つかって、${ps[0]}えんの ${both[0][0]}と ${ps[1]}えんの ${both[1][0]}を ひとつずつ かえますか？`, viz: `<div style="display:flex;gap:18px;align-items:center;justify-content:center;flex-wrap:wrap">${O('coin50', 2)}${LB(`${ps[0]}えん`, O(both[0][1], 1))}${LB(`${ps[1]}えん`, O(both[1][1], 1))}</div>`, ans: aa, choices: shuffle(o2.slice()), txt: true,
         steps: [{ h: P(`50えんだま 1まいで 1つ かう と かんがえる<br>${both[0][0]} ${ps[0]}えん、${both[1][0]} ${ps[1]}えん`), s: `どちらも 50えんと くらべよう` }, { h: big(aa), s: cc ? 'どちらも 50えんより やすいから かえます' : 'どちらも 50えんより たかいから かえません' }] }; } },
@@ -1328,7 +1336,7 @@ const TB_KOKUGO = (() => {
   const mimizu = [
     { lv: 1, t: MIMI, q: 'だれの たいそう？', a: 'みみず', ng: ['かえる', 'ねこ', 'へび'], k: 'みみずの たいそう' },
     { lv: 1, t: MIMI, q: 'どこから とびだした？', a: 'つちの なか', ng: ['みずの なか', 'そら', 'はなの なか'], k: 'つちの なかから' },
-    { lv: 2, q: 'しの なかで なんども {出|で}て くる ことばは？', a: 'ぴん ぴこ ぴん', ng: ['ぴょん ぴょん', 'くね くね', 'ぱっ ぱっ'], w: 'ぴん ぴこ ぴん は なんども でて くるね' },
+    { lv: 2, t: MIMI + '<br>……<br>ぴん ぴこ ぴん', q: 'しの なかで なんども {出|で}て くる ことばは？', a: 'ぴん ぴこ ぴん', ng: ['ぴょん ぴょん', 'くね くね', 'ぱっ ぱっ'], w: 'ぴん ぴこ ぴん は なんども でて くるね' },
     { lv: 2, t: 'あさの くうきを<br>いっぱい すって', q: 'あさの なにを いっぱい すった？', a: 'くうき', ng: ['みず', 'つゆ', 'はなの みつ'], k: 'あさの くうきを' },
     { lv: 3, t: 'はりきり はじけて<br>はねすぎて<br>ちきゅうの そとへ', q: 'はねすぎて どこへ いった？', a: 'ちきゅうの そと', ng: ['つちの なか', 'いけの なか', 'くさの かげ'], k: 'ちきゅうの そとへ', il: 'earth' },
   ];
@@ -1401,7 +1409,7 @@ const TB_KOKUGO = (() => {
   const mamoru2 = [
     { lv: 1, t: 'コチドリは、{小|ちい}さな わたりどりです。はるに {日|に}{本|ほん}に やって きます。', q: 'コチドリが {日|に}{本|ほん}に くるのは いつ？', a: 'はる', ng: ['ふゆ', 'あき', 'なつ'], k: 'はるに', iv: 'plover' },
     { lv: 1, t: 'コチドリは、じゃりの じめんに すを つくります。', q: 'コチドリは すを どこに つくる？', a: 'じゃりの じめん', ng: ['{木|き}の {上|うえ}', 'いえの やね', '{水|みず}の {中|なか}'], k: 'じゃりの じめん', iv: 'plover' },
-    { lv: 2, t: 'じゃりの じめんに すを つくるので、ひなが てきから よく {見|み}えて しまいます。', q: 'こまる ことは なに？', a: 'ひなが てきから よく {見|み}える', ng: ['たまごが われやすい', 'たべものが ない', 'さむくて ねられない'], k: 'ひなが てきから よく {見|み}えて しまいます' },
+    { lv: 2, t: 'すは じめんに あるので、{木|き}の {上|うえ}の すと ちがって、てきが かんたんに ちかづいて きます。', q: 'こまる ことは なに？', a: 'てきが かんたんに ちかづく', ng: ['たまごが われやすい', 'たべものが ない', 'さむくて ねられない'], k: 'てきが かんたんに ちかづいて きます' },
     F(2, (d) => ordQ('コチドリの おやが てきを {見|み}つけた ときに する じゅんばん', KOCHI_EV, d, ['ひなを くわえて とぶ', 'すを こわして にげる'])),
     { lv: 3, t: 'おやは、じぶんが けがを して いると てきに {見|み}せかけて、てきの ちゅういを ひなから そらします。', q: 'けがの ふりを するのは なんの ため？', a: 'てきの ちゅういを ひなから そらす ため', ng: ['ひなに とびかたを おしえる ため', 'なかまを よぶ ため', 'ひるねを する ため'], k: 'てきの ちゅういを ひなから そらします' },
     F(2, (d) => kjR([{ s: '[早|はや]{足|あし}で はなれる。', ng: ['そう', 'くさ', 'はな'] }, { s: '{早|はや}[足|あし]で はなれる。', ng: ['そく', 'て', 'くち'] }], d)),
@@ -1434,7 +1442,7 @@ const TB_KOKUGO = (() => {
   // ───── 小学校の ことを しょうかいしよう
   const SEASON = [['はる', 'えん{足|そく}', 'どうぶつえんに いく'], ['なつ', 'プール', '{大|おお}きな プールで およぐ'], ['あき', '{音|おん}がくかい', 'けんばんハーモニカを えんそうする'], ['ふゆ', 'マラソン{大|たい}かい', 'はしりおわると すっきり']];
   const shokai = [
-    ...SEASON.map(([s, e, x], i) => ({ lv: 1, q: `めいさんの はなしで、${s}の できごとは？`, a: e, ng: SEASON.map((y) => y[1]), w: `${s}は ${e}。${x}` })),
+    ...SEASON.map(([s, e, x], i) => ({ lv: 1, t: SEASON.map((y) => `${y[0]}は ${y[1]}。`).join('<br>'), k: `${s}は ${e}。`, q: `めいさんの はなしで、${s}の できごとは？`, a: e, ng: SEASON.map((y) => y[1]), w: `${s}は ${e}。${x}` })),
     F(1, (d) => ordQ('きせつの じゅんばん', ['はる', 'なつ', 'あき', 'ふゆ'], d)),
     { lv: 2, t: 'あきの {音|おん}がくかいでは、けんばんハーモニカを えんそうします。', q: 'えんそうする がっきは？', a: 'けんばんハーモニカ', ng: ['ピアノ', 'たいこ', 'カスタネット'], k: 'けんばんハーモニカ' },
     { lv: 2, t: 'はるには えん{足|そく}が あります。どうぶつえんに いきます。', q: 'えん{足|そく}で いく ところは？', a: 'どうぶつえん', ng: ['すいぞくかん', 'うみ', 'こうえん'], k: 'どうぶつえんに いきます', il: 'elephant' },
@@ -1463,12 +1471,12 @@ const TB_KOKUGO = (() => {
   ];
   const TATOE = [['にじいろの ゼリーのような', 'くらげ', 'jellyfish'], ['{水|すい}{中|ちゅう}ブルドーザーみたいな', 'いせえび', 'spiny_lobster'], ['ドロップみたいな', 'いわ', null], ['ももいろの やしの {木|き}みたいな', 'いそぎんちゃく', 'sea_anemone'], ['ミサイルみたいに つっこんで きた', 'まぐろ', 'tuna']];
   const TOBJ = TATOE.map((x) => x[1]);
-  const KJ_SW = [{ s: 'からすの [貝|かい]がら', ng: ['み', 'め', 'がい'] }, { s: '{見|み}えない [糸|いと]', ng: ['ひも', 'き', 'かい'] }, { s: 'こんぶや わかめの [林|はやし]', ng: ['もり', 'き', 'むら'] }, { lv: 2, s: '{水|すい}[中|ちゅう]ブルドーザー', ng: ['なか', 'じゅう', 'うえ'] }, { lv: 3, s: 'いわから [生|は]えて いる。', ng: ['う', 'い', 'せい'] }];
+  const KJ_SW = [{ s: '[貝|かい]がらを ひろう。', ng: ['み', 'め', 'ぐ'] }, { s: '{見|み}えない [糸|いと]', ng: ['ひも', 'き', 'かい'] }, { s: 'こんぶや わかめの [林|はやし]', ng: ['もり', 'き', 'むら'] }, { lv: 2, s: '{水|すい}[中|ちゅう]ブルドーザー', ng: ['なか', 'じゅう', 'うえ'] }, { lv: 3, s: 'いわから [生|は]えて いる。', ng: ['う', 'い', 'せい'] }];
   const KW_SW = [{ s: '[貝|かい]がら', ng: ['見', '目', '具'], w: 'かいは、め の したに ちいさな あし' }, { s: '[糸|いと]で ひっぱる', ng: ['系', '米', '小'], w: 'いとを より あわせた かたち' }, { s: 'わかめの [林|はやし]', ng: ['森', '木', '休'], w: 'き が ふたつで はやし' }];
   const swimmy2 = [
-    ...TATOE.map(([t, a, il]) => ({ lv: 1, q: `「${t}」のは なに？`, a, ng: [...TOBJ, 'うなぎ'], ...(il ? { il } : {}), w: `${t} ${a}` })),
-    { lv: 2, q: 'かおを {見|み}る ころには、しっぽを わすれて いるほど ながいのは？', a: 'うなぎ', ng: TOBJ, il: 'eel', w: 'とても ながい うなぎ' },
-    ...TATOE.slice(0, 4).map(([t, a, il]) => ({ lv: 2, q: `${a}は、どのように かいて ある？`, a: t, ng: TATOE.map((x) => x[0]), ...(il ? { iv: il } : {}) })),
+    ...TATOE.map(([t, a, il]) => ({ lv: 1, t: `${t} ${a}。`, q: `「${t}」のは なに？`, a, ng: [...TOBJ, 'うなぎ'], ...(il ? { il } : {}), w: `${t} ${a}` })),
+    { lv: 2, t: 'うなぎ。かおを {見|み}る ころには、しっぽを わすれて いるほど ながい。', q: 'かおを {見|み}る ころには、しっぽを わすれて いるほど ながいのは？', a: 'うなぎ', ng: TOBJ, il: 'eel', w: 'とても ながい うなぎ' },
+    ...TATOE.slice(0, 4).map(([t, a, il]) => ({ lv: 2, t: `${t} ${a}。`, q: `${a}は、どのように かいて ある？`, a: t, ng: TATOE.map((x) => x[0]), ...(il ? { iv: il } : {}) })),
     F(2, (d) => kjR(KJ_SW, d)), F(3, (d) => kjW(KW_SW, d)), F(3, (d) => kjR(KJ_SW, d)),
   ];
   const SW_EV = ['{赤|あか}い きょうだいたちと くらす', 'まぐろが きょうだいを のみこむ', 'ひとりで くらい うみの そこを およぐ', 'おもしろい ものを {見|み}て げん{気|き}に なる', 'いわかげで きょうだいたちを {見|み}つける', '{大|おお}きな さかなの ふりを して およぐ', '{大|おお}きな さかなを おい{出|だ}す'];
@@ -1486,7 +1494,7 @@ const TB_KOKUGO = (() => {
 
   // ───── かたちの にて いる かん字
   const NI = [['{三|さん}（　）で へやに {入|はい}る。', '人', ['入', '八', '大'], 'ひと は ひだりが ながい'], ['{三|さん}{人|にん}で へやに （　）る。', '入', ['人', '八', '大'], 'はいる は みぎが ながい'],
-    ['{小|ちい}さな （　）を {見|み}つけた。', '貝', ['見', '目', '具'], 'かい の したは ちいさな てん ふたつ'], ['{小|ちい}さな {貝|かい}を （　）つけた。', '見', ['貝', '目', '兄'], 'みる の したは ひとの あし'],
+    ['うみで {小|ちい}さな （　）がらを ひろう。', '貝', ['見', '目', '具'], 'かい の したは ちいさな てん ふたつ'], ['{小|ちい}さな {貝|かい}を （　）つけた。', '見', ['貝', '目', '兄'], 'みる の したは ひとの あし'],
     ['（　）{手|て}で {石|いし}を ひろう。', '右', ['石', '若', '名'], 'みぎは ななめの せんを さきに かく'], ['{右|みぎ}{手|て}で （　）を ひろう。', '石', ['右', '名', '若'], 'いしは よこぼうを さきに、みぎは ななめの せんを さきに かく'],
     ['（　）のりを する {王|おう}さま。', '玉', ['王', '主', '土'], 'たま は みぎしたに てんが ある'], ['{玉|たま}のりを する （　）さま。', '王', ['玉', '主', '工'], 'おう は てんが ない'],
     ['（　）の {下|した}で {本|ほん}を よむ。', '木', ['本', '休', '水'], 'き には したの よこぼうが ない'], ['{木|き}の {下|した}で （　）を よむ。', '本', ['木', '休', '体'], 'ほん は きの したに よこぼう']];
@@ -1545,7 +1553,7 @@ const TB_KOKUGO = (() => {
   const OPP = [['{入|はい}る', '{出|で}る'], ['のぼる', 'おりる'], ['あける', 'しめる'], ['すわる', '{立|た}つ'], ['あかるい', 'くらい'], ['おきる', 'ねる']];
   const oppQ = (d) => { const [a, b] = pick(OPP); const sw = Math.random() < 0.5; const x = sw ? b : a, y = sw ? a : b; const ch = opts(y, OPP.flat().filter((z) => z !== x), d);
     return { text: `「${D(x)}」の はんたいの ことばは？`, sayQ: Y(`${x} の はんたいの ことばは どれ？`), ans: D(y), choices: ch, bigC: true, steps: [{ h: `<div class="sk-sbs">${big(D(x))}<span class="ar">と</span>${big(D(y))}</div>`, s: Y(`${x} と ${y} は はんたいの ことば`) }] }; };
-  const DOU = [['かいだんを （　）。', 'のぼる', ['あける', 'うたう', 'かぞえる']], ['まどを （　）。', 'あける', ['のぼる', 'かぞえる', 'たべる']], ['うたを （　）。', 'うたう', ['はく', 'あける', 'すわる']], ['かずを （　）。', 'かぞえる', ['のぼる', 'うたう', 'はく']],
+  const DOU = [['かいだんを （　）。', 'のぼる', ['あける', 'うたう', 'たべる']], ['まどを （　）。', 'あける', ['のぼる', 'うたう', 'たべる']], ['うたを （　）。', 'うたう', ['はく', 'あける', 'すわる']], ['かずを （　）。', 'かぞえる', ['のぼる', 'うたう', 'はく']],
     ['ほうきで （　）。', 'はく', ['うたう', 'のむ', 'かぞえる']], ['ぞうきんで （　）。', 'ふく', ['のぼる', 'うたう', 'たべる']], ['ボールを （　）。', 'なげる', ['のむ', 'うたう', 'しめる']], ['おちゃを （　）。', 'のむ', ['なげる', 'はく', 'のぼる']]];
   const douQ = (d) => { const [s, a, ng] = pick(DOU); const ch = opts(a, ng, d);
     return { text: `（　）に あう ことばは？\n${s}`, sayQ: `${end(Y(s))}まるに あう ことばは どれ？`, ans: a, choices: ch, ...look(ch), steps: [{ h: `<div class="sk-p">${s.replace('（　）', `<b class="mark">${a}</b>`)}</div>`, s: Y(s.replace('（　）', a)) }] }; };
@@ -1555,7 +1563,7 @@ const TB_KOKUGO = (() => {
     return { text: `${story(-1)}${t}に する ことは どれ？`, sayQ: `${t}に する ことは どれ？`, ans: D(a), choices: ch, txt: true, steps: [{ h: story(i), s: Y(a) }] }; };
   const hiroba1 = [F(1, oppQ), F(1, douQ), F(1, timeQ), F(2, oppQ), F(2, douQ), F(3, douQ)];
   const JS = [['はブラシ（　） はを みがく。', 'で'], ['{雨|あめ}（　） ふる。', 'が'], ['ふく（　） きる。', 'を'], ['かお（　） あらう。', 'を'], ['たいよう（　） のぼる。', 'が'], ['ほうき（　） はく。', 'で'], ['おちゃ（　） のむ。', 'を'], ['かぜ（　） ふく。', 'が'], ['せっけん（　） {手|て}を あらう。', 'で']];
-  const HWE = [['ぼく（　） こうえんへ いく。', 'は', ['わ', 'を']], ['わたしは こうえん（　） いく。', 'へ', ['え', 'を']], ['いもうとは {本|ほん}（　） よむ。', 'を', ['お', 'は']], ['ねこ（　） ミルクを のむ。', 'は', ['わ', 'へ']], ['ぼくは がっこう（　） いく。', 'へ', ['え', 'を']], ['わたしは えほん（　） かう。', 'を', ['お', 'へ']]];
+  const HWE = [['ぼく（　） こうえんへ いく。', 'は', ['わ', 'を']], ['わたしは こうえん（　） いく。', 'へ', ['え', 'お']], ['いもうとは {本|ほん}（　） よむ。', 'を', ['お', 'わ']], ['ねこ（　） ミルクを のむ。', 'は', ['わ', 'へ']], ['ぼくは がっこう（　） いく。', 'へ', ['え', 'お']], ['わたしは えほん（　） かう。', 'を', ['お', 'わ']]];
   const jsQ = (d) => { const hwe = lvOf(d) >= 2 && Math.random() < 0.5; const [s, a, ng] = hwe ? pick(HWE) : [...pick(JS), ['が', 'を', 'で']]; const ch = shuffle(uniq([a, ...ng]));
     const rd = { は: 'わ', へ: 'え', を: 'お' }[a];
     return { text: `（　）に はいる じは？\n${D(s)}`, sayQ: `${end(Y(s))}まるに はいる じは どれ？`, ans: a, choices: ch, bigC: true,
@@ -2333,7 +2341,7 @@ export function openSekai(opt0 = {}) {
       if (session.pre) { const id = PRE[session.pre]; session.pre = null; for (const k of Object.keys(SUBJ)) { const i = SUBJ[k].L.findIndex((s) => s.id === id); if (i >= 0) { forced = build(SUBJ[k], i, 0, false, k, p.subj[k].r); forced.slot = 'down'; forced.retry = 'もとに なる もんだいで れんしゅう'; forced.preQ = true; } } }
       if (!forced && session.down) { forced = makeQ(p, chooseSubj(p, session.prefer), 'down'); forced.slot = 'down'; session.down = false; }
       else if ((slot === 'review' || (slot === 'cur' && due.length >= 3)) && due.length) { forced = reviewQ(p, pick(due)); if (forced) forced.slot = 'review'; }
-      if (!forced) { const m = slot === 'review' ? 'cur' : slot; const sj0 = chooseSubj(p, session.prefer); const keyOf = (q) => q.sk + '|' + String(q.text).replace(/<[^>]+>/g, '') + '|' + (q.sayEn ? q.sayQ : '') + '|' + q.ans; session.seenQ = session.seenQ || []; let n0 = 0; do { forced = makeQ(p, sj0, m === 'cur' ? null : m); } while (session.seenQ.includes(keyOf(forced)) && ++n0 < 8); session.seenQ.push(keyOf(forced)); if (session.seenQ.length > 15) session.seenQ.shift(); forced.slot = m; } // おなじ もんだいを つづけて ださない（アストラ 28）
+      if (!forced) { const m = slot === 'review' ? 'cur' : slot; const sj0 = chooseSubj(p, session.prefer); const keyOf = (q) => q.sk + '|' + String(q.text).replace(/<[^>]+>/g, '') + '|' + (q.sayEn ? q.sayQ : '') + '|' + q.ans + '|' + String(q.viz || ''); session.seenQ = session.seenQ || []; let n0 = 0; do { forced = makeQ(p, sj0, m === 'cur' ? null : m); } while (session.seenQ.includes(keyOf(forced)) && ++n0 < 8); session.seenQ.push(keyOf(forced)); if (session.seenQ.length > 15) session.seenQ.shift(); forced.slot = m; } // おなじ もんだいを つづけて ださない（アストラ 28）
       forced.plan = session.plan.length; session.plan.push({ slot: forced.slot, sk: forced.sk, ok: null });
     }
     q = forced; sj = q.sj;

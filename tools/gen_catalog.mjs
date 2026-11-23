@@ -12,8 +12,8 @@ for (const [k, sk] of all) { const seen = new Map(); let ex = null;
   for (let i = 0; i < 400; i++) { let q; try { q = sk.q([0, 0.35, 0.7, 1][i % 4]); } catch (e) { continue; } const steps = (q.steps || []).map((s) => strip(s.s)).join(' ▶ ');
     const line = `- 【問】${strip(q.text)} 【選】${(q.choices || []).map(strip).join(' / ')} 【答】${strip(q.ans)}${q.viz && /sk-ill|sk-d|sk-objs/.test(q.viz) ? ' 【図】あり' : ''}${q.sayEn ? ' 【音】えいご' : ''}\n  【説明】${steps}`;
     const key = nz(line); if (!seen.has(key)) seen.set(key, line); if (!ex && /\d/.test(line)) ex = line; }
-  const mo = MON[sk.id]; out.push({ k, txt: `## [${k}] ${sk.id}  ${sk.n}${mo ? `（${mo}がつ）` : ''}  (${seen.size})\n` + [...seen.keys()].slice(0, 30).join('\n') + (ex ? `\n  ＜れい＞\n${ex.replace(/^- /, '  ')}` : '') });
+  const mo = MON[sk.id]; out.push({ k, txt: `## [${k}] ${sk.id}  ${sk.n}${mo ? `（${mo}がつ）` : ''}  (${seen.size})\n` + [...seen.keys()].slice(0, 14).join('\n') + (ex ? `\n  ＜れい＞\n${ex.replace(/^- /, '  ')}` : '') });
 }
 const head = `# せかいを しる もんだいカタログ（生成元コミット ${commit}・${day}）\n# かずは N に おきかえ。各たんげんの さいごに ぐたいてきな れいを 1つ。（○がつ）は きょうかしょの めやす\n`;
-const per = Math.ceil(out.length / 4); for (let f = 0; f < 4; f++) fs.writeFileSync(path.join(root, 'review', `mondai_${f + 1}.txt`), head + out.slice(f * per, (f + 1) * per).map((x) => x.txt).join('\n') + '\n');
+const NF = 6; const per = Math.ceil(out.length / NF); for (let f = 0; f < NF; f++) fs.writeFileSync(path.join(root, 'review', `mondai_${f + 1}.txt`), head + out.slice(f * per, (f + 1) * per).map((x) => x.txt).join('\n') + '\n');
 console.log('skills', out.length);

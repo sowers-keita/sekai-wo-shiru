@@ -10,7 +10,7 @@ const nz = (t) => t.replace(/\d+/g, 'N');
 const out = []; const all = Object.entries(SUBJ).flatMap(([k, S]) => S.L.map((sk, i) => [k, sk, i]));
 for (const [k, sk] of all) { const seen = new Map(); let ex = null;
   for (let i = 0; i < 400; i++) { let q; try { q = sk.q([0, 0.35, 0.7, 1][i % 4]); } catch (e) { continue; } const steps = (q.steps || []).map((s) => strip(s.s)).join(' ▶ ');
-    const line = `- 【問】${strip(q.text)} 【選】${(q.choices || []).map(strip).join(' / ')} 【答】${strip(q.ans)}${q.viz && /sk-ill|sk-d|sk-objs/.test(q.viz) ? ' 【図】あり' : ''}${q.sayEn ? ' 【音】えいご' : ''}\n  【説明】${steps}`;
+    const line = `- 【問】${strip(q.text)} 【選】${(q.choices || []).map(strip).join(' / ')} 【答】${strip(q.ans)}${q.viz && strip(q.viz).replace(/👂/g, '') ? ' 【画面の図・文】' + strip(q.viz).slice(0, 80) : q.viz && /sk-ill|sk-d|sk-objs/.test(q.viz) ? ' 【図】あり' : ''}${q.sayEn ? ' 【よみあげる えいご】' + q.sayQ : ''}${q.en ? ' 【せんたくしは 1つずつ 🔊で きける】' : ''}\n  【説明】${steps}`;
     const key = nz(line); if (!seen.has(key)) seen.set(key, line); if (!ex && /\d/.test(line)) ex = line; }
   const mo = MON[sk.id]; out.push({ k, txt: `## [${k}] ${sk.id}  ${sk.n}${mo ? `（${mo}がつ）` : ''}  (${seen.size})\n` + [...seen.keys()].slice(0, 14).join('\n') + (ex ? `\n  ＜れい＞\n${ex.replace(/^- /, '  ')}` : '') });
 }

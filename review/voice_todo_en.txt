@@ -1,0 +1,629 @@
+en| dog
+en| cat
+en| egg
+en| flower
+en| bear
+en| rabbit
+en| house
+en| banana
+en| moon
+en| car
+en| star
+en| strawberry
+en| fish
+en| tree
+en| apple
+en| bird
+en| book
+en| sun
+en| red
+en| black
+en| brown
+en| blue
+en| orange
+en| yellow
+en| white
+en| green
+en| pink
+en| purple
+en| two
+en| seven
+en| three
+en| five
+en| one
+en| ten
+en| six
+en| four
+en| eight
+en| nine
+en| ear
+en| hand
+en| nose
+en| face
+en| foot
+en| mouth
+en| eye
+en| Good night
+en| Good morning
+en| Hello
+en| Thank you
+en| monkey
+en| tiger
+en| elephant
+en| pig
+en| rice
+en| pizza
+en| watermelon
+en| juice
+en| cake
+en| bread
+en| milk
+en| ice cream
+en| hamburger
+en| tomato
+en| lemon
+en| cookie
+en| melon
+en| carrot
+en| I like pizza.
+en| I like cake.
+en| I like hamburgers.
+en| I like milk.
+en| I like lemons.
+en| I like cookies.
+en| I like watermelon.
+en| I like bread.
+en| I like apples.
+en| I like bananas.
+en| I like rice.
+en| I like ice cream.
+en| I like juice.
+en| I like melon.
+en| I like eggs.
+en| I like strawberries.
+en| I like carrots.
+en| I like candy.
+en| I like cheese.
+en| I like tomatoes.
+en| fox
+en| giraffe
+en| lion
+en| penguin
+en| koala
+en| frog
+en| panda
+en| owl
+en| chicken
+en| I see a lion.
+en| I see a giraffe.
+en| I see a bird.
+en| I see a frog.
+en| I see an owl.
+en| I see a penguin.
+en| I see a rabbit.
+en| I see a bear.
+en| I see a koala.
+en| I see a tiger.
+en| I see a cat.
+en| I see an elephant.
+en| I see a fox.
+en| I see a panda.
+en| I see a dog.
+en| I see a pig.
+en| I see a monkey.
+en| I see a chicken.
+en| scared
+en| surprised
+en| angry
+en| sad
+en| happy
+en| sleepy
+en| I'm happy.
+en| I'm sleepy.
+en| I'm surprised.
+en| I'm angry.
+en| I'm sad.
+en| I'm scared.
+en| How are you?
+en| thirteen
+en| fourteen
+en| twenty
+en| eighteen
+en| sixteen
+en| eleven
+en| twelve
+en| fifteen
+en| nineteen
+en| seventeen
+en| How many?
+en| Four.
+en| One.
+en| Three.
+en| Eight.
+en| Nine.
+en| Ten.
+en| Two.
+en| Five.
+en| Six.
+en| Seven.
+en| five elephants
+en| four elephants
+en| nine koalas
+en| nine foxes
+en| two koalas
+en| seven foxes
+en| seven lions
+en| ten elephants
+en| seven elephants
+en| two cats
+en| five lions
+en| seven cats
+en| two lions
+en| ten frogs
+en| seven frogs
+en| nine giraffes
+en| four dogs
+en| nine penguins
+en| nine elephants
+en| six lions
+en| five penguins
+en| eight lions
+en| eight cats
+en| four pandas
+en| eight giraffes
+en| five giraffes
+en| four giraffes
+en| nine lions
+en| seven koalas
+en| two foxes
+en| ten penguins
+en| four foxes
+en| six pandas
+en| seven pandas
+en| three frogs
+en| two frogs
+en| nine pandas
+en| two pandas
+en| six koalas
+en| eight koalas
+en| nine frogs
+en| eight elephants
+en| ten koalas
+en| five frogs
+en| two giraffes
+en| four penguins
+en| three dogs
+en| five pandas
+en| seven dogs
+en| nine cats
+en| four koalas
+en| ten foxes
+en| eight pandas
+en| six elephants
+en| two elephants
+en| six cats
+en| ten cats
+en| six giraffes
+en| six foxes
+en| two penguins
+en| six penguins
+en| three elephants
+en| eight frogs
+en| three lions
+en| eight foxes
+en| nine dogs
+en| three pandas
+en| three koalas
+en| six frogs
+en| four lions
+en| three cats
+en| five cats
+en| seven penguins
+en| seven giraffes
+en| five koalas
+en| ten lions
+en| eight dogs
+en| five dogs
+en| four frogs
+en| two dogs
+en| three giraffes
+en| five foxes
+en| three penguins
+en| four cats
+en| six dogs
+en| ten dogs
+en| three foxes
+en| ten giraffes
+en| eight penguins
+en| helicopter
+en| boat
+en| fire truck
+en| taxi
+en| train
+en| rocket
+en| bus
+en| teddy bear
+en| ball
+en| pencil
+en| T-shirt
+en| bag
+en| camera
+en| balloon
+en| robot
+en| umbrella
+en| piano
+en| kite
+en| ribbon
+en| notebook
+en| I have a pencil.
+en| I have a notebook.
+en| I have a robot.
+en| I have a bag.
+en| I have a teddy bear.
+en| I have a balloon.
+en| I have an umbrella.
+en| I have a piano.
+en| I have a ribbon.
+en| I have a book.
+en| I have a kite.
+en| I have a ball.
+en| I have a camera.
+en| I have a T-shirt.
+en| cloudy
+en| rainy
+en| sunny
+en| snowy
+en| How's the weather?
+en| It's rainy.
+en| It's snowy.
+en| It's sunny.
+en| It's cloudy.
+en| a red ball
+en| a black balloon
+en| a pink balloon
+en| a white train
+en| a black umbrella
+en| an orange book
+en| a white pencil
+en| a blue ball
+en| a pink umbrella
+en| an orange bag
+en| a green book
+en| a yellow bag
+en| a pink pencil
+en| a black car
+en| a yellow ball
+en| a red book
+en| a black pencil
+en| a pink bus
+en| a yellow balloon
+en| a red bus
+en| an orange bus
+en| a black train
+en| a yellow bus
+en| a blue car
+en| a white book
+en| a blue pencil
+en| a pink book
+en| an orange ball
+en| a white balloon
+en| a white bag
+en| an orange train
+en| a white bus
+en| a white car
+en| a blue balloon
+en| a green bag
+en| a red umbrella
+en| a yellow train
+en| a blue book
+en| an orange pencil
+en| a black bus
+en| a blue bag
+en| a yellow pencil
+en| an orange umbrella
+en| a black ball
+en| a green pencil
+en| an orange balloon
+en| a green balloon
+en| a green train
+en| a green umbrella
+en| a yellow umbrella
+en| a pink car
+en| a pink train
+en| a white umbrella
+en| a white ball
+en| a yellow book
+en| a black book
+en| a blue bus
+en| a red car
+en| a green bus
+en| a blue train
+en| a green ball
+en| a blue umbrella
+en| an orange car
+en| a red pencil
+en| a pink bag
+en| a red train
+en| a green car
+en| a red balloon
+en| a black bag
+en| a yellow car
+en| a pink ball
+en| a red bag
+en| What color is it?
+en| It's white.
+en| It's pink.
+en| It's black.
+en| It's green.
+en| It's brown.
+en| It's purple.
+en| It's blue.
+en| It's orange.
+en| It's red.
+en| It's yellow.
+en| Is it a fox?
+en| No, it isn't.
+en| Is it a bear?
+en| Yes, it is.
+en| Is it a rabbit?
+en| Is it a lion?
+en| Is it a koala?
+en| Is it a penguin?
+en| Is it a panda?
+en| Is it a chicken?
+en| Is it a cat?
+en| Is it a monkey?
+en| Is it a giraffe?
+en| Is it an owl?
+en| Is it a pig?
+en| Is it a dog?
+en| Is it a frog?
+en| Is it a bird?
+en| Is it an elephant?
+en| Is it a tiger?
+en| What's this?
+en| It's a penguin.
+en| It's a fox.
+en| It's a panda.
+en| It's an elephant.
+en| It's a rabbit.
+en| It's a giraffe.
+en| It's a lion.
+en| It's a cat.
+en| It's a bear.
+en| It's a book.
+en| It's a monkey.
+en| It's a bird.
+en| It's a frog.
+en| It's a koala.
+en| It's a dog.
+en| It's an owl.
+en| It's a pig.
+en| It's a pencil.
+en| It's a tiger.
+en| It's a chicken.
+en| bed
+en| soap
+en| spoon
+en| bath
+en| toothbrush
+en| sofa
+en| TV
+en| door
+en| I want strawberries.
+en| I want pizza.
+en| I want tomatoes.
+en| I want rice.
+en| I want juice.
+en| I want apples.
+en| I want bread.
+en| I want lemons.
+en| I want milk.
+en| I want bananas.
+en| I want watermelon.
+en| I want cookies.
+en| I want carrots.
+en| I want cake.
+en| I want hamburgers.
+en| I want candy.
+en| I want melon.
+en| I want cheese.
+en| I want ice cream.
+en| I want eggs.
+en| dolphin
+en| octopus
+en| shark
+en| turtle
+en| butterfly
+en| bee
+en| tulip
+en| snail
+en| sunflower
+en| sea
+en| rainbow
+en| snowman
+en| cloud
+en| mountain
+en| C
+en| M
+en| E
+en| D
+en| G
+en| F
+en| B
+en| H
+en| J
+en| K
+en| A
+en| I
+en| L
+en| Y
+en| R
+en| Q
+en| T
+en| U
+en| N
+en| V
+en| O
+en| P
+en| X
+en| Z
+en| S
+en| W
+en| Monday
+en| Sunday
+en| Wednesday
+en| Saturday
+en| Thursday
+en| Friday
+en| Tuesday
+en| Can a pig fly?
+en| No, it can't.
+en| Can an owl fly?
+en| Yes, it can.
+en| Can a butterfly fly?
+en| Can a butterfly swim?
+en| Can a bee swim?
+en| Can a rabbit jump?
+en| Can a dolphin swim?
+en| Can a bee fly?
+en| Can a turtle fly?
+en| Can a turtle jump?
+en| Can a snail jump?
+en| Can a penguin swim?
+en| Can a frog jump?
+en| Can a dog fly?
+en| Can a shark swim?
+en| Can an elephant fly?
+en| Can a bird fly?
+en| Can a fish swim?
+en| Can a frog swim?
+en| I'm hungry. I want milk.
+en| I have a balloon. I'm angry.
+en| I'm hungry. I want apples.
+en| It's cloudy. I see a dog.
+en| It's rainy. I see a frog.
+en| I have a bag. I'm angry.
+en| I'm hungry. I want cake.
+en| I'm hungry. I want eggs.
+en| I have a bag. I'm sad.
+en| I'm hungry. I want bread.
+en| It's sunny. I see a penguin.
+en| I have a book. I'm angry.
+en| I have a bag. I'm happy.
+en| I have an umbrella. I'm happy.
+en| I have a ball. I'm happy.
+en| It's snowy. I see a pig.
+en| I have a pencil. I'm angry.
+en| It's sunny. I see a bear.
+en| It's snowy. I see a frog.
+en| It's rainy. I see a fox.
+en| It's snowy. I see a lion.
+en| I'm hungry. I want rice.
+en| It's rainy. I see a pig.
+en| It's cloudy. I see a pig.
+en| I'm hungry. I want melon.
+en| I have a teddy bear. I'm sad.
+en| I have a book. I'm sad.
+en| It's sunny. I see a giraffe.
+en| I have a ribbon. I'm happy.
+en| It's cloudy. I see a cat.
+en| I'm hungry. I want watermelon.
+en| I'm hungry. I want strawberries.
+en| It's snowy. I see a cat.
+en| I'm hungry. I want cheese.
+en| It's cloudy. I see a penguin.
+en| I'm hungry. I want pizza.
+en| I have a ribbon. I'm angry.
+en| It's snowy. I see a giraffe.
+en| I have a robot. I'm sad.
+en| I have a T-shirt. I'm sad.
+en| I have a ball. I'm sleepy.
+en| I have a kite. I'm sad.
+en| I have a balloon. I'm sad.
+en| It's cloudy. I see a fox.
+en| It's sunny. I see a fox.
+en| I have a T-shirt. I'm sleepy.
+en| I have a book. I'm sleepy.
+en| It's sunny. I see a chicken.
+en| It's sunny. I see a panda.
+en| It's rainy. I see a penguin.
+en| It's cloudy. I see a chicken.
+en| It's snowy. I see a monkey.
+en| It's cloudy. I see a rabbit.
+en| It's sunny. I see an elephant.
+en| I'm hungry. I want ice cream.
+en| It's rainy. I see a chicken.
+en| I have a pencil. I'm sad.
+en| It's sunny. I see a monkey.
+en| I'm hungry. I want carrots.
+en| I have a piano. I'm angry.
+en| It's rainy. I see a giraffe.
+en| I have a ribbon. I'm sad.
+en| I'm hungry. I want lemons.
+en| I have a ball. I'm angry.
+en| I'm hungry. I want juice.
+en| It's snowy. I see a dog.
+en| I have a bag. I'm sleepy.
+en| I have a ball. I'm sad.
+en| I'm hungry. I want hamburgers.
+en| I have a camera. I'm sad.
+en| I have a pencil. I'm happy.
+en| I have a camera. I'm sleepy.
+en| It's sunny. I see a koala.
+en| It's sunny. I see a rabbit.
+en| It's cloudy. I see a panda.
+en| I have a teddy bear. I'm happy.
+en| I have an umbrella. I'm sleepy.
+en| I have a teddy bear. I'm sleepy.
+en| It's snowy. I see a tiger.
+en| It's cloudy. I see a lion.
+en| I have a T-shirt. I'm angry.
+en| It's rainy. I see a panda.
+en| It's sunny. I see a lion.
+en| It's cloudy. I see an owl.
+en| I have a robot. I'm angry.
+en| It's cloudy. I see a frog.
+en| It's snowy. I see a fox.
+en| I'm hungry. I want tomatoes.
+en| I have a robot. I'm happy.
+en| It's rainy. I see a lion.
+en| I have a notebook. I'm angry.
+en| I have a balloon. I'm sleepy.
+en| It's rainy. I see a dog.
+en| It's snowy. I see an elephant.
+en| It's snowy. I see a bear.
+en| I'm hungry. I want bananas.
+en| I have a book. I'm happy.
+en| I have a notebook. I'm sleepy.
+en| I have a piano. I'm sad.
+en| I have a piano. I'm sleepy.
+en| It's sunny. I see a dog.
+en| It's sunny. I see a bird.
+en| It's sunny. I see a frog.
+en| I have a notebook. I'm sad.
+en| It's rainy. I see a cat.
+en| It's rainy. I see a bear.
+en| I have a kite. I'm happy.
+en| It's sunny. I see a cat.
+en| It's sunny. I see a tiger.
+en| It's cloudy. I see a giraffe.
+en| I have a T-shirt. I'm happy.
+en| I have a pencil. I'm sleepy.
+en| I have a notebook. I'm happy.
+en| I have a kite. I'm angry.
+en| I'm hungry. I want cookies.
+en| I have a teddy bear. I'm angry.
+en| I have an umbrella. I'm angry.
+en| It's cloudy. I see a monkey.
+en| It's cloudy. I see an elephant.
+en| It's snowy. I see a bird.
+en| I have an umbrella. I'm sad.
+en| It's rainy. I see a rabbit.
+en| It's snowy. I see a panda.
+en| It's rainy. I see an owl.
+en| It's sunny. I see a pig.
+en| I have a camera. I'm happy.
+en| It's snowy. I see a chicken.
+en| I have a balloon. I'm happy.
+en| It's rainy. I see an elephant.

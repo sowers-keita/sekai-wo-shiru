@@ -207,7 +207,7 @@ let voiceOn = true;
 // こえは 1つずつ じゅんばんに（かさならない・とちゅうで きれない）。がめんが かわる ときは hush() で ぜんぶ とめる
 let sayChain = Promise.resolve(), sayGen = 0;
 function say(text, opt = {}) { const g = sayGen; const pr = sayChain.then(() => (g === sayGen ? speakNow(text, opt) : null)); sayChain = pr.catch(() => {}); return pr; }
-const NOREAD = new Set(['k_hira', 'k_hira2', 'k_small', 'k_long', 'k_part', 'k_kana1', 'k_kata', 'k_bun', 'tk_hira2', 'tk_kata1', 'tk_kata2', 'tk_hiroba2']); // かきかたを えらぶ もんだい（よむと こたえが わかる・おなじ おとに なる）
+const NOREAD = new Set(['e_num20', 'e_numnoun', 'e_abc1', 'e_abc2', 'e_abc3', 'e_abcs', 'e_abcl', 'e_vowel', 'e_spell', 'e_first', 'k_hira', 'k_hira2', 'k_small', 'k_long', 'k_part', 'k_kana1', 'k_kata', 'k_bun', 'tk_hira2', 'tk_kata1', 'tk_kata2', 'tk_hiroba2']); // かきかたを えらぶ もんだい（よむと こたえが わかる・おなじ おとに なる）
 const fmM = (n) => (n === 0 ? 'ちょうど' : n + ([1, 3, 4, 6, 8, 0].includes(n % 10) ? 'ぷん' : 'ふん'));
 const chTxt = (c) => noEmo(String(c).replace(/<rt>[\s\S]*?<\/rt>/g, (m) => m).replace(/<ruby>([\s\S]*?)<rt>([\s\S]*?)<\/rt><\/ruby>/g, '$2').replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ')).replace(/(\d{1,2}):(\d\d)/g, (m, h, mm) => `${+h}じ ${fmM(+mm)}`).trim();
 function hush() { sayGen++; sayChain = Promise.resolve(); try { curSrc && curSrc.stop(); } catch (e) {} curSrc = null; try { window.speechSynthesis && speechSynthesis.cancel(); } catch (e) {} }
@@ -538,6 +538,100 @@ const NEWE = [
     return { text: '🔊 きいて えらんでね', sayQ: w, sayEn: true, viz: '<div class="sk-ear">👂</div>', ans: e, choices: shuffle([e, ...ng]), emoji: true, ng: enNgFor(e), steps: enEar(e, w, j) }; } },
 ];
 const MEM = new Set(['k_hira', 'k_kana1', 'k_kata', 'k_small', 'k_long', 'k_kanjiR', 'k_kanjiW', 'e_listen', 'e_col', 'e_body', 'e_greet', 'e_ani', 'e_first']);
+
+// ───────── えいご レベル8〜50（2026-11-23 木原さん）：きく → いう → ぶん → かいわ → もじ → よむ の じゅん。
+// さんこう：文科省 Let's Try! 1・2（小3・4 の たんげん）／Cambridge Pre A1 Starters の ことば／Let's Go（かいわ から はいる）
+const FOOD = [['🍎', 'apple', 'りんご', 'apples'], ['🍌', 'banana', 'バナナ', 'bananas'], ['🍓', 'strawberry', 'いちご', 'strawberries'], ['🍕', 'pizza', 'ピザ', 'pizza'], ['🍰', 'cake', 'ケーキ', 'cake'], ['🥛', 'milk', 'ぎゅうにゅう', 'milk'], ['🍞', 'bread', 'パン', 'bread'], ['🍚', 'rice', 'ごはん', 'rice'], ['🥚', 'egg', 'たまご', 'eggs'], ['🍪', 'cookie', 'クッキー', 'cookies'], ['🍦', 'ice cream', 'アイスクリーム', 'ice cream'], ['🧃', 'juice', 'ジュース', 'juice'], ['🍋', 'lemon', 'レモン', 'lemons'], ['🍉', 'watermelon', 'すいか', 'watermelon'], ['🍈', 'melon', 'メロン', 'melon'], ['🥕', 'carrot', 'にんじん', 'carrots'], ['🍅', 'tomato', 'トマト', 'tomatoes'], ['🍔', 'hamburger', 'ハンバーガー', 'hamburgers'], ['🧀', 'cheese', 'チーズ', 'cheese'], ['🍬', 'candy', 'あめ', 'candy']];
+const ZOO = [['🐶', 'dog', 'いぬ'], ['🐱', 'cat', 'ねこ'], ['🦁', 'lion', 'ライオン'], ['🐼', 'panda', 'パンダ'], ['🐧', 'penguin', 'ペンギン'], ['🦒', 'giraffe', 'きりん'], ['🐸', 'frog', 'かえる'], ['🦊', 'fox', 'きつね'], ['🐨', 'koala', 'コアラ'], ['🐘', 'elephant', 'ぞう'], ['🐵', 'monkey', 'さる'], ['🐰', 'rabbit', 'うさぎ'], ['🐻', 'bear', 'くま'], ['🐷', 'pig', 'ぶた'], ['🐯', 'tiger', 'とら'], ['🦉', 'owl', 'ふくろう'], ['🐔', 'chicken', 'にわとり'], ['🐦', 'bird', 'とり']];
+const SEA = [['🐟', 'fish', 'さかな'], ['🐙', 'octopus', 'たこ'], ['🦈', 'shark', 'さめ'], ['🐬', 'dolphin', 'いるか'], ['🐢', 'turtle', 'かめ'], ['🐧', 'penguin', 'ペンギン'], ['🐸', 'frog', 'かえる'], ['⛵', 'boat', 'ふね']];
+const BUG = [['🦋', 'butterfly', 'ちょうちょ'], ['🐝', 'bee', 'はち'], ['🐌', 'snail', 'かたつむり'], ['🌸', 'flower', 'はな'], ['🌳', 'tree', 'き'], ['🌻', 'sunflower', 'ひまわり'], ['🌷', 'tulip', 'チューリップ'], ['🐦', 'bird', 'とり']];
+const VEH = [['🚗', 'car', 'くるま'], ['🚌', 'bus', 'バス'], ['🚃', 'train', 'でんしゃ'], ['🚕', 'taxi', 'タクシー'], ['🚒', 'fire truck', 'しょうぼうしゃ'], ['🚁', 'helicopter', 'ヘリコプター'], ['🚀', 'rocket', 'ロケット'], ['⛵', 'boat', 'ふね']];
+const THING = [['✏️', 'pencil', 'えんぴつ'], ['📕', 'book', 'ほん'], ['⚽', 'ball', 'ボール'], ['🎈', 'balloon', 'ふうせん'], ['🎒', 'bag', 'かばん'], ['☔', 'umbrella', 'かさ'], ['📓', 'notebook', 'ノート'], ['🧸', 'teddy bear', 'くまの ぬいぐるみ'], ['🤖', 'robot', 'ロボット'], ['🎹', 'piano', 'ピアノ'], ['🪁', 'kite', 'たこ'], ['👕', 'T-shirt', 'ティーシャツ'], ['🎀', 'ribbon', 'リボン'], ['📷', 'camera', 'カメラ']];
+const HOME = [['🛏️', 'bed', 'ベッド'], ['🛁', 'bath', 'おふろ'], ['🚪', 'door', 'ドア'], ['🛋️', 'sofa', 'ソファ'], ['📺', 'TV', 'テレビ'], ['🥄', 'spoon', 'スプーン'], ['🪥', 'toothbrush', 'はブラシ'], ['🧼', 'soap', 'せっけん'], ['🏠', 'house', 'いえ']];
+const NATURE = [['☀️', 'sun', 'たいよう'], ['🌙', 'moon', 'つき'], ['⭐', 'star', 'ほし'], ['☁️', 'cloud', 'くも'], ['🌈', 'rainbow', 'にじ'], ['⛰️', 'mountain', 'やま'], ['🌊', 'sea', 'うみ'], ['🌳', 'tree', 'き'], ['⛄', 'snowman', 'ゆきだるま']];
+const FEEL = [['😄', 'happy', 'うれしい'], ['😢', 'sad', 'かなしい'], ['😠', 'angry', 'おこって いる'], ['😪', 'sleepy', 'ねむい'], ['😱', 'scared', 'こわい'], ['😲', 'surprised', 'びっくり']];
+const WX = [['☀️', 'sunny', 'はれ'], ['☁️', 'cloudy', 'くもり'], ['🌧️', 'rainy', 'あめ'], ['❄️', 'snowy', 'ゆき']];
+const NUM20 = { 11: 'eleven', 12: 'twelve', 13: 'thirteen', 14: 'fourteen', 15: 'fifteen', 16: 'sixteen', 17: 'seventeen', 18: 'eighteen', 19: 'nineteen', 20: 'twenty' };
+const DAYS = [['Sunday', 'にちようび'], ['Monday', 'げつようび'], ['Tuesday', 'かようび'], ['Wednesday', 'すいようび'], ['Thursday', 'もくようび'], ['Friday', 'きんようび'], ['Saturday', 'どようび']];
+const CAN = [['🐦', 'bird', 'fly', 1], ['🦋', 'butterfly', 'fly', 1], ['🐝', 'bee', 'fly', 1], ['🦉', 'owl', 'fly', 1], ['🐶', 'dog', 'fly', 0], ['🐷', 'pig', 'fly', 0], ['🐘', 'elephant', 'fly', 0], ['🐢', 'turtle', 'fly', 0], ['🐟', 'fish', 'swim', 1], ['🐬', 'dolphin', 'swim', 1], ['🦈', 'shark', 'swim', 1], ['🐧', 'penguin', 'swim', 1], ['🐸', 'frog', 'swim', 1], ['🦋', 'butterfly', 'swim', 0], ['🐝', 'bee', 'swim', 0], ['🐰', 'rabbit', 'jump', 1], ['🐸', 'frog', 'jump', 1], ['🐌', 'snail', 'jump', 0], ['🐢', 'turtle', 'jump', 0]];
+const CAN_JA = { fly: 'とべる', swim: 'およげる', jump: 'ジャンプ できる' };
+[FOOD, ZOO, SEA, BUG, VEH, THING, HOME, NATURE, FEEL, WX].forEach((l) => l.forEach(([e, w, j]) => { if (!ED[w]) ED[w] = [e, j]; if (!ED[e]) ED[e] = [w, j]; }));
+const enA = (w) => (/^[aeiou]/i.test(w) ? 'an ' : 'a ') + w;
+const enPl = (w) => (w === 'fish' ? 'fish' : /(x|s|ch|sh)$/.test(w) ? w + 'es' : /[^aeiou]y$/.test(w) ? w.slice(0, -1) + 'ies' : w + 's');
+const cap1 = (t) => t[0].toUpperCase() + t.slice(1);
+const eSub = (list, d) => list.slice(0, Math.max(6, Math.min(list.length, 8 + (d * 12 | 0))));
+// え → えいごを えらぶ（せんたくしの 🔊 で きける）
+const eSay = (id, n, list) => ({ id, n, q(d) { const L = eSub(list, d); const [e, w, j] = pick(L); const ng = shuffle(L.filter((x) => x[1] !== w)).slice(0, 2).map((x) => x[1]); return { text: 'えいごで なんて いう？', sayQ: 'えいごで なんて いう？', viz: big(e, 'emo'), ans: w, choices: shuffle([w, ...ng]), en: true, steps: enSteps(e, w, j) }; } });
+// ぶんを きいて えを えらぶ
+const eSen = (id, n, list, mkS, mkJ) => ({ id, n, q(d) { const L = eSub(list, d); const it = pick(L); const [e, w, j] = it; const s = mkS(it), ja = mkJ(it); const ng = shuffle(L.filter((x) => x[1] !== w)).slice(0, 2).map((x) => x[0]);
+  return { text: '🔊 きいて えらんでね', sayQ: s, sayEn: true, viz: '<div class="sk-ear">👂</div>', ans: e, choices: shuffle([e, ...ng]), emoji: true, ng: enNgFor(e), steps: [{ h: big(e, 'emo') + big(ja), s: ja, seq: [[ja], [s, 1]] }, { h: big(e, 'emo') + '<div class="sk-ear">👂</div>', s: 'いっしょに いってみよう', seq: [['いっしょに いってみよう'], [s, 1]] }] }; } });
+// しつもんを きいて こたえを えらぶ（かいわ）
+const eQA = (id, n, gen) => ({ id, n, q(d) { const g = gen(d); return { text: '🔊 しつもんに こたえよう', sayQ: g.q, sayEn: true, viz: g.viz, ans: g.a, choices: shuffle([g.a, ...g.ng]), en: true,
+  steps: [{ h: g.viz + big(g.ja), s: g.ja, seq: [[g.ja], [g.q, 1]] }, { h: g.viz + big(g.a), s: g.a, seq: [['こたえは'], [g.a, 2]] }, { h: g.viz + '<div class="sk-ear">👂</div>', s: 'いっしょに いってみよう', seq: [['いっしょに いってみよう'], [g.q, 1], [g.a, 1]] }] }; } });
+const eU = {};
+const qaFeel = () => { const [e, w, j] = pick(FEEL); return { viz: big(e, 'emo'), q: 'How are you?', a: `I'm ${w}.`, ng: shuffle(FEEL.filter((x) => x[1] !== w)).slice(0, 2).map((x) => `I'm ${x[1]}.`), ja: `げんき？ ときかれて「${j}」と こたえる` }; };
+const qaMany = () => { const n = R(1, 10); const [e, w, j] = pick(ZOO.slice(0, 8)); return { viz: `<div class="sk-big emos">${e.repeat(n)}</div>`, q: 'How many?', a: cap1(NUM[n]) + '.', ng: numChoices(n, 1, 10).filter((x) => +x !== n).slice(0, 2).map((x) => cap1(NUM[+x]) + '.'), ja: `いくつ？ ${n}ひき（${NUM[n]}）` }; };
+const qaWx = () => { const [e, w, j] = pick(WX); return { viz: big(e, 'emo'), q: "How's the weather?", a: `It's ${w}.`, ng: shuffle(WX.filter((x) => x[1] !== w)).slice(0, 2).map((x) => `It's ${x[1]}.`), ja: `てんきは？「${j}」` }; };
+const qaCol = () => { const [w, j, e] = pick(COLE); return { viz: big(e, 'emo'), q: 'What color is it?', a: `It's ${w}.`, ng: shuffle(COLE.filter((x) => x[0] !== w)).slice(0, 2).map((x) => `It's ${x[0]}.`), ja: `なにいろ？「${j}」` }; };
+const qaWhat = (d) => { const L = eSub([...ZOO, ...THING, ...VEH], d || 0); const [e, w, j] = pick(L); return { viz: big(e, 'emo'), q: "What's this?", a: `It's ${enA(w)}.`, ng: shuffle(L.filter((x) => x[1] !== w)).slice(0, 2).map((x) => `It's ${enA(x[1])}.`), ja: `これは なに？「${j}」` }; };
+const abcQ = (lo, hi) => () => { const A = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.slice(lo, hi).split(''); const c = pick(A); const ng = shuffle(A.filter((x) => x !== c)).slice(0, 2); return { text: '🔊 きいて もじを えらんでね', sayQ: c, sayEn: true, viz: '<div class="sk-ear">👂</div>', ans: c, choices: shuffle([c, ...ng]), bigC: true, steps: [{ h: big(`${c} ${c.toLowerCase()}`), s: 'この もじの なまえは', seq: [['この もじの なまえは'], [c, 2]] }] }; };
+const READ3 = [['🐱', 'cat', 'ねこ'], ['🐶', 'dog', 'いぬ'], ['🐷', 'pig', 'ぶた'], ['☀️', 'sun', 'たいよう'], ['🛏️', 'bed', 'ベッド'], ['🚌', 'bus', 'バス'], ['🦊', 'fox', 'きつね'], ['🥚', 'egg', 'たまご'], ['🚗', 'car', 'くるま'], ['🐝', 'bee', 'はち'], ['🎒', 'bag', 'かばん']];
+const READ_ALL = [...new Map([...ZOO, ...FOOD, ...VEH, ...THING, ...NATURE].map((x) => [x[1], x])).values()].filter((x) => !/ |-/.test(x[1]));
+const readQ = (list) => (d) => { const L = eSub(list, d); const [e, w, j] = pick(L); const ng = shuffle(L.filter((x) => x[1] !== w && x[0] !== e)).slice(0, 2).map((x) => x[0]); return { text: `<div class="sk-big">${w}</div>よんで えを えらぼう`, sayQ: 'よんで えを えらぼう', ans: e, choices: shuffle([e, ...ng]), emoji: true, steps: enSteps(e, w, j) }; };
+const SENS = [[FOOD, (x) => `I like ${x[3]}.`, (x) => `${x[2]}が すき`], [ZOO, (x) => `I see ${enA(x[1])}.`, (x) => `${x[2]}が みえる`], [THING, (x) => `I have ${enA(x[1])}.`, (x) => `${x[2]}を もって いる`], [FOOD, (x) => `I want ${x[3]}.`, (x) => `${x[2]}が ほしい`]];
+const NEWE2 = [
+  listen('e_food_l', 'たべもの（きく）', FOOD, (x) => x),
+  eSay('e_food_s', 'たべもの（いう）', FOOD),
+  eSen('e_like', 'I like 〜.（すき）', FOOD, (x) => `I like ${x[3]}.`, (x) => `${x[2]}が すき`),
+  listen('e_zoo_l', 'どうぶつ（きく）', ZOO, (x) => x),
+  eSay('e_zoo_s', 'どうぶつ（いう）', ZOO),
+  eSen('e_see', 'I see 〜.（みえる）', ZOO, (x) => `I see ${enA(x[1])}.`, (x) => `${x[2]}が みえる`),
+  listen('e_feel_l', 'きもち（きく）', FEEL, (x) => x),
+  eSen('e_iam', "I'm 〜.（きもち）", FEEL, (x) => `I'm ${x[1]}.`, (x) => `わたしは ${x[2]}`),
+  eQA('e_howru', 'How are you?（かいわ）', qaFeel),
+  { id: 'e_num20', n: 'かず 11〜20（きく）', q() { const n = R(11, 20); return { text: '🔊 きいて えらんでね', sayQ: NUM20[n], sayEn: true, viz: '<div class="sk-ear">👂</div>', ans: String(n), choices: numChoices(n, 11, 20), bigC: true, steps: [{ h: big(String(n)), s: `${n}は ${NUM20[n]}`, seq: [[`${n}は`], [NUM20[n], 2]] }] }; } },
+  eQA('e_howmany', 'How many?（かいわ）', qaMany),
+  { id: 'e_numnoun', n: 'かずと ことば（three dogs）', q() { const n = R(2, 10); const [e, w, j] = pick(ZOO.slice(0, 10)); const s = `${NUM[n]} ${enPl(w)}`; return { text: `${e} 🔊 いくつ いる？`, sayQ: s, sayEn: true, ans: String(n), choices: numChoices(n, 1, 10), bigC: true, steps: [{ h: `<div class="sk-big emos">${e.repeat(n)}</div>`, s: `${j}が ${n}`, seq: [[`${j}が ${n}`], [s, 2]] }] }; } },
+  listen('e_veh_l', 'のりもの（きく）', VEH, (x) => x),
+  listen('e_things_l', 'もちもの（きく）', THING, (x) => x),
+  eSen('e_have', 'I have 〜.（もって いる）', THING, (x) => `I have ${enA(x[1])}.`, (x) => `${x[2]}を もって いる`),
+  listen('e_wx_l', 'てんき（きく）', WX, (x) => x),
+  eQA('e_wxq', "How's the weather?（かいわ）", qaWx),
+  { id: 'e_colnoun', n: 'いろと ことば（a red car）', q() { const [cw, cj, ce] = pick(COLE.slice(0, 8)); const [e, w, j] = pick(THING.slice(0, 6).concat(VEH.slice(0, 3))); const s = `${enA(cw)} ${w}`.replace(/^an? /, /^[aeiou]/.test(cw) ? 'an ' : 'a '); const ja = `${cj}の ${j}`;
+      if (Math.random() < 0.5) { const ng = shuffle(COLE.slice(0, 8).filter((x) => x[0] !== cw)).slice(0, 2).map((x) => x[2]); return { text: `${e} 🔊 なにいろ？`, sayQ: s, sayEn: true, ans: ce, choices: shuffle([ce, ...ng]), emoji: true, steps: [{ h: big(ce, 'emo') + big(e, 'emo'), s: ja, seq: [[ja], [s, 2]] }] }; }
+      const ng = shuffle(THING.slice(0, 6).concat(VEH.slice(0, 3)).filter((x) => x[1] !== w)).slice(0, 2).map((x) => x[0]); return { text: `${ce} 🔊 なにの こと？`, sayQ: s, sayEn: true, ans: e, choices: shuffle([e, ...ng]), emoji: true, steps: [{ h: big(ce, 'emo') + big(e, 'emo'), s: ja, seq: [[ja], [s, 2]] }] }; } },
+  eQA('e_whatcol', 'What color is it?（かいわ）', qaCol),
+  { id: 'e_isit', n: 'Is it 〜?（Yes / No）', q(d) { const L = eSub(ZOO, d); const [e, w, j] = pick(L); const yes = Math.random() < 0.5; const o = yes ? [e, w, j] : pick(L.filter((x) => x[1] !== w)); const s = `Is it ${enA(o[1])}?`; const a = yes ? 'Yes' : 'No';
+      return { text: '🔊 きいて こたえよう', sayQ: s, sayEn: true, viz: big(e, 'emo'), ans: a, choices: ['Yes', 'No'], en: true, steps: [{ h: big(e, 'emo') + big(j), s: `これは ${j}`, seq: [[`これは ${j}。えいごで`], [w, 1]] }, { h: big(e, 'emo') + big(a), s: yes ? `${o[2]}ですか？ → はい` : `${o[2]}ですか？ → いいえ`, seq: [[yes ? `${o[2]}ですか？ はい` : `${o[2]}ですか？ いいえ`], [s, 1], [yes ? 'Yes, it is.' : "No, it isn't.", 1]] }] }; } },
+  eQA('e_whats', "What's this?（かいわ）", qaWhat),
+  listen('e_home_l', 'おうちの もの（きく）', HOME, (x) => x),
+  eSen('e_want', 'I want 〜.（ほしい）', FOOD, (x) => `I want ${x[3]}.`, (x) => `${x[2]}が ほしい`),
+  listen('e_sea_l', 'うみの いきもの（きく）', SEA, (x) => x),
+  listen('e_bug_l', 'にわの いきもの・はな（きく）', BUG, (x) => x),
+  listen('e_nature_l', 'そらと しぜん（きく）', NATURE, (x) => x),
+  { id: 'e_abc1', n: 'アルファベット A〜M（きく）', q: abcQ(0, 13) },
+  { id: 'e_abc2', n: 'アルファベット N〜Z（きく）', q: abcQ(13, 26) },
+  { id: 'e_abc3', n: 'アルファベット A〜Z', q: abcQ(0, 26) },
+  { id: 'e_abcs', n: 'おおもじと こもじ', q() { const A = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split(''); const c = pick(A); const ng = shuffle(A.filter((x) => x !== c)).slice(0, 2).map((x) => x.toLowerCase()); return { text: `<div class="sk-big">${c}</div>ちいさい もじは どれ？`, sayQ: 'ちいさい もじは どれ？', ans: c.toLowerCase(), choices: shuffle([c.toLowerCase(), ...ng]), bigC: true, steps: [{ h: big(`${c} → ${c.toLowerCase()}`), s: 'おおもじと こもじ', seq: [['おおもじと こもじ。なまえは'], [c, 1]] }] }; } },
+  { id: 'e_abcl', n: 'こもじ（きく）', q() { const A = 'abcdefghijklmnopqrstuvwxyz'.split(''); const c = pick(A); const ng = shuffle(A.filter((x) => x !== c)).slice(0, 2); return { text: '🔊 きいて もじを えらんでね', sayQ: c.toUpperCase(), sayEn: true, viz: '<div class="sk-ear">👂</div>', ans: c, choices: shuffle([c, ...ng]), bigC: true, steps: [{ h: big(`${c.toUpperCase()} ${c}`), s: 'この もじの なまえは', seq: [['この もじの なまえは'], [c.toUpperCase(), 2]] }] }; } },
+  E.find((u) => u.id === 'e_first'),
+  { id: 'e_read1', n: 'みじかい ことばを よむ', q: readQ(READ3) },
+  { id: 'e_vowel', n: 'ぬけた もじ（c_t）', q() { const [e, w, j] = pick(READ3.concat([['🐟', 'fish', 'さかな'], ['🐸', 'frog', 'かえる'], ['🥛', 'milk', 'ぎゅうにゅう'], ['⚽', 'ball', 'ボール'], ['⭐', 'star', 'ほし']])); const i = w.search(/[aeiou]/); const v = w[i]; const ng = shuffle('aeiou'.split('').filter((x) => x !== v)).slice(0, 2); return { text: `${e} <b>${w.slice(0, i)}_${w.slice(i + 1)}</b><br>ぬけた もじは？`, sayQ: w, sayEn: true, ans: v, choices: shuffle([v, ...ng]), bigC: true, steps: enSteps(e, w, j) }; } },
+  { id: 'e_read2', n: 'ことばを よむ', q: readQ(READ_ALL) },
+  { id: 'e_spell', n: 'ただしい つづり', q(d) { const [e, w, j] = pick(eSub(READ_ALL.filter((x) => x[1].length >= 3 && x[1].length <= 6), d)); const bad = new Set(); let g = 0; while (bad.size < 2 && g++ < 40) { const a = [...w]; if (Math.random() < 0.5) { const i = R(0, a.length - 2); [a[i], a[i + 1]] = [a[i + 1], a[i]]; } else { const vi = a.map((c, k) => (/[aeiou]/.test(c) ? k : -1)).filter((k) => k >= 0); if (vi.length) { const k = pick(vi); a[k] = pick('aeiou'.split('').filter((c) => c !== a[k])); } } const t = a.join(''); if (t !== w && !READ_ALL.some((x) => x[1] === t)) bad.add(t); }
+      return { text: `${e} 🔊 ただしい つづりは？`, sayQ: w, sayEn: true, ans: w, choices: shuffle([w, ...bad]), steps: enSteps(e, w, j) }; } },
+  { id: 'e_days', n: 'ようび（きく）', q() { const [w, j] = pick(DAYS); const ng = shuffle(DAYS.filter((x) => x[0] !== w)).slice(0, 2).map((x) => x[1]); return { text: '🔊 なんようび？', sayQ: w, sayEn: true, viz: '<div class="sk-ear">👂</div>', ans: j, choices: shuffle([j, ...ng]), steps: [{ h: big(j) + big(w), s: `${j}は ${w}`, seq: [[`${j}は`], [w, 2]] }] }; } },
+  { id: 'e_can', n: 'Can 〜?（できる？）', q() { const [e, w, v, y] = pick(CAN); const s = `Can ${enA(w)} ${v}?`; const a = y ? 'Yes' : 'No'; const ja = `${ED[w] ? ED[w][1] : w}は ${CAN_JA[v]}？`; return { text: '🔊 きいて こたえよう', sayQ: s, sayEn: true, viz: big(e, 'emo'), ans: a, choices: ['Yes', 'No'], en: true, steps: [{ h: big(e, 'emo') + big(ja), s: ja, seq: [[ja], [s, 1]] }, { h: big(e, 'emo') + big(a), s: y ? 'できる → Yes' : 'できない → No', seq: [[y ? 'できるね' : 'できないね'], [y ? 'Yes, it can.' : "No, it can't.", 1]] }] }; } },
+  { id: 'e_readsen1', n: 'ぶんを よむ（I like 〜.）', q(d) { const L = eSub(FOOD, d); const x = pick(L); const s = `I like ${x[3]}.`; const ng = shuffle(L.filter((y) => y[1] !== x[1])).slice(0, 2).map((y) => y[0]); return { text: `<div class="sk-big">${s}</div>よんで えを えらぼう`, sayQ: 'よんで えを えらぼう', ans: x[0], choices: shuffle([x[0], ...ng]), emoji: true, steps: [{ h: big(x[0], 'emo') + big(s), s: `${x[2]}が すき`, seq: [[`${x[2]}が すき`], [s, 2]] }] }; } },
+  { id: 'e_readsen2', n: 'ぶんを よむ（いろいろ）', q(d) { const [list, mkS, mkJ] = pick(SENS); const L = eSub(list, d); const x = pick(L); const s = mkS(x), ja = mkJ(x); const ng = shuffle(L.filter((y) => y[1] !== x[1])).slice(0, 2).map((y) => y[0]); return { text: `<div class="sk-big">${s}</div>よんで えを えらぼう`, sayQ: 'よんで えを えらぼう', ans: x[0], choices: shuffle([x[0], ...ng]), emoji: true, steps: [{ h: big(x[0], 'emo') + big(s), s: ja, seq: [[ja], [s, 2]] }] }; } },
+  { id: 'e_qamix', n: 'かいわ まぜまぜ', q(d) { return eU[pick(['e_howru', 'e_howmany', 'e_wxq', 'e_whatcol', 'e_whats'])].q(d); } },
+  { id: 'e_senmix', n: 'ぶんを きく まぜまぜ', q(d) { return eU[pick(['e_like', 'e_see', 'e_iam', 'e_have', 'e_want'])].q(d); } },
+  { id: 'e_story', n: 'みじかい おはなし（2つの ぶん）', q(d) { const t = R(0, 2);
+      if (t === 0) { const L = eSub(FOOD, d); const x = pick(L); const s = `I'm hungry. I want ${x[3]}.`; const ja = `おなかが すいた。${x[2]}が ほしい`; const ng = shuffle(L.filter((y) => y[1] !== x[1])).slice(0, 2).map((y) => y[0]); return { text: '🔊 なにが ほしい？', sayQ: s, sayEn: true, viz: '<div class="sk-ear">👂</div>', ans: x[0], choices: shuffle([x[0], ...ng]), emoji: true, ng: enNgFor(x[0]), steps: [{ h: big(x[0], 'emo') + big(ja), s: ja, seq: [[ja], [s, 2]] }] }; }
+      if (t === 1) { const [we, ww, wj] = pick(WX); const x = pick(eSub(ZOO, d)); const s = `It's ${ww}. I see ${enA(x[1])}.`; const ja = `${wj}。${x[2]}が みえる`; const ng = shuffle(WX.filter((y) => y[1] !== ww)).slice(0, 2).map((y) => y[0]); return { text: '🔊 てんきは どれ？', sayQ: s, sayEn: true, viz: '<div class="sk-ear">👂</div>', ans: we, choices: shuffle([we, ...ng]), emoji: true, ng: enNgFor(we), steps: [{ h: big(we, 'emo') + big(x[0], 'emo') + big(ja), s: ja, seq: [[ja], [s, 2]] }] }; }
+      const [fe, fw, fj] = pick(FEEL.slice(0, 4)); const x = pick(eSub(THING, d)); const s = `I have ${enA(x[1])}. I'm ${fw}.`; const ja = `${x[2]}を もって いる。${fj}`; const ng = shuffle(FEEL.filter((y) => y[1] !== fw)).slice(0, 2).map((y) => y[0]); return { text: '🔊 どんな きもち？', sayQ: s, sayEn: true, viz: '<div class="sk-ear">👂</div>', ans: fe, choices: shuffle([fe, ...ng]), emoji: true, ng: enNgFor(fe), steps: [{ h: big(x[0], 'emo') + big(fe, 'emo') + big(ja), s: ja, seq: [[ja], [s, 2]] }] }; } },
+];
+NEWE2.forEach((u) => { eU[u.id] = u; });
 const order = (ids, ...lists) => ids.map((id) => { for (const l of lists) { const f = l.find((s) => s.id === id); if (f) return f; } throw new Error(id); });
 // ───────── がくねん・つき（小1 の きょうかしょの ながれ に あわせた じゅんばん。m＝がっこうの つき）
 const MON = { m_count: 4, m_cmp: 5, m_bunkai: 5, k_hira: 4, k_hira2: 5, m_make10: 6, m_add10: 6, m_sub10: 7, m_teen: 9, m_sub1x: 9, m_clock: 9, m_three: 10, m_carry9: 11, m_carry87: 11, m_carry: 11, m_shape: 12, m_borrow: 1, m_word: 2, m_carry2: 3, m_borrow2: 3,
@@ -1502,7 +1596,7 @@ const TB_MON = (u) => u.id.startsWith('tm_') ? (u.page < 88 ? 11 : u.page < 98 ?
 const TB_PAGE = Object.fromEntries([...TB_MATH, ...TB_KOKUGO].map((u) => [u.id, u.page]));
 const M2 = order(['m_count', 'm_cmp', 'm_bunkai', 'm_make10', 'm_add10', 'm_sub10', 'm_teen', 'm_sub1x', 'm_clock', 'm_three', 'm_carry9', 'm_carry87', 'm_carry', 'm_shape'], NEWM, M).concat(TB_MATH);
 const K2 = order(['k_hira', 'k_hira2', 'k_small', 'k_long', 'k_part', 'k_kana1', 'k_shugo', 'k_read', 'k_kata', 'k_kanjiR', 'k_bun', 'k_kanjiW', 'k_jun', 'k_kimochi'], NEWK, NEWK2, K).concat(TB_KOKUGO);
-const E2 = order(['e_listen', 'e_col', 'e_num', 'e_body', 'e_greet', 'e_ani', 'e_same'], NEWE, E); // e_first（さいしょの もじ）は もじが よめる ように なってから
+const E2 = order(['e_listen', 'e_col', 'e_num', 'e_body', 'e_greet', 'e_ani', 'e_same'], NEWE, E).concat(NEWE2); /* 8〜50：NEWE2 */ // e_first（さいしょの もじ）は もじが よめる ように なってから
 const SUBJ = { math: { n: 'さんすう', ic: '🔢', col: '#ff9a3c', L: M2 }, kokugo: { n: 'こくご', ic: '📖', col: '#ff6b8f', L: K2 }, eigo: { n: 'えいご', ic: '🔤', col: '#4dabf0', L: E2 } };
 
 // ───────── せかいの カード（5もん おわるごとに 1まい：どの あそびかたでも おなじ。2026-11-20）

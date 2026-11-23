@@ -1082,7 +1082,7 @@ const TB_KOKUGO = (() => {
   const plain = (s) => String(s).replace(RB, '$1').replace(/<[^>]+>/g, '');
   const lvOf = (d) => (d < 0.34 ? 1 : d < 0.67 ? 2 : 3);
   // いまの レベルの もんだいを おおめに、したの レベルも まぜる
-  const pool = (L, d) => { const v = lvOf(d); const f = L.filter((x) => (x.lv || 1) <= v); const top = f.filter((x) => (x.lv || 1) === v); return top.length && Math.random() < 0.6 ? top : f.length ? f : L; };
+  const pool = (L, d) => { const v = lvOf(d); const f = L.filter((x) => (x.lv || 1) <= v); const top = f.filter((x) => (x.lv || 1) === v); return top.length && Math.random() < Math.min(0.6, top.length * 0.1) ? top : f.length ? f : L; }; // いちばん うえの だんが すくない ときは、おなじ もんだい ばかりに ならない ように（2026-11-23：学校 ばかり でた）
   const opts = (a, ng, d) => { const A = D(a); const rest = shuffle(uniq(ng.map(D)).filter((x) => x !== A)); if (rest.length < 2) throw new Error('ng too few: ' + A); return shuffle([A, ...rest.slice(0, (d > 0.6 ? 4 : 3) - 1)]); };
   const look = (ch) => (ch.some((c) => plain(c).length > 4) ? { txt: true } : { bigC: true });
   const story = (t, k) => { const T = D(t); if (!k) return `<div class="sk-story">${T}</div>`; const K = D(k); if (!T.includes(K)) throw new Error('k not in t: ' + K); return `<div class="sk-story">${T.replace(K, `<span class="mark">${K}</span>`)}</div>`; };
@@ -1189,14 +1189,25 @@ const TB_KOKUGO = (() => {
 
   // ───── すきな きょうかを はなそう
   const KENTA = 'けんたさんが すきな きょうかを はっぴょうしました。「{一|ひと}つ{目|め}は、たいいくです。はしる ことが すきだからです。{二|ふた}つ{目|め}は、こくごです。かん{字|じ}を おぼえる ことが たのしいからです。」';
+  // 2026-11-23 木原さん「こたえが 学校の もんだいが 25もん中 4もん」→ おはなしを ふやして、学校は 1しゅるいに まとめる
+  const MIO = 'みおさんが すきな きょうかを はっぴょうしました。「{一|ひと}つ{目|め}は、ずこうです。えを かく ことが すきだからです。{二|ふた}つ{目|め}は、おんがくです。みんなで うたうと たのしいからです。」';
+  const SOU = 'そうたさんが すきな きょうかを はっぴょうしました。「{一|ひと}つ{目|め}は、さんすうです。けいさんが とける と うれしいからです。{二|ふた}つ{目|め}は、せいかつです。{虫|むし}を さがす ことが すきだからです。」';
   const kyouka = [
+    { lv: 1, t: MIO, q: 'みおさんの すきな きょうかは？', a: 'ずこうと おんがく', ng: ['たいいくと こくご', 'さんすうと ずこう', 'おんがくと せいかつ'], k: '{一|ひと}つ{目|め}は、ずこうです', hs: 'ひとつめと ふたつめを さがそう' },
+    { lv: 2, t: MIO, q: 'ずこうが すきな わけは？', a: 'えを かく ことが すきだから', ng: ['みんなで うたうと たのしいから', 'はしる ことが すきだから', 'けいさんが とけると うれしいから'], k: 'えを かく ことが すきだからです' },
+    { lv: 2, t: MIO, q: 'おんがくが すきな わけは？', a: 'みんなで うたうと たのしいから', ng: ['えを かく ことが すきだから', 'ほんを よむのが すきだから', 'ボールあそびが できるから'], k: 'みんなで うたうと たのしいからです' },
+    { lv: 1, t: SOU, q: 'そうたさんの すきな きょうかは？', a: 'さんすうと せいかつ', ng: ['ずこうと おんがく', 'たいいくと こくご', 'さんすうと こくご'], k: '{一|ひと}つ{目|め}は、さんすうです', hs: 'ひとつめと ふたつめを さがそう' },
+    { lv: 2, t: SOU, q: 'さんすうが すきな わけは？', a: 'けいさんが とけると うれしいから', ng: ['{虫|むし}を さがす ことが すきだから', 'うたが すきだから', 'はしる ことが すきだから'], k: 'けいさんが とける と うれしいからです' },
+    { lv: 2, t: SOU, q: 'せいかつが すきな わけは？', a: '{虫|むし}を さがす ことが すきだから', ng: ['けいさんが とけると うれしいから', 'えを かく ことが すきだから', 'かん{字|じ}を おぼえるのが たのしいから'], k: '{虫|むし}を さがす ことが すきだからです' },
+    { lv: 2, t: SOU, q: 'そうたさんが {二|ふた}つ{目|め}に いった きょうかは？', a: 'せいかつ', ng: ['さんすう', 'たいいく', 'おんがく'], k: '{二|ふた}つ{目|め}は、せいかつです' },
+    { lv: 2, t: MIO, q: 'みおさんが {一|ひと}つ{目|め}に いった きょうかは？', a: 'ずこう', ng: ['おんがく', 'こくご', 'さんすう'], k: '{一|ひと}つ{目|め}は、ずこうです' },
+    { lv: 2, q: 'はっぴょうで、はじめに いうと よいのは どれ？', a: 'すきな きょうかの なまえ', ng: ['さようなら', 'きのうの ばんごはん', 'ともだちの なまえ'], w: 'はじめに「すきな きょうか」、つぎに「わけ」を いうと わかりやすいね' },
     { lv: 1, t: KENTA, q: 'けんたさんの すきな きょうかは？', a: 'たいいくと こくご', ng: ['さんすうと おんがく', 'ずこうと たいいく', 'こくごと せいかつ'], k: '{一|ひと}つ{目|め}は、たいいくです', hs: 'ひとつめと ふたつめを さがそう' },
     { lv: 2, t: KENTA, q: 'たいいくが すきな わけは？', a: 'はしる ことが すきだから', ng: ['かん{字|じ}を おぼえるのが たのしいから', 'うたが すきだから', 'えを かくのが すきだから'], k: 'はしる ことが すきだからです' },
     { lv: 2, t: KENTA, q: 'こくごが すきな わけは？', a: 'かん{字|じ}を おぼえるのが たのしいから', ng: ['はしる ことが すきだから', 'ボールあそびが できるから', 'きゅうしょくが おいしいから'], k: 'かん{字|じ}を おぼえる ことが たのしいからです' },
     { lv: 2, q: '「わけ」を いって いる {文|ぶん}は どれ？', a: 'はしるのが たのしいからです。', ng: ['ぼくは、たいいくが すきです。', 'すきな きょうかは なんですか。', 'いっしょに はしろうね。'], k: '「〜から」', hs: 'わけを いう ときは', w: '「からです」が わけの めじるし' },
     { lv: 1, q: 'みんなの まえで はなす ときは、どんな こえ？', a: 'うしろの {人|ひと}にも きこえる こえ', ng: ['となりの {人|ひと}だけに きこえる こえ', 'とても はやい こえ', 'ないしょばなしの こえ'], w: 'おおきな こえで、ゆっくり はなすと ききやすいね' },
-    F(3, (d) => kjR([{ s: '[学校|がっこう]へ いく。', ng: ['がくこう', 'かっこう', 'がっこ'] }], d)),
-    F(3, (d) => kjW([{ s: '[学校|がっこう]に いく', ng: ['字校', '子校', '学木'], w: 'がっこうの がは、うえに てんが みっつ' }], d)),
+    F(3, (d) => (Math.random() < 0.5 ? kjR([{ s: '[学校|がっこう]へ いく。', ng: ['がくこう', 'かっこう', 'がっこ'] }], d) : kjW([{ s: '[学校|がっこう]に いく', ng: ['字校', '子校', '学木'], w: 'がっこうの がは、うえに てんが みっつ' }], d))),
   ];
 
   // ───── ことばで あそぼう
@@ -2354,14 +2365,16 @@ export function openSekai(opt0 = {}) {
     d.querySelector('.cont').onclick = fin; setTimeout(() => d.querySelector('.cont').focus(), 50); setTimeout(fin, 20000);
     (async () => { try {
       await say(text, { en: true }); if (done) return;
-      try { stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } }); } catch (e) { micNo = true; return fin(); } if (done) { stream.getTracks().forEach((t) => t.stop()); return; }
+      try { stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: true } }); } catch (e) { micNo = true; msg.textContent = 'マイクが つかえません（おうちの ひとに みせてね）'; await wait(2500); return fin(); } if (done) { stream.getTracks().forEach((t) => t.stop()); return; }
       const c = ac(), src = c.createMediaStreamSource(stream), an = c.createAnalyser(); an.fftSize = 1024; src.connect(an); const buf = new Float32Array(an.fftSize); const chunks = []; rec = new MediaRecorder(stream); rec.ondataavailable = (e) => e.data.size && chunks.push(e.data); rec.start();
-      mic.classList.add('on'); msg.textContent = 'どうぞ！ おおきな こえで'; SE.tap();
-      const t0 = performance.now(); let floor = 0, fn = 0, loud = 0, last = 0, heard = false;
+      mic.classList.add('on'); msg.textContent = 'どうぞ！ おおきな こえで'; /* ここで おとを ならさない（マイクが ひろって しずかさの きじゅんが くるう） */
+      const t0 = performance.now(); let floor = 0, fn = 0, loud = 0, last = 0, heard = false, mx = 0;
       await new Promise((r) => { const tick = () => { if (done) return r(); an.getFloatTimeDomainData(buf); let sum = 0; for (let i = 0; i < buf.length; i++) sum += buf[i] * buf[i]; const rms = Math.sqrt(sum / buf.length), t = performance.now() - t0;
-        if (t < 250) { floor += rms; fn++; } else { const th = Math.max(0.02, (floor / Math.max(1, fn)) * 3); if (rms > th) { loud += 16.7; last = t; if (loud > 220) heard = true; } }
-        ring.style.transform = `scale(${1 + Math.min(1.2, rms * 9)})`; if ((heard && t - last > 800) || t > (heard ? 5000 : 4200)) return r(); raf = requestAnimationFrame(tick); }; tick(); });
+        if (rms > mx) mx = rms; let pk = 0; for (let i = 0; i < buf.length; i++) { const v = Math.abs(buf[i]); if (v > pk) pk = v; }
+        if (t > 120 && t < 400) { floor += rms; fn++; } else if (t >= 400) { const f0 = floor / Math.max(1, fn); const th = Math.max(0.006, f0 * 2.2); if (rms > th || pk > Math.max(0.05, f0 * 8)) { loud += 16.7; last = t; if (loud > 130) heard = true; } }
+        ring.style.transform = `scale(${1 + Math.min(1.4, rms * 30)})`; if ((heard && t - last > 800) || t > (heard ? 6000 : 5500)) return r(); raf = requestAnimationFrame(tick); }; tick(); });
       if (done) return; mic.classList.remove('on'); ring.style.transform = ''; const stopped = new Promise((r) => { rec.onstop = r; }); try { rec.stop(); } catch (e) {} await stopped; try { stream.getTracks().forEach((t) => t.stop()); src.disconnect(); } catch (e) {}
+      if (!heard && mx === 0) heard = true; // マイクの おとが はかれない たんまつ：ろくおんは できて いるので OK に する
       if (!heard) { msg.textContent = 'また こんど いってみよう'; await wait(900); return fin(); }
       msg.innerHTML = '<b>いえたね！ +1えん</b>'; d.classList.add('ok'); SE.card(); earnYen(p, 1); session.pend = (session.pend || 0) + 1; p.spk = (p.spk || 0) + 1; saveProgress(p); pouchUI(); { const r0 = root.getBoundingClientRect(), r1 = mic.getBoundingClientRect(); spark3(r1.left - r0.left + r1.width / 2, r1.top - r0.top + r1.height / 2); }
       await wait(700); if (done) return; msg.textContent = 'じぶんの こえ'; url = URL.createObjectURL(new Blob(chunks, { type: rec.mimeType || 'audio/webm' })); await new Promise((r) => { const a = new Audio(url); a.onended = a.onerror = r; setTimeout(r, 6000); a.play().catch(r); });

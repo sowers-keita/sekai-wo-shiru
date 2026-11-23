@@ -1106,7 +1106,7 @@ const TB_KOKUGO = (() => {
   const ordQ = (title, L, d, extra = []) => { // 2026-11-20 アストラ：おはなし ぜんぶを おぼえて いるか ではなく、その ばで ならびを よむ
     const n = L.length; const st = R(0, Math.max(0, n - 3)), W = L.slice(st, st + 3); const bi = lvOf(d) === 1 ? pick([0, 2]) : R(0, W.length - 1); const a = W[bi];
     const ng = L.filter((x) => !W.includes(x)); const ch = opts(a, ng.length >= 2 ? ng : [...ng, ...extra, ...W.filter((x) => x !== a)], d);
-    const list = (fill) => `<div class="sk-story">${W.map((x, i) => `<div>${i + 1}. ${i === bi ? (fill ? `<span class="mark">${D(x)}</span>` : '<b class="mark">（　　）</b>') : D(x)}</div>`).join('')}</div>`;
+    const list = (fill) => `<div class="sk-story">${W.map((x, i) => `<div>${i ? '<span style="opacity:.55">↓</span> ' : '　 '}${i === bi ? (fill ? `<span class="mark">${D(x)}</span>` : '<b class="mark">（　　）</b>') : D(x)}</div>`).join('')}</div>`;
     const ref = bi > 0 ? W[bi - 1] : W[1], rel = bi > 0 ? 'つぎ' : 'まえ'; // こえは まえと おなじ いいかた（ずんだもんの こえが ある）
     return { text: `${D(title)}\n${list(false)}「${D(ref)}」の ${rel}は どれ？`, sayQ: Y(`${title}で、「${ref}」の ${rel}は どれ？`), ans: D(a), choices: ch, txt: true,
       steps: [{ h: list(true), s: Y(`じゅんばんに ならべると、${L.join('、')}`) }, { h: list(true), s: Y(`「${ref}」の ${rel}は、${a}`) }] };
@@ -2333,7 +2333,7 @@ export function openSekai(opt0 = {}) {
       if (session.pre) { const id = PRE[session.pre]; session.pre = null; for (const k of Object.keys(SUBJ)) { const i = SUBJ[k].L.findIndex((s) => s.id === id); if (i >= 0) { forced = build(SUBJ[k], i, 0, false, k, p.subj[k].r); forced.slot = 'down'; forced.retry = 'もとに なる もんだいで れんしゅう'; forced.preQ = true; } } }
       if (!forced && session.down) { forced = makeQ(p, chooseSubj(p, session.prefer), 'down'); forced.slot = 'down'; session.down = false; }
       else if ((slot === 'review' || (slot === 'cur' && due.length >= 3)) && due.length) { forced = reviewQ(p, pick(due)); if (forced) forced.slot = 'review'; }
-      if (!forced) { const m = slot === 'review' ? 'cur' : slot; forced = makeQ(p, chooseSubj(p, session.prefer), m === 'cur' ? null : m); forced.slot = m; }
+      if (!forced) { const m = slot === 'review' ? 'cur' : slot; const sj0 = chooseSubj(p, session.prefer); const keyOf = (q) => q.sk + '|' + String(q.text).replace(/<[^>]+>/g, '') + '|' + (q.sayEn ? q.sayQ : '') + '|' + q.ans; session.seenQ = session.seenQ || []; let n0 = 0; do { forced = makeQ(p, sj0, m === 'cur' ? null : m); } while (session.seenQ.includes(keyOf(forced)) && ++n0 < 8); session.seenQ.push(keyOf(forced)); if (session.seenQ.length > 15) session.seenQ.shift(); forced.slot = m; } // おなじ もんだいを つづけて ださない（アストラ 28）
       forced.plan = session.plan.length; session.plan.push({ slot: forced.slot, sk: forced.sk, ok: null });
     }
     q = forced; sj = q.sj;
